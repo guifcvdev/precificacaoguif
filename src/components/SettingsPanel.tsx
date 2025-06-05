@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ArrowDown, Settings } from 'lucide-react';
 import { PricingConfig, formatCurrency } from '../types/pricing';
@@ -7,6 +8,41 @@ interface Props {
   onSave: (config: PricingConfig) => void;
   onClose: () => void;
 }
+
+interface ConfigSectionProps {
+  title: string;
+  section: string;
+  fields: Array<{key: string, label: string, unit?: string}>;
+  editConfig: any;
+  updateConfig: (section: string, field: string, value: string) => void;
+}
+
+const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, editConfig, updateConfig }) => (
+  <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {fields.map(field => (
+        <div key={`${section}-${field.key}`}>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {field.label} {field.unit && `(${field.unit})`}
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+            <input
+              type="text"
+              value={editConfig[section]?.[field.key] || ''}
+              onChange={(e) => updateConfig(section, field.key, e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="0,00"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+));
+
+ConfigSection.displayName = 'ConfigSection';
 
 const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
   // Convert numbers to strings for editing
@@ -57,36 +93,6 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
     }));
   };
 
-  const formatInputValue = (value: string) => {
-    // Ensure we have a string
-    return value || '';
-  };
-
-  const ConfigSection = ({ title, section, fields }: { title: string; section: string; fields: Array<{key: string, label: string, unit?: string}> }) => (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {fields.map(field => (
-          <div key={field.key}>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {field.label} {field.unit && `(${field.unit})`}
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
-              <input
-                type="text"
-                value={formatInputValue(editConfig[section]?.[field.key] || '')}
-                onChange={(e) => updateConfig(section, field.key, e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="0,00"
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
@@ -132,6 +138,8 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             { key: 'adesivoPerfurado', label: 'Adesivo Perfurado', unit: 'm²' },
             { key: 'imantado', label: 'Imantado', unit: 'm²' },
           ]}
+          editConfig={editConfig}
+          updateConfig={updateConfig}
         />
 
         <ConfigSection
@@ -143,6 +151,8 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             { key: 'lonaBacklight', label: 'Lona Backlight', unit: 'm²' },
             { key: 'soRefile', label: 'Só Refile', unit: 'm²' },
           ]}
+          editConfig={editConfig}
+          updateConfig={updateConfig}
         />
 
         <ConfigSection
@@ -158,6 +168,8 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             { key: 'somentePlaca', label: 'Adicional Somente Placa', unit: 'm²' },
             { key: 'placaAdesivada', label: 'Adicional Placa Adesivada', unit: 'm²' },
           ]}
+          editConfig={editConfig}
+          updateConfig={updateConfig}
         />
 
         <ConfigSection
@@ -166,6 +178,8 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
           fields={[
             { key: 'preco', label: 'Preço por m²', unit: 'm²' },
           ]}
+          editConfig={editConfig}
+          updateConfig={updateConfig}
         />
 
         <ConfigSection
@@ -179,6 +193,8 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             { key: 'acm150', label: 'ACM 1.50m', unit: 'unid' },
             { key: 'cantoneira', label: 'Cantoneira 3/4', unit: 'unid' },
           ]}
+          editConfig={editConfig}
+          updateConfig={updateConfig}
         />
 
         <ConfigSection
@@ -192,6 +208,8 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             { key: 'pinturaAutomotiva', label: 'Adicional Pintura Automotiva', unit: 'm²' },
             { key: 'fitaDuplaFace', label: 'Adicional Fita Dupla-Face', unit: 'm²' },
           ]}
+          editConfig={editConfig}
+          updateConfig={updateConfig}
         />
 
         <ConfigSection
@@ -203,6 +221,8 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             { key: 'espessura8mm', label: 'Adicional Espessura 8mm', unit: 'm²' },
             { key: 'prolongadores', label: 'Prolongadores', unit: 'unid' },
           ]}
+          editConfig={editConfig}
+          updateConfig={updateConfig}
         />
       </div>
     </div>
