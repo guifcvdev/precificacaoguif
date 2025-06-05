@@ -9,6 +9,7 @@ interface Props {
 const FachadaCalculator: React.FC<Props> = ({ config }) => {
   const [larguraLona, setLarguraLona] = useState<number>(0);
   const [alturaLona, setAlturaLona] = useState<number>(0);
+  const [quantidadeLona, setQuantidadeLona] = useState<number>(1);
   const [quantities, setQuantities] = useState({
     metalon20x20: 0,
     metalon30x20: 0,
@@ -19,6 +20,7 @@ const FachadaCalculator: React.FC<Props> = ({ config }) => {
   const [total, setTotal] = useState<number>(0);
 
   const areaLona = larguraLona * alturaLona;
+  const areaLonaTotal = areaLona * quantidadeLona;
 
   const items = [
     { id: 'metalon20x20', label: 'Metalon 20x20', price: config.metalon20x20, unit: 'unid' },
@@ -32,8 +34,9 @@ const FachadaCalculator: React.FC<Props> = ({ config }) => {
     let totalValue = 0;
     
     // Calculate lona cost
-    if (areaLona > 0) {
-      totalValue += calculateMinimumCharge(areaLona * config.lona);
+    if (areaLona > 0 && quantidadeLona > 0) {
+      const unitLonaTotal = calculateMinimumCharge(areaLona * config.lona);
+      totalValue += unitLonaTotal * quantidadeLona;
     }
     
     // Calculate unit items cost
@@ -47,7 +50,7 @@ const FachadaCalculator: React.FC<Props> = ({ config }) => {
     });
     
     setTotal(totalValue);
-  }, [larguraLona, alturaLona, quantities, config]);
+  }, [larguraLona, alturaLona, quantidadeLona, quantities, config]);
 
   const handleQuantityChange = (itemId: string, value: number) => {
     setQuantities(prev => ({
@@ -69,7 +72,7 @@ const FachadaCalculator: React.FC<Props> = ({ config }) => {
             <label className="block text-sm font-medium text-gray-700 mb-4">
               Dimensões da Lona
             </label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Largura (m)</label>
                 <input
@@ -94,10 +97,21 @@ const FachadaCalculator: React.FC<Props> = ({ config }) => {
                   placeholder="0.00"
                 />
               </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Quantidade</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={quantidadeLona || ''}
+                  onChange={(e) => setQuantidadeLona(parseInt(e.target.value) || 1)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="1"
+                />
+              </div>
             </div>
             {areaLona > 0 && (
               <p className="text-sm text-gray-600 mt-2">
-                Área calculada: {areaLona.toFixed(2)} m² - Preço: {formatCurrency(config.lona)}/m²
+                Área unitária: {areaLona.toFixed(2)} m² | Área total: {areaLonaTotal.toFixed(2)} m² - Preço: {formatCurrency(config.lona)}/m²
               </p>
             )}
           </div>
@@ -137,19 +151,27 @@ const FachadaCalculator: React.FC<Props> = ({ config }) => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Orçamento</h3>
           
           <div className="space-y-3">
-            {areaLona > 0 && (
+            {areaLona > 0 && quantidadeLona > 0 && (
               <>
                 <div className="flex justify-between text-sm">
                   <span>Dimensões da Lona:</span>
                   <span>{larguraLona.toFixed(2)} x {alturaLona.toFixed(2)} m</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Área da Lona:</span>
+                  <span>Quantidade de Lonas:</span>
+                  <span>{quantidadeLona} unidade(s)</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Área unitária:</span>
                   <span>{areaLona.toFixed(2)} m²</span>
                 </div>
                 <div className="flex justify-between text-sm">
+                  <span>Área total:</span>
+                  <span>{areaLonaTotal.toFixed(2)} m²</span>
+                </div>
+                <div className="flex justify-between text-sm">
                   <span>Custo da Lona:</span>
-                  <span>{formatCurrency(calculateMinimumCharge(areaLona * config.lona))}</span>
+                  <span>{formatCurrency(calculateMinimumCharge(areaLona * config.lona) * quantidadeLona)}</span>
                 </div>
               </>
             )}

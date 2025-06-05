@@ -9,11 +9,13 @@ interface Props {
 const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
   const [largura, setLargura] = useState<number>(0);
   const [altura, setAltura] = useState<number>(0);
+  const [quantidade, setQuantidade] = useState<number>(1);
   const [espessura, setEspessura] = useState<string>('');
   const [addOns, setAddOns] = useState<string[]>([]);
   const [total, setTotal] = useState<number>(0);
 
   const area = largura * altura;
+  const areaTotal = area * quantidade;
 
   const espessuraOptions = [
     { id: '10mm', label: '10mm', price: config.espessura10mm },
@@ -27,7 +29,7 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
   ];
 
   useEffect(() => {
-    if (area > 0 && espessura) {
+    if (area > 0 && espessura && quantidade > 0) {
       const espessuraOption = espessuraOptions.find(opt => opt.id === espessura);
       let pricePerM2 = espessuraOption?.price || 0;
       
@@ -39,12 +41,12 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
         }
       });
       
-      const calculatedTotal = calculateMinimumCharge(area * pricePerM2);
-      setTotal(calculatedTotal);
+      const unitTotal = calculateMinimumCharge(area * pricePerM2);
+      setTotal(unitTotal * quantidade);
     } else {
       setTotal(0);
     }
-  }, [largura, altura, espessura, addOns, config]);
+  }, [largura, altura, quantidade, espessura, addOns, config]);
 
   const handleAddOnChange = (addOnId: string, checked: boolean) => {
     if (checked) {
@@ -67,7 +69,7 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
             <label className="block text-sm font-medium text-gray-700 mb-4">
               Dimensões
             </label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Largura (m)</label>
                 <input
@@ -92,10 +94,21 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
                   placeholder="0.00"
                 />
               </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Quantidade</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={quantidade || ''}
+                  onChange={(e) => setQuantidade(parseInt(e.target.value) || 1)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="1"
+                />
+              </div>
             </div>
             {area > 0 && (
               <p className="text-sm text-gray-600 mt-2">
-                Área calculada: {area.toFixed(2)} m²
+                Área unitária: {area.toFixed(2)} m² | Área total: {areaTotal.toFixed(2)} m²
               </p>
             )}
           </div>
@@ -160,15 +173,23 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
         <div className="bg-gray-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Orçamento</h3>
           
-          {area > 0 && espessura && (
+          {area > 0 && espessura && quantidade > 0 && (
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span>Dimensões:</span>
                 <span>{largura.toFixed(2)} x {altura.toFixed(2)} m</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Área:</span>
+                <span>Quantidade:</span>
+                <span>{quantidade} unidade(s)</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>Área unitária:</span>
                 <span>{area.toFixed(2)} m²</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>Área total:</span>
+                <span>{areaTotal.toFixed(2)} m²</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Espessura:</span>
@@ -188,9 +209,9 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
             </div>
           )}
 
-          {(area <= 0 || !espessura) && (
+          {(area <= 0 || !espessura || quantidade <= 0) && (
             <p className="text-gray-500 text-center py-8">
-              Preencha as dimensões e selecione a espessura para ver o orçamento
+              Preencha as dimensões, quantidade e selecione a espessura para ver o orçamento
             </p>
           )}
         </div>

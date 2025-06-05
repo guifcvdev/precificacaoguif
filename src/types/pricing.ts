@@ -20,6 +20,7 @@ export interface PlacaPSConfig {
   espessura2mm: number;
   transparente: number;
   leitoso: number;
+  brancoPreto: number;
   somentePlaca: number;
   placaAdesivada: number;
 }
@@ -83,6 +84,7 @@ export const defaultConfig: PricingConfig = {
     espessura2mm: 35.00,
     transparente: 0.00,
     leitoso: 5.00,
+    brancoPreto: 2.00,
     somentePlaca: 0.00,
     placaAdesivada: 10.00,
   },

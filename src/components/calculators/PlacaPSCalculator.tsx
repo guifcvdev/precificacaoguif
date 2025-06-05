@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { PlacaPSConfig, formatCurrency, calculateMinimumCharge } from '../../types/pricing';
 
@@ -8,15 +9,17 @@ interface Props {
 const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
   const [largura, setLargura] = useState<number>(0);
   const [altura, setAltura] = useState<number>(0);
+  const [quantidade, setQuantidade] = useState<number>(1);
   const [espessura, setEspessura] = useState<string>('');
-  const [tipo, setTipo] = useState<string>('');
   const [acabamento, setAcabamento] = useState<string>('');
+  const [tipo, setTipo] = useState<string>('');
   const [total, setTotal] = useState<number>(0);
 
   const area = largura * altura;
+  const areaTotal = area * quantidade;
 
   useEffect(() => {
-    if (area > 0 && espessura && tipo && acabamento) {
+    if (area > 0 && espessura && acabamento && tipo && quantidade > 0) {
       let pricePerM2 = 0;
       
       // Base price according to thickness
@@ -29,6 +32,8 @@ const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
       // Add type price
       if (tipo === 'leitoso') {
         pricePerM2 += config.leitoso;
+      } else if (tipo === 'brancoPreto') {
+        pricePerM2 += config.brancoPreto;
       }
       
       // Add finishing price
@@ -36,12 +41,12 @@ const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
         pricePerM2 += config.placaAdesivada;
       }
       
-      const calculatedTotal = calculateMinimumCharge(area * pricePerM2);
-      setTotal(calculatedTotal);
+      const unitTotal = calculateMinimumCharge(area * pricePerM2);
+      setTotal(unitTotal * quantidade);
     } else {
       setTotal(0);
     }
-  }, [largura, altura, espessura, tipo, acabamento, config]);
+  }, [largura, altura, quantidade, espessura, acabamento, tipo, config]);
 
   return (
     <div className="p-6">
@@ -56,7 +61,7 @@ const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
             <label className="block text-sm font-medium text-gray-700 mb-4">
               Dimensões
             </label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Largura (m)</label>
                 <input
@@ -81,10 +86,21 @@ const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
                   placeholder="0.00"
                 />
               </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Quantidade</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={quantidade || ''}
+                  onChange={(e) => setQuantidade(parseInt(e.target.value) || 1)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="1"
+                />
+              </div>
             </div>
             {area > 0 && (
               <p className="text-sm text-gray-600 mt-2">
-                Área calculada: {area.toFixed(2)} m²
+                Área unitária: {area.toFixed(2)} m² | Área total: {areaTotal.toFixed(2)} m²
               </p>
             )}
           </div>
@@ -137,52 +153,6 @@ const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-4">
-              Tipo
-            </label>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                <div className="flex items-center">
-                  <input
-                    type="radio"
-                    id="transparente"
-                    name="tipo"
-                    value="transparente"
-                    checked={tipo === 'transparente'}
-                    onChange={(e) => setTipo(e.target.value)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                  />
-                  <label htmlFor="transparente" className="ml-3 text-sm font-medium text-gray-700">
-                    Transparente
-                  </label>
-                </div>
-                <span className="text-sm text-gray-500">
-                  +{formatCurrency(config.transparente)}/m²
-                </span>
-              </div>
-              <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                <div className="flex items-center">
-                  <input
-                    type="radio"
-                    id="leitoso"
-                    name="tipo"
-                    value="leitoso"
-                    checked={tipo === 'leitoso'}
-                    onChange={(e) => setTipo(e.target.value)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                  />
-                  <label htmlFor="leitoso" className="ml-3 text-sm font-medium text-gray-700">
-                    Leitoso
-                  </label>
-                </div>
-                <span className="text-sm text-gray-500">
-                  +{formatCurrency(config.leitoso)}/m²
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">
               Acabamento
             </label>
             <div className="space-y-2">
@@ -226,32 +196,105 @@ const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
               </div>
             </div>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-4">
+              Tipo
+            </label>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    id="transparente"
+                    name="tipo"
+                    value="transparente"
+                    checked={tipo === 'transparente'}
+                    onChange={(e) => setTipo(e.target.value)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                  <label htmlFor="transparente" className="ml-3 text-sm font-medium text-gray-700">
+                    Transparente
+                  </label>
+                </div>
+                <span className="text-sm text-gray-500">
+                  +{formatCurrency(config.transparente)}/m²
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    id="leitoso"
+                    name="tipo"
+                    value="leitoso"
+                    checked={tipo === 'leitoso'}
+                    onChange={(e) => setTipo(e.target.value)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                  <label htmlFor="leitoso" className="ml-3 text-sm font-medium text-gray-700">
+                    Leitoso
+                  </label>
+                </div>
+                <span className="text-sm text-gray-500">
+                  +{formatCurrency(config.leitoso)}/m²
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    id="brancoPreto"
+                    name="tipo"
+                    value="brancoPreto"
+                    checked={tipo === 'brancoPreto'}
+                    onChange={(e) => setTipo(e.target.value)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                  <label htmlFor="brancoPreto" className="ml-3 text-sm font-medium text-gray-700">
+                    Branco/Preto
+                  </label>
+                </div>
+                <span className="text-sm text-gray-500">
+                  +{formatCurrency(config.brancoPreto)}/m²
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="bg-gray-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Orçamento</h3>
           
-          {area > 0 && espessura && tipo && acabamento && (
+          {area > 0 && espessura && acabamento && tipo && quantidade > 0 && (
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span>Dimensões:</span>
                 <span>{largura.toFixed(2)} x {altura.toFixed(2)} m</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Área:</span>
+                <span>Quantidade:</span>
+                <span>{quantidade} unidade(s)</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>Área unitária:</span>
                 <span>{area.toFixed(2)} m²</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>Área total:</span>
+                <span>{areaTotal.toFixed(2)} m²</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Espessura:</span>
                 <span>{espessura}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Tipo:</span>
-                <span>{tipo === 'transparente' ? 'Transparente' : 'Leitoso'}</span>
-              </div>
-              <div className="flex justify-between text-sm">
                 <span>Acabamento:</span>
                 <span>{acabamento === 'somentePlaca' ? 'Somente Placa' : 'Placa Adesivada'}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>Tipo:</span>
+                <span>{tipo === 'transparente' ? 'Transparente' : tipo === 'leitoso' ? 'Leitoso' : 'Branco/Preto'}</span>
               </div>
               <hr className="my-3" />
               <div className="flex justify-between text-lg font-bold text-blue-600">
@@ -261,7 +304,7 @@ const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
             </div>
           )}
 
-          {(area <= 0 || !espessura || !tipo || !acabamento) && (
+          {(area <= 0 || !espessura || !acabamento || !tipo || quantidade <= 0) && (
             <p className="text-gray-500 text-center py-8">
               Preencha todos os campos para ver o orçamento
             </p>

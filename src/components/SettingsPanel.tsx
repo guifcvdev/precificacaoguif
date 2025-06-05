@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowDown, Settings } from 'lucide-react';
 import { PricingConfig, formatCurrency } from '../types/pricing';
@@ -120,6 +119,7 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             { key: 'espessura2mm', label: 'Espessura 2mm', unit: 'm²' },
             { key: 'transparente', label: 'Adicional Transparente', unit: 'm²' },
             { key: 'leitoso', label: 'Adicional Leitoso', unit: 'm²' },
+            { key: 'brancoPreto', label: 'Adicional Branco/Preto', unit: 'm²' },
             { key: 'somentePlaca', label: 'Somente Placa', unit: 'm²' },
             { key: 'placaAdesivada', label: 'Placa Adesivada', unit: 'm²' },
           ]}
