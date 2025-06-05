@@ -7,8 +7,11 @@ interface Props {
 }
 
 const PlacaACMCalculator: React.FC<Props> = ({ config }) => {
-  const [area, setArea] = useState<number>(0);
+  const [largura, setLargura] = useState<number>(0);
+  const [altura, setAltura] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
+
+  const area = largura * altura;
 
   useEffect(() => {
     if (area > 0) {
@@ -17,30 +20,52 @@ const PlacaACMCalculator: React.FC<Props> = ({ config }) => {
     } else {
       setTotal(0);
     }
-  }, [area, config]);
+  }, [largura, altura, config]);
 
   return (
     <div className="p-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Calculadora de Placa em ACM</h2>
-        <p className="text-gray-600">Informe a área em metros quadrados para calcular o preço.</p>
+        <p className="text-gray-600">Informe as dimensões para calcular o preço.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Área (m²)
+            <label className="block text-sm font-medium text-gray-700 mb-4">
+              Dimensões
             </label>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={area || ''}
-              onChange={(e) => setArea(parseFloat(e.target.value) || 0)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="0.00"
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Largura (m)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={largura || ''}
+                  onChange={(e) => setLargura(parseFloat(e.target.value) || 0)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Altura (m)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={altura || ''}
+                  onChange={(e) => setAltura(parseFloat(e.target.value) || 0)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+            {area > 0 && (
+              <p className="text-sm text-gray-600 mt-2">
+                Área calculada: {area.toFixed(2)} m²
+              </p>
+            )}
           </div>
 
           <div className="bg-blue-50 p-4 rounded-lg">
@@ -59,6 +84,10 @@ const PlacaACMCalculator: React.FC<Props> = ({ config }) => {
           
           {area > 0 && (
             <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span>Dimensões:</span>
+                <span>{largura.toFixed(2)} x {altura.toFixed(2)} m</span>
+              </div>
               <div className="flex justify-between text-sm">
                 <span>Área:</span>
                 <span>{area.toFixed(2)} m²</span>
@@ -82,7 +111,7 @@ const PlacaACMCalculator: React.FC<Props> = ({ config }) => {
 
           {area <= 0 && (
             <p className="text-gray-500 text-center py-8">
-              Informe a área para ver o orçamento
+              Informe as dimensões para ver o orçamento
             </p>
           )}
         </div>
