@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ArrowDown, Settings } from 'lucide-react';
 import { PricingConfig, formatCurrency } from '../types/pricing';
@@ -115,13 +116,14 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
           title="Placa em PS"
           section="placaPS"
           fields={[
-            { key: 'espessura1mm', label: 'Espessura 1mm', unit: 'm²' },
-            { key: 'espessura2mm', label: 'Espessura 2mm', unit: 'm²' },
+            { key: 'base', label: 'Preço Base', unit: 'm²' },
+            { key: 'espessura1mm', label: 'Adicional Espessura 1mm', unit: 'm²' },
+            { key: 'espessura2mm', label: 'Adicional Espessura 2mm', unit: 'm²' },
             { key: 'transparente', label: 'Adicional Transparente', unit: 'm²' },
             { key: 'leitoso', label: 'Adicional Leitoso', unit: 'm²' },
             { key: 'brancoPreto', label: 'Adicional Branco/Preto', unit: 'm²' },
-            { key: 'somentePlaca', label: 'Somente Placa', unit: 'm²' },
-            { key: 'placaAdesivada', label: 'Placa Adesivada', unit: 'm²' },
+            { key: 'somentePlaca', label: 'Adicional Somente Placa', unit: 'm²' },
+            { key: 'placaAdesivada', label: 'Adicional Placa Adesivada', unit: 'm²' },
           ]}
         />
 
@@ -150,11 +152,12 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
           title="Letra Caixa em PVC"
           section="letraCaixa"
           fields={[
-            { key: 'espessura10mm', label: 'Espessura 10mm', unit: 'm²' },
-            { key: 'espessura15mm', label: 'Espessura 15mm', unit: 'm²' },
-            { key: 'espessura20mm', label: 'Espessura 20mm', unit: 'm²' },
-            { key: 'pinturaAutomotiva', label: 'Pintura Automotiva', unit: 'm²' },
-            { key: 'fitaDuplaFace', label: 'Fita Dupla-Face', unit: 'm²' },
+            { key: 'base', label: 'Preço Base', unit: 'm²' },
+            { key: 'espessura10mm', label: 'Adicional Espessura 10mm', unit: 'm²' },
+            { key: 'espessura15mm', label: 'Adicional Espessura 15mm', unit: 'm²' },
+            { key: 'espessura20mm', label: 'Adicional Espessura 20mm', unit: 'm²' },
+            { key: 'pinturaAutomotiva', label: 'Adicional Pintura Automotiva', unit: 'm²' },
+            { key: 'fitaDuplaFace', label: 'Adicional Fita Dupla-Face', unit: 'm²' },
           ]}
         />
 
@@ -162,8 +165,9 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
           title="Vidro Temperado"
           section="vidro"
           fields={[
-            { key: 'espessura6mm', label: 'Espessura 6mm', unit: 'm²' },
-            { key: 'espessura8mm', label: 'Espessura 8mm', unit: 'm²' },
+            { key: 'base', label: 'Preço Base', unit: 'm²' },
+            { key: 'espessura6mm', label: 'Adicional Espessura 6mm', unit: 'm²' },
+            { key: 'espessura8mm', label: 'Adicional Espessura 8mm', unit: 'm²' },
             { key: 'prolongadores', label: 'Prolongadores', unit: 'unid' },
           ]}
         />

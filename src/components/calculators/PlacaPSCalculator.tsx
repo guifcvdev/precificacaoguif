@@ -20,13 +20,13 @@ const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
 
   useEffect(() => {
     if (area > 0 && espessura && acabamento && tipo && quantidade > 0) {
-      let pricePerM2 = 0;
+      let pricePerM2 = config.base;
       
-      // Base price according to thickness
+      // Add thickness price
       if (espessura === '1mm') {
-        pricePerM2 = config.espessura1mm;
+        pricePerM2 += config.espessura1mm;
       } else if (espessura === '2mm') {
-        pricePerM2 = config.espessura2mm;
+        pricePerM2 += config.espessura2mm;
       }
       
       // Add type price
@@ -35,11 +35,13 @@ const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
       } else if (tipo === 'brancoPreto') {
         pricePerM2 += config.brancoPreto;
       }
+      // transparente adds 0, so no need to add anything
       
       // Add finishing price
       if (acabamento === 'placaAdesivada') {
         pricePerM2 += config.placaAdesivada;
       }
+      // somentePlaca adds 0, so no need to add anything
       
       const unitTotal = calculateMinimumCharge(area * pricePerM2);
       setTotal(unitTotal * quantidade);
@@ -126,7 +128,7 @@ const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
                   </label>
                 </div>
                 <span className="text-sm text-gray-500">
-                  {formatCurrency(config.espessura1mm)}/m²
+                  +{formatCurrency(config.espessura1mm)}/m²
                 </span>
               </div>
               <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
@@ -145,10 +147,13 @@ const PlacaPSCalculator: React.FC<Props> = ({ config }) => {
                   </label>
                 </div>
                 <span className="text-sm text-gray-500">
-                  {formatCurrency(config.espessura2mm)}/m²
+                  +{formatCurrency(config.espessura2mm)}/m²
                 </span>
               </div>
             </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Preço base: {formatCurrency(config.base)}/m²
+            </p>
           </div>
 
           <div>

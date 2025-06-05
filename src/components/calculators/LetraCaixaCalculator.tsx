@@ -30,8 +30,12 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
 
   useEffect(() => {
     if (area > 0 && espessura && quantidade > 0) {
+      let pricePerM2 = config.base;
+      
       const espessuraOption = espessuraOptions.find(opt => opt.id === espessura);
-      let pricePerM2 = espessuraOption?.price || 0;
+      if (espessuraOption) {
+        pricePerM2 += espessuraOption.price;
+      }
       
       // Add add-ons
       addOns.forEach(addOnId => {
@@ -135,11 +139,14 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
                     </label>
                   </div>
                   <span className="text-sm text-gray-500">
-                    {formatCurrency(option.price)}/m²
+                    +{formatCurrency(option.price)}/m²
                   </span>
                 </div>
               ))}
             </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Preço base: {formatCurrency(config.base)}/m²
+            </p>
           </div>
 
           <div>
