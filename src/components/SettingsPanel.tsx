@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
-import { ArrowDown, Settings } from 'lucide-react';
+import { ArrowLeft, Settings, Save, X } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 import { PricingConfig, formatCurrency } from '../types/pricing';
 
 interface Props {
@@ -9,6 +11,8 @@ interface Props {
 }
 
 const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
+  const { theme } = useTheme();
+  
   // Convert numbers to strings for editing
   const convertConfigToStrings = (config: PricingConfig) => {
     const result: any = {};
@@ -63,23 +67,30 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
   };
 
   const ConfigSection = ({ title, section, fields }: { title: string; section: string; fields: Array<{key: string, label: string, unit?: string}> }) => (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="modern-card p-8 mb-8 animate-fade-in">
+      <div className="flex items-center space-x-3 mb-6">
+        <div className="w-2 h-8 bg-gradient-to-b from-indigo-500 to-purple-600 rounded-full"></div>
+        <h3 className="text-xl font-bold text-foreground">{title}</h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {fields.map(field => (
-          <div key={field.key}>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {field.label} {field.unit && `(${field.unit})`}
+          <div key={field.key} className="space-y-2">
+            <label className="block text-sm font-semibold text-foreground">
+              {field.label}
+              {field.unit && <span className="text-muted-foreground ml-1">({field.unit})</span>}
             </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+            <div className="relative group">
+              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground font-medium">
+                R$
+              </span>
               <input
                 type="text"
                 value={formatInputValue(editConfig[section]?.[field.key] || '')}
                 onChange={(e) => updateConfig(section, field.key, e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="modern-input pl-12 group-hover:border-primary/30 focus:border-primary"
                 placeholder="0,00"
               />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
             </div>
           </div>
         ))}
@@ -88,27 +99,43 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen gradient-bg theme-transition">
       {/* Header */}
-      <div className="bg-white shadow-lg border-b border-blue-100">
+      <div className="header-gradient border-b border-border shadow-xl theme-transition">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-3">
-              <Settings className="w-8 h-8 text-blue-600" />
-              <h1 className="text-3xl font-bold text-gray-900">Configurações de Preços</h1>
-            </div>
-            <div className="flex space-x-3">
+            <div className="flex items-center space-x-4 animate-fade-in">
               <button
                 onClick={onClose}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                className="p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-all duration-200 border border-border"
               >
-                Cancelar
+                <ArrowLeft className="w-5 h-5 text-foreground" />
+              </button>
+              <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg">
+                <Settings className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+                  Configurações de Preços
+                </h1>
+                <p className="text-sm text-muted-foreground">Gerencie os valores de todos os produtos</p>
+              </div>
+            </div>
+            
+            <div className="flex space-x-3 animate-fade-in">
+              <button
+                onClick={onClose}
+                className="modern-button-secondary flex items-center space-x-2"
+              >
+                <X className="w-4 h-4" />
+                <span>Cancelar</span>
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg"
+                className="modern-button-primary flex items-center space-x-2"
               >
-                Salvar Configurações
+                <Save className="w-4 h-4" />
+                <span>Salvar Configurações</span>
               </button>
             </div>
           </div>
@@ -116,10 +143,19 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-blue-800">
-            <strong>Importante:</strong> Todos os produtos que utilizam cálculo por m² têm um valor mínimo de R$ 20,00 automaticamente aplicado.
-          </p>
+        <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-200 dark:border-blue-800 rounded-2xl animate-fade-in">
+          <div className="flex items-start space-x-3">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+              <Settings className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Importante</h3>
+              <p className="text-blue-800 dark:text-blue-200 text-sm">
+                Todos os produtos que utilizam cálculo por m² têm um valor mínimo de R$ 20,00 automaticamente aplicado.
+                Use vírgula (,) como separador decimal.
+              </p>
+            </div>
+          </div>
         </div>
 
         <ConfigSection
