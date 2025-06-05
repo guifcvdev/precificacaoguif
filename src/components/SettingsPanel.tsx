@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowDown, Settings } from 'lucide-react';
 import { PricingConfig, formatCurrency } from '../types/pricing';
@@ -10,21 +9,57 @@ interface Props {
 }
 
 const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
-  const [editConfig, setEditConfig] = useState<PricingConfig>(JSON.parse(JSON.stringify(config)));
+  // Convert numbers to strings for editing
+  const convertConfigToStrings = (config: PricingConfig) => {
+    const result: any = {};
+    Object.keys(config).forEach(section => {
+      result[section] = {};
+      Object.keys(config[section as keyof PricingConfig] as any).forEach(field => {
+        const value = (config[section as keyof PricingConfig] as any)[field];
+        result[section][field] = value.toString().replace('.', ',');
+      });
+    });
+    return result;
+  };
+
+  // Convert strings back to numbers for saving
+  const convertStringsToNumbers = (stringConfig: any): PricingConfig => {
+    const result: any = {};
+    Object.keys(stringConfig).forEach(section => {
+      result[section] = {};
+      Object.keys(stringConfig[section]).forEach(field => {
+        const stringValue = stringConfig[section][field];
+        const numericValue = parseFloat(stringValue.replace(',', '.')) || 0;
+        result[section][field] = numericValue;
+      });
+    });
+    return result as PricingConfig;
+  };
+
+  const [editConfig, setEditConfig] = useState(convertConfigToStrings(config));
 
   const handleSave = () => {
-    onSave(editConfig);
+    const numericConfig = convertStringsToNumbers(editConfig);
+    onSave(numericConfig);
     onClose();
   };
 
-  const updateConfig = (section: string, field: string, value: number) => {
+  const updateConfig = (section: string, field: string, value: string) => {
+    // Allow numbers, comma, and dot
+    const cleanValue = value.replace(/[^0-9,]/g, '');
+    
     setEditConfig(prev => ({
       ...prev,
       [section]: {
-        ...prev[section as keyof PricingConfig],
-        [field]: value
+        ...prev[section],
+        [field]: cleanValue
       }
     }));
+  };
+
+  const formatInputValue = (value: string) => {
+    // Ensure we have a string
+    return value || '';
   };
 
   const ConfigSection = ({ title, section, fields }: { title: string; section: string; fields: Array<{key: string, label: string, unit?: string}> }) => (
@@ -39,13 +74,11 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             <div className="relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
               <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={(editConfig[section as keyof PricingConfig] as any)[field.key] || ''}
-                onChange={(e) => updateConfig(section, field.key, parseFloat(e.target.value) || 0)}
+                type="text"
+                value={formatInputValue(editConfig[section]?.[field.key] || '')}
+                onChange={(e) => updateConfig(section, field.key, e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="0.00"
+                placeholder="0,00"
               />
             </div>
           </div>
