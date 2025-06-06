@@ -46,42 +46,43 @@
   }
 
   .dark {
-    --background: 210 10% 12%;
-    --foreground: 0 0% 100%;
+    /* Paleta Slate moderna e profissional */
+    --background: 222.2 84% 4.9%;      /* slate-900 #0f172a */
+    --foreground: 210 40% 98%;         /* white #f8fafc */
 
-    --card: 210 10% 16%;
-    --card-foreground: 0 0% 100%;
+    --card: 215 27.9% 16.9%;           /* slate-800 #1e293b com transparência */
+    --card-foreground: 210 40% 98%;    /* white #f8fafc */
 
-    --popover: 210 10% 16%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 215 27.9% 16.9%;        /* slate-800 */
+    --popover-foreground: 210 40% 98%; /* white */
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 217.2 91.2% 59.8%;      /* blue-500 para acentos */
+    --primary-foreground: 222.2 84% 4.9%; /* slate-900 */
 
-    --secondary: 210 10% 20%;
-    --secondary-foreground: 0 0% 90%;
+    --secondary: 215 25% 26.7%;        /* slate-700 #374151 */
+    --secondary-foreground: 210 20% 82%; /* slate-300 #cbd5e1 */
 
-    --muted: 210 10% 24%;
-    --muted-foreground: 0 0% 63%;
+    --muted: 215 25% 26.7%;            /* slate-700 para backgrounds sutis */
+    --muted-foreground: 215 20.2% 65.1%; /* slate-400 #94a3b8 */
 
-    --accent: 210 10% 24%;
-    --accent-foreground: 0 0% 90%;
+    --accent: 215 25% 26.7%;           /* slate-700 */
+    --accent-foreground: 210 20% 82%;  /* slate-300 */
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;      /* red-500 */
+    --destructive-foreground: 210 40% 98%; /* white */
 
-    --border: 210 10% 29%;
-    --input: 210 10% 20%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 215 19.3% 34.5%;         /* slate-600 #475569 */
+    --input: 215 27.9% 16.9%;          /* slate-800 para inputs */
+    --ring: 217.2 91.2% 59.8%;         /* blue-500 para focus rings */
     
-    --sidebar-background: 210 10% 12%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 10% 24%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 210 10% 29%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 222.2 84% 4.9%; /* slate-900 */
+    --sidebar-foreground: 210 20% 82%;    /* slate-300 */
+    --sidebar-primary: 217.2 91.2% 59.8%; /* blue-500 */
+    --sidebar-primary-foreground: 210 40% 98%; /* white */
+    --sidebar-accent: 215 25% 26.7%;      /* slate-700 */
+    --sidebar-accent-foreground: 210 20% 82%; /* slate-300 */
+    --sidebar-border: 215 19.3% 34.5%;    /* slate-600 */
+    --sidebar-ring: 217.2 91.2% 59.8%;    /* blue-500 */
   }
 }
 
@@ -94,7 +95,7 @@
     @apply bg-background text-foreground;
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar para tema escuro */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -104,18 +105,18 @@
     display: none;
   }
 
-  /* Glassmorphism utilities */
+  /* Glassmorphism modernizado */
   .glass {
     @apply bg-white/10 backdrop-blur-xl border border-white/20;
   }
 
   .glass-dark {
-    @apply bg-black/10 backdrop-blur-xl border border-white/10;
+    @apply bg-slate-800/50 backdrop-blur-xl border border-slate-700/50;
   }
 }
 
 @layer utilities {
-  /* Animation utilities */
+  /* Animation utilities melhoradas */
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
@@ -142,13 +143,35 @@
     }
   }
 
-  /* Focus utilities */
+  /* Focus utilities melhorados */
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background;
   }
 
-  /* Gradient text */
+  /* Gradient text melhorado */
   .gradient-text {
-    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent;
+  }
+
+  /* Utilitários para melhor contraste no tema escuro */
+  .text-hierarchy-primary {
+    @apply text-foreground font-semibold;
+  }
+
+  .text-hierarchy-secondary {
+    @apply text-slate-300 dark:text-slate-300;
+  }
+
+  .text-hierarchy-muted {
+    @apply text-muted-foreground;
+  }
+
+  /* Cards modernos */
+  .modern-card {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50 shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .modern-card-dark {
+    @apply dark:bg-slate-800/50 dark:backdrop-blur-xl dark:border-slate-700/50 dark:shadow-2xl;
   }
 }
