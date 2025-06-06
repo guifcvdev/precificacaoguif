@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
 import { ArrowDown, Settings, Save, X } from 'lucide-react';
 import { PricingConfig, formatCurrency } from '../types/pricing';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import ThemeToggle from './ThemeToggle';
 
 interface Props {
   config: PricingConfig;
@@ -23,7 +21,7 @@ interface ConfigSectionProps {
 const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, editConfig, updateConfig }) => (
   <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
     <CardHeader className="pb-4">
-      <CardTitle className="text-xl font-semibold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+      <CardTitle className="text-xl font-semibold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
         {title}
       </CardTitle>
     </CardHeader>
@@ -103,7 +101,7 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
       {/* Header */}
       <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -112,12 +110,11 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
               <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">
                 <Settings className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                 Configurações de Preços
               </h1>
             </div>
             <div className="flex items-center space-x-3">
-              <ThemeToggle />
               <Button variant="outline" onClick={onClose}>
                 <X className="w-4 h-4 mr-2" />
                 Cancelar
@@ -132,8 +129,8 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg backdrop-blur-sm">
-          <p className="text-blue-800 dark:text-blue-200">
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg backdrop-blur-sm">
+          <p className="text-blue-800">
             <strong>Importante:</strong> Todos os produtos que utilizam cálculo por m² têm um valor mínimo de R$ 20,00 automaticamente aplicado.
           </p>
         </div>
@@ -170,14 +167,8 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             title="Placa em PS"
             section="placaPS"
             fields={[
-              { key: 'base', label: 'Preço Base', unit: 'm²' },
-              { key: 'espessura1mm', label: 'Adicional Espessura 1mm', unit: 'm²' },
-              { key: 'espessura2mm', label: 'Adicional Espessura 2mm', unit: 'm²' },
-              { key: 'transparente', label: 'Adicional Transparente', unit: 'm²' },
-              { key: 'leitoso', label: 'Adicional Leitoso', unit: 'm²' },
-              { key: 'brancoPreto', label: 'Adicional Branco/Preto', unit: 'm²' },
-              { key: 'somentePlaca', label: 'Adicional Somente Placa', unit: 'm²' },
-              { key: 'placaAdesivada', label: 'Adicional Placa Adesivada', unit: 'm²' },
+              { key: 'espessura1mm', label: 'Espessura 1mm', unit: 'm²' },
+              { key: 'espessura2mm', label: 'Espessura 2mm', unit: 'm²' },
             ]}
             editConfig={editConfig}
             updateConfig={updateConfig}

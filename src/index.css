@@ -44,45 +44,6 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
-
-  .dark {
-    --background: 210 10% 12%;
-    --foreground: 0 0% 100%;
-
-    --card: 210 10% 16%;
-    --card-foreground: 0 0% 100%;
-
-    --popover: 210 10% 16%;
-    --popover-foreground: 0 0% 100%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 210 10% 20%;
-    --secondary-foreground: 0 0% 90%;
-
-    --muted: 210 10% 24%;
-    --muted-foreground: 0 0% 63%;
-
-    --accent: 210 10% 24%;
-    --accent-foreground: 0 0% 90%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 210 10% 29%;
-    --input: 210 10% 20%;
-    --ring: 212.7 26.8% 83.9%;
-    
-    --sidebar-background: 210 10% 12%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 10% 24%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 210 10% 29%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
 }
 
 @layer base {
@@ -107,10 +68,6 @@
   /* Glassmorphism utilities */
   .glass {
     @apply bg-white/10 backdrop-blur-xl border border-white/20;
-  }
-
-  .glass-dark {
-    @apply bg-black/10 backdrop-blur-xl border border-white/10;
   }
 }
 

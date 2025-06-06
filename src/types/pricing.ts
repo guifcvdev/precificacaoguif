@@ -15,14 +15,8 @@ export interface LonaConfig {
 }
 
 export interface PlacaPSConfig {
-  base: number;
   espessura1mm: number;
   espessura2mm: number;
-  transparente: number;
-  leitoso: number;
-  brancoPreto: number;
-  somentePlaca: number;
-  placaAdesivada: number;
 }
 
 export interface PlacaACMConfig {
@@ -79,14 +73,8 @@ export const defaultConfig: PricingConfig = {
     soRefile: 15.00,
   },
   placaPS: {
-    base: 25.00,
-    espessura1mm: 5.00,
-    espessura2mm: 10.00,
-    transparente: 0.00,
-    leitoso: 5.00,
-    brancoPreto: 2.00,
-    somentePlaca: 0.00,
-    placaAdesivada: 10.00,
+    espessura1mm: 30.00,
+    espessura2mm: 35.00,
   },
   placaACM: {
     preco: 45.00,
