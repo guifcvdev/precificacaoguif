@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ArrowDown, Settings, Save, X } from 'lucide-react';
 import { PricingConfig, formatCurrency } from '../types/pricing';
@@ -169,18 +170,14 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             title="Placa em PS"
             section="placaPS"
             fields={[
-              { key: 'transparente1mm', label: 'Transparente 1mm', unit: 'm²' },
-              { key: 'leitoso1mm', label: 'Leitoso 1mm', unit: 'm²' },
-              { key: 'brancoPreto1mm', label: 'Branco/Preto 1mm', unit: 'm²' },
-              { key: 'transparente1mmAdesivada', label: 'Transparente 1mm Adesivada', unit: 'm²' },
-              { key: 'leitoso1mmAdesivada', label: 'Leitoso 1mm Adesivada', unit: 'm²' },
-              { key: 'brancoPreto1mmAdesivada', label: 'Branco/Preto 1mm Adesivada', unit: 'm²' },
-              { key: 'transparente2mm', label: 'Transparente 2mm', unit: 'm²' },
-              { key: 'leitoso2mm', label: 'Leitoso 2mm', unit: 'm²' },
-              { key: 'brancoPreto2mm', label: 'Branco/Preto 2mm', unit: 'm²' },
-              { key: 'transparente2mmAdesivada', label: 'Transparente 2mm Adesivada', unit: 'm²' },
-              { key: 'leitoso2mmAdesivada', label: 'Leitoso 2mm Adesivada', unit: 'm²' },
-              { key: 'brancoPreto2mmAdesivada', label: 'Branco/Preto 2mm Adesivada', unit: 'm²' },
+              { key: 'base', label: 'Preço Base', unit: 'm²' },
+              { key: 'espessura1mm', label: 'Adicional Espessura 1mm', unit: 'm²' },
+              { key: 'espessura2mm', label: 'Adicional Espessura 2mm', unit: 'm²' },
+              { key: 'transparente', label: 'Adicional Transparente', unit: 'm²' },
+              { key: 'leitoso', label: 'Adicional Leitoso', unit: 'm²' },
+              { key: 'brancoPreto', label: 'Adicional Branco/Preto', unit: 'm²' },
+              { key: 'somentePlaca', label: 'Adicional Somente Placa', unit: 'm²' },
+              { key: 'placaAdesivada', label: 'Adicional Placa Adesivada', unit: 'm²' },
             ]}
             editConfig={editConfig}
             updateConfig={updateConfig}

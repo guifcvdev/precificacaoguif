@@ -1,3 +1,4 @@
+
 export interface AdesivoConfig {
   corteEspecial: number;
   soRefile: number;
@@ -14,21 +15,14 @@ export interface LonaConfig {
 }
 
 export interface PlacaPSConfig {
-  // 1mm options
-  transparente1mm: number;
-  leitoso1mm: number;
-  brancoPreto1mm: number;
-  transparente1mmAdesivada: number;
-  leitoso1mmAdesivada: number;
-  brancoPreto1mmAdesivada: number;
-  
-  // 2mm options  
-  transparente2mm: number;
-  leitoso2mm: number;
-  brancoPreto2mm: number;
-  transparente2mmAdesivada: number;
-  leitoso2mmAdesivada: number;
-  brancoPreto2mmAdesivada: number;
+  base: number;
+  espessura1mm: number;
+  espessura2mm: number;
+  transparente: number;
+  leitoso: number;
+  brancoPreto: number;
+  somentePlaca: number;
+  placaAdesivada: number;
 }
 
 export interface PlacaACMConfig {
@@ -85,18 +79,14 @@ export const defaultConfig: PricingConfig = {
     soRefile: 15.00,
   },
   placaPS: {
-    transparente1mm: 30.00,
-    leitoso1mm: 35.00,
-    brancoPreto1mm: 32.00,
-    transparente1mmAdesivada: 40.00,
-    leitoso1mmAdesivada: 45.00,
-    brancoPreto1mmAdesivada: 42.00,
-    transparente2mm: 35.00,
-    leitoso2mm: 40.00,
-    brancoPreto2mm: 37.00,
-    transparente2mmAdesivada: 45.00,
-    leitoso2mmAdesivada: 50.00,
-    brancoPreto2mmAdesivada: 47.00,
+    base: 25.00,
+    espessura1mm: 5.00,
+    espessura2mm: 10.00,
+    transparente: 0.00,
+    leitoso: 5.00,
+    brancoPreto: 2.00,
+    somentePlaca: 0.00,
+    placaAdesivada: 10.00,
   },
   placaACM: {
     preco: 45.00,
