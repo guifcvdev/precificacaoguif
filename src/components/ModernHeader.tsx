@@ -1,10 +1,8 @@
 
-import React, { useState } from 'react';
-import { Calculator, Settings, Save, Download, Plus, Menu } from 'lucide-react';
+import React from 'react';
+import { Calculator, Settings, Download } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { useBudgets } from '../hooks/useBudgets';
 
 interface ModernHeaderProps {
@@ -12,17 +10,7 @@ interface ModernHeaderProps {
 }
 
 const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
-  const [budgetName, setBudgetName] = useState('');
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const { createBudget, currentBudget, exportToPDF } = useBudgets();
-
-  const handleCreateBudget = () => {
-    if (budgetName.trim()) {
-      createBudget(budgetName.trim());
-      setBudgetName('');
-      setIsCreateDialogOpen(false);
-    }
-  };
+  const { currentBudget, exportToPDF } = useBudgets();
 
   const handleExport = () => {
     if (currentBudget) {
@@ -53,36 +41,6 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
           </div>
 
           <div className="flex items-center space-x-3">
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="hidden sm:flex">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Novo Orçamento
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Criar Novo Orçamento</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <Input
-                    placeholder="Nome do orçamento"
-                    value={budgetName}
-                    onChange={(e) => setBudgetName(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleCreateBudget()}
-                  />
-                  <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                      Cancelar
-                    </Button>
-                    <Button onClick={handleCreateBudget} disabled={!budgetName.trim()}>
-                      Criar
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-
             {currentBudget && (
               <Button variant="outline" size="sm" onClick={handleExport}>
                 <Download className="w-4 h-4 mr-2" />
