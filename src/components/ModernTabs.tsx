@@ -9,19 +9,19 @@ interface ModernTabsProps {
 
 const ModernTabs: React.FC<ModernTabsProps> = ({ activeTab, onTabChange }) => {
   const tabs = [
-    { id: 'adesivo', label: 'Adesivo', icon: FileText, color: 'from-red-400 to-pink-400' },
-    { id: 'lona', label: 'Lona', icon: Package, color: 'from-blue-400 to-cyan-400' },
-    { id: 'placa-ps', label: 'Placa em PS', icon: Square, color: 'from-green-400 to-emerald-400' },
-    { id: 'placa-acm', label: 'Placa em ACM', icon: Layers, color: 'from-purple-400 to-violet-400' },
-    { id: 'fachada', label: 'Fachada Simples', icon: Building, color: 'from-orange-400 to-red-400' },
-    { id: 'letra-caixa', label: 'Letra Caixa em PVC', icon: Type, color: 'from-teal-400 to-cyan-400' },
-    { id: 'vidro', label: 'Vidro Temperado', icon: Shield, color: 'from-indigo-400 to-purple-400' },
+    { id: 'adesivo', label: 'Adesivo', icon: FileText, color: 'from-red-500 to-pink-500' },
+    { id: 'lona', label: 'Lona', icon: Package, color: 'from-blue-500 to-cyan-500' },
+    { id: 'placa-ps', label: 'Placa em PS', icon: Square, color: 'from-green-500 to-emerald-500' },
+    { id: 'placa-acm', label: 'Placa em ACM', icon: Layers, color: 'from-purple-500 to-violet-500' },
+    { id: 'fachada', label: 'Fachada Simples', icon: Building, color: 'from-orange-500 to-red-500' },
+    { id: 'letra-caixa', label: 'Letra Caixa em PVC', icon: Type, color: 'from-teal-500 to-cyan-500' },
+    { id: 'vidro', label: 'Vidro Temperado', icon: Shield, color: 'from-indigo-500 to-purple-500' },
   ];
 
   return (
-    <div className="bg-background/95 backdrop-blur-xl border-b border-border shadow-lg sticky top-16 z-40">
-      <div className="container-modern">
-        <div className="flex space-x-1 overflow-x-auto py-4 scrollbar-hide">
+    <div className="bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex space-x-1 overflow-x-auto py-2 scrollbar-hide">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -30,30 +30,23 @@ const ModernTabs: React.FC<ModernTabsProps> = ({ activeTab, onTabChange }) => {
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className={`tab-modern ${isActive ? 'active' : ''} group min-w-fit`}
+                className={`group relative flex items-center space-x-2 px-4 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300 ${
+                  isActive
+                    ? 'text-white shadow-lg transform scale-105'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                }`}
               >
-                <div className={`p-2 rounded-lg transition-all duration-200 ${
-                  isActive 
-                    ? 'bg-primary/20 shadow-lg' 
-                    : 'group-hover:bg-accent/10'
-                }`}>
-                  <Icon className={`w-5 h-5 transition-all duration-200 ${
-                    isActive 
-                      ? 'text-primary scale-110' 
-                      : 'text-hierarchy-secondary group-hover:text-accent group-hover:scale-105'
-                  }`} />
-                </div>
-                <span className={`hidden sm:inline transition-all duration-200 ${
-                  isActive 
-                    ? 'font-semibold text-primary' 
-                    : 'text-hierarchy-secondary group-hover:text-accent-foreground group-hover:font-medium'
-                }`}>
-                  {tab.label}
-                </span>
-                
-                {/* Glow effect para tab ativa */}
                 {isActive && (
-                  <div className="absolute inset-0 rounded-xl border border-primary/30 shadow-lg shadow-primary/20 pointer-events-none" />
+                  <div className={`absolute inset-0 bg-gradient-to-r ${tab.color} rounded-lg transition-all duration-300`} />
+                )}
+                <div className="relative z-10 flex items-center space-x-2">
+                  <Icon className={`w-4 h-4 transition-transform duration-300 ${
+                    isActive ? 'scale-110' : 'group-hover:scale-105'
+                  }`} />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </div>
+                {isActive && (
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-white rounded-full" />
                 )}
               </button>
             );

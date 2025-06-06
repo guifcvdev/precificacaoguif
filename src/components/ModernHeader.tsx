@@ -19,24 +19,21 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
   };
 
   return (
-    <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-lg">
-      <div className="container-modern">
-        <div className="flex justify-between items-center py-6">
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-4">
-              <div className="relative group">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-primary to-accent shadow-xl group-hover:shadow-2xl transition-all duration-200">
-                  <Calculator className="w-8 h-8 text-white" />
-                </div>
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary to-accent opacity-20 blur-lg group-hover:opacity-30 transition-all duration-200" />
+    <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center py-4">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">
+                <Calculator className="w-6 h-6 text-white" />
               </div>
-              <div className="space-y-2">
-                <h1 className="text-3xl sm:text-4xl font-bold text-hierarchy-primary gradient-text">
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                   Precificação CV
                 </h1>
                 {currentBudget && (
-                  <p className="text-sm text-hierarchy-secondary font-medium">
-                    Orçamento: <span className="text-hierarchy-accent">{currentBudget.name}</span>
+                  <p className="text-sm text-muted-foreground">
+                    Orçamento: {currentBudget.name}
                   </p>
                 )}
               </div>
@@ -45,25 +42,15 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
 
           <div className="flex items-center space-x-3">
             {currentBudget && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleExport}
-                className="modern-button-secondary interactive-element border-border hover:border-primary/30 shadow-md hover:shadow-lg"
-              >
+              <Button variant="outline" size="sm" onClick={handleExport}>
                 <Download className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline font-medium">Exportar</span>
+                <span className="hidden sm:inline">Exportar</span>
               </Button>
             )}
 
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={onSettingsClick}
-              className="modern-button-secondary interactive-element border-border hover:border-primary/30 shadow-md hover:shadow-lg"
-            >
+            <Button variant="outline" size="sm" onClick={onSettingsClick}>
               <Settings className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline font-medium">Configurações</span>
+              <span className="hidden sm:inline">Configurações</span>
             </Button>
 
             <ThemeToggle />
