@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Calculator, Settings, Download } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
 import { Button } from './ui/button';
 import { useBudgets } from '../hooks/useBudgets';
 
@@ -28,7 +27,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
                 <Calculator className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                   Precificação CV
                 </h1>
                 {currentBudget && (
@@ -52,8 +51,6 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
               <Settings className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Configurações</span>
             </Button>
-
-            <ThemeToggle />
           </div>
         </div>
       </div>
