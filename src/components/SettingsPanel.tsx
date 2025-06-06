@@ -1,7 +1,10 @@
 
 import React, { useState } from 'react';
-import { ArrowDown, Settings } from 'lucide-react';
+import { ArrowDown, Settings, Save, X } from 'lucide-react';
 import { PricingConfig, formatCurrency } from '../types/pricing';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import ThemeToggle from './ThemeToggle';
 
 interface Props {
   config: PricingConfig;
@@ -18,28 +21,36 @@ interface ConfigSectionProps {
 }
 
 const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, editConfig, updateConfig }) => (
-  <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-    <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {fields.map(field => (
-        <div key={`${section}-${field.key}`}>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {field.label} {field.unit && `(${field.unit})`}
-          </label>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
-            <input
-              type="text"
-              value={editConfig[section]?.[field.key] || ''}
-              onChange={(e) => updateConfig(section, field.key, e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="0,00"
-            />
+  <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
+    <CardHeader className="pb-4">
+      <CardTitle className="text-xl font-semibold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+        {title}
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {fields.map(field => (
+          <div key={`${section}-${field.key}`} className="space-y-2">
+            <label className="block text-sm font-medium text-foreground">
+              {field.label} {field.unit && `(${field.unit})`}
+            </label>
+            <div className="relative group">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm font-medium">
+                R$
+              </span>
+              <input
+                type="text"
+                value={editConfig[section]?.[field.key] || ''}
+                onChange={(e) => updateConfig(section, field.key, e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-background/50 border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200 placeholder:text-muted-foreground hover:bg-background/70"
+                placeholder="0,00"
+              />
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
-  </div>
+        ))}
+      </div>
+    </CardContent>
+  </Card>
 ));
 
 ConfigSection.displayName = 'ConfigSection';
@@ -58,7 +69,6 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
     return result;
   };
 
-  // Convert strings back to numbers for saving
   const convertStringsToNumbers = (stringConfig: any): PricingConfig => {
     const result: any = {};
     Object.keys(stringConfig).forEach(section => {
@@ -81,7 +91,6 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
   };
 
   const updateConfig = (section: string, field: string, value: string) => {
-    // Allow numbers, comma, and dot
     const cleanValue = value.replace(/[^0-9,]/g, '');
     
     setEditConfig(prev => ({
@@ -94,136 +103,145 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
       {/* Header */}
-      <div className="bg-white shadow-lg border-b border-blue-100">
+      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-3">
-              <Settings className="w-8 h-8 text-blue-600" />
-              <h1 className="text-3xl font-bold text-gray-900">Configurações de Preços</h1>
+              <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">
+                <Settings className="w-6 h-6 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                Configurações de Preços
+              </h1>
             </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
-              >
+            <div className="flex items-center space-x-3">
+              <ThemeToggle />
+              <Button variant="outline" onClick={onClose}>
+                <X className="w-4 h-4 mr-2" />
                 Cancelar
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg"
-              >
+              </Button>
+              <Button onClick={handleSave} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl">
+                <Save className="w-4 h-4 mr-2" />
                 Salvar Configurações
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-blue-800">
+        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg backdrop-blur-sm">
+          <p className="text-blue-800 dark:text-blue-200">
             <strong>Importante:</strong> Todos os produtos que utilizam cálculo por m² têm um valor mínimo de R$ 20,00 automaticamente aplicado.
           </p>
         </div>
 
-        <ConfigSection
-          title="Adesivo"
-          section="adesivo"
-          fields={[
-            { key: 'corteEspecial', label: 'Corte Especial', unit: 'm²' },
-            { key: 'soRefile', label: 'Só Refile', unit: 'm²' },
-            { key: 'laminado', label: 'Laminado', unit: 'm²' },
-            { key: 'adesivoPerfurado', label: 'Adesivo Perfurado', unit: 'm²' },
-            { key: 'imantado', label: 'Imantado', unit: 'm²' },
-          ]}
-          editConfig={editConfig}
-          updateConfig={updateConfig}
-        />
+        <div className="space-y-6">
+          <ConfigSection
+            title="Adesivo"
+            section="adesivo"
+            fields={[
+              { key: 'corteEspecial', label: 'Corte Especial', unit: 'm²' },
+              { key: 'soRefile', label: 'Só Refile', unit: 'm²' },
+              { key: 'laminado', label: 'Laminado', unit: 'm²' },
+              { key: 'adesivoPerfurado', label: 'Adesivo Perfurado', unit: 'm²' },
+              { key: 'imantado', label: 'Imantado', unit: 'm²' },
+            ]}
+            editConfig={editConfig}
+            updateConfig={updateConfig}
+          />
 
-        <ConfigSection
-          title="Lona"
-          section="lona"
-          fields={[
-            { key: 'bannerFaixa', label: 'Banner/Faixa', unit: 'm²' },
-            { key: 'reforcoIlhos', label: 'Reforço e Ilhós', unit: 'm²' },
-            { key: 'lonaBacklight', label: 'Lona Backlight', unit: 'm²' },
-            { key: 'soRefile', label: 'Só Refile', unit: 'm²' },
-          ]}
-          editConfig={editConfig}
-          updateConfig={updateConfig}
-        />
+          <ConfigSection
+            title="Lona"
+            section="lona"
+            fields={[
+              { key: 'bannerFaixa', label: 'Banner/Faixa', unit: 'm²' },
+              { key: 'reforcoIlhos', label: 'Reforço e Ilhós', unit: 'm²' },
+              { key: 'lonaBacklight', label: 'Lona Backlight', unit: 'm²' },
+              { key: 'soRefile', label: 'Só Refile', unit: 'm²' },
+            ]}
+            editConfig={editConfig}
+            updateConfig={updateConfig}
+          />
 
-        <ConfigSection
-          title="Placa em PS"
-          section="placaPS"
-          fields={[
-            { key: 'base', label: 'Preço Base', unit: 'm²' },
-            { key: 'espessura1mm', label: 'Adicional Espessura 1mm', unit: 'm²' },
-            { key: 'espessura2mm', label: 'Adicional Espessura 2mm', unit: 'm²' },
-            { key: 'transparente', label: 'Adicional Transparente', unit: 'm²' },
-            { key: 'leitoso', label: 'Adicional Leitoso', unit: 'm²' },
-            { key: 'brancoPreto', label: 'Adicional Branco/Preto', unit: 'm²' },
-            { key: 'somentePlaca', label: 'Adicional Somente Placa', unit: 'm²' },
-            { key: 'placaAdesivada', label: 'Adicional Placa Adesivada', unit: 'm²' },
-          ]}
-          editConfig={editConfig}
-          updateConfig={updateConfig}
-        />
+          <ConfigSection
+            title="Placa em PS"
+            section="placaPS"
+            fields={[
+              { key: 'base', label: 'Preço Base', unit: 'm²' },
+              { key: 'espessura1mm', label: 'Adicional Espessura 1mm', unit: 'm²' },
+              { key: 'espessura2mm', label: 'Adicional Espessura 2mm', unit: 'm²' },
+              { key: 'transparente', label: 'Adicional Transparente', unit: 'm²' },
+              { key: 'leitoso', label: 'Adicional Leitoso', unit: 'm²' },
+              { key: 'brancoPreto', label: 'Adicional Branco/Preto', unit: 'm²' },
+              { key: 'somentePlaca', label: 'Adicional Somente Placa', unit: 'm²' },
+              { key: 'placaAdesivada', label: 'Adicional Placa Adesivada', unit: 'm²' },
+            ]}
+            editConfig={editConfig}
+            updateConfig={updateConfig}
+          />
 
-        <ConfigSection
-          title="Placa em ACM"
-          section="placaACM"
-          fields={[
-            { key: 'preco', label: 'Preço por m²', unit: 'm²' },
-          ]}
-          editConfig={editConfig}
-          updateConfig={updateConfig}
-        />
+          <ConfigSection
+            title="Placa em ACM"
+            section="placaACM"
+            fields={[
+              { key: 'preco', label: 'Preço por m²', unit: 'm²' },
+            ]}
+            editConfig={editConfig}
+            updateConfig={updateConfig}
+          />
 
-        <ConfigSection
-          title="Fachada Simples"
-          section="fachada"
-          fields={[
-            { key: 'lona', label: 'Lona', unit: 'm²' },
-            { key: 'metalon20x20', label: 'Metalon 20x20', unit: 'unid' },
-            { key: 'metalon30x20', label: 'Metalon 30x20', unit: 'unid' },
-            { key: 'acm122', label: 'ACM 1.22m', unit: 'unid' },
-            { key: 'acm150', label: 'ACM 1.50m', unit: 'unid' },
-            { key: 'cantoneira', label: 'Cantoneira 3/4', unit: 'unid' },
-          ]}
-          editConfig={editConfig}
-          updateConfig={updateConfig}
-        />
+          <ConfigSection
+            title="Fachada Simples"
+            section="fachada"
+            fields={[
+              { key: 'lona', label: 'Lona', unit: 'm²' },
+              { key: 'metalon20x20', label: 'Metalon 20x20', unit: 'unid' },
+              { key: 'metalon30x20', label: 'Metalon 30x20', unit: 'unid' },
+              { key: 'acm122', label: 'ACM 1.22m', unit: 'unid' },
+              { key: 'acm150', label: 'ACM 1.50m', unit: 'unid' },
+              { key: 'cantoneira', label: 'Cantoneira 3/4', unit: 'unid' },
+            ]}
+            editConfig={editConfig}
+            updateConfig={updateConfig}
+          />
 
-        <ConfigSection
-          title="Letra Caixa em PVC"
-          section="letraCaixa"
-          fields={[
-            { key: 'base', label: 'Preço Base', unit: 'm²' },
-            { key: 'espessura10mm', label: 'Adicional Espessura 10mm', unit: 'm²' },
-            { key: 'espessura15mm', label: 'Adicional Espessura 15mm', unit: 'm²' },
-            { key: 'espessura20mm', label: 'Adicional Espessura 20mm', unit: 'm²' },
-            { key: 'pinturaAutomotiva', label: 'Adicional Pintura Automotiva', unit: 'm²' },
-            { key: 'fitaDuplaFace', label: 'Adicional Fita Dupla-Face', unit: 'm²' },
-          ]}
-          editConfig={editConfig}
-          updateConfig={updateConfig}
-        />
+          <ConfigSection
+            title="Letra Caixa em PVC"
+            section="letraCaixa"
+            fields={[
+              { key: 'base', label: 'Preço Base', unit: 'm²' },
+              { key: 'espessura10mm', label: 'Adicional Espessura 10mm', unit: 'm²' },
+              { key: 'espessura15mm', label: 'Adicional Espessura 15mm', unit: 'm²' },
+              { key: 'espessura20mm', label: 'Adicional Espessura 20mm', unit: 'm²' },
+              { key: 'pinturaAutomotiva', label: 'Adicional Pintura Automotiva', unit: 'm²' },
+              { key: 'fitaDuplaFace', label: 'Adicional Fita Dupla-Face', unit: 'm²' },
+            ]}
+            editConfig={editConfig}
+            updateConfig={updateConfig}
+          />
 
-        <ConfigSection
-          title="Vidro Temperado"
-          section="vidro"
-          fields={[
-            { key: 'base', label: 'Preço Base', unit: 'm²' },
-            { key: 'espessura6mm', label: 'Adicional Espessura 6mm', unit: 'm²' },
-            { key: 'espessura8mm', label: 'Adicional Espessura 8mm', unit: 'm²' },
-            { key: 'prolongadores', label: 'Prolongadores', unit: 'unid' },
-          ]}
-          editConfig={editConfig}
-          updateConfig={updateConfig}
-        />
+          <ConfigSection
+            title="Vidro Temperado"
+            section="vidro"
+            fields={[
+              { key: 'base', label: 'Preço Base', unit: 'm²' },
+              { key: 'espessura6mm', label: 'Adicional Espessura 6mm', unit: 'm²' },
+              { key: 'espessura8mm', label: 'Adicional Espessura 8mm', unit: 'm²' },
+              { key: 'prolongadores', label: 'Prolongadores', unit: 'unid' },
+            ]}
+            editConfig={editConfig}
+            updateConfig={updateConfig}
+          />
+        </div>
+      </div>
+
+      {/* Background Decorations */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
     </div>
   );

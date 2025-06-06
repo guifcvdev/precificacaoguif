@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { Calculator, Settings, FileText } from 'lucide-react';
 import AdesivoCalculator from '../components/calculators/AdesivoCalculator';
 import LonaCalculator from '../components/calculators/LonaCalculator';
 import PlacaPSCalculator from '../components/calculators/PlacaPSCalculator';
@@ -9,6 +8,9 @@ import FachadaCalculator from '../components/calculators/FachadaCalculator';
 import LetraCaixaCalculator from '../components/calculators/LetraCaixaCalculator';
 import VidroCalculator from '../components/calculators/VidroCalculator';
 import SettingsPanel from '../components/SettingsPanel';
+import ModernHeader from '../components/ModernHeader';
+import ModernTabs from '../components/ModernTabs';
+import ModernCalculatorWrapper from '../components/ModernCalculatorWrapper';
 import { PricingConfig, defaultConfig } from '../types/pricing';
 
 const Index = () => {
@@ -28,17 +30,24 @@ const Index = () => {
     localStorage.setItem('pricingConfig', JSON.stringify(newConfig));
   };
 
-  const tabs = [
-    { id: 'adesivo', label: 'Adesivo', icon: FileText },
-    { id: 'lona', label: 'Lona', icon: FileText },
-    { id: 'placa-ps', label: 'Placa em PS', icon: FileText },
-    { id: 'placa-acm', label: 'Placa em ACM', icon: FileText },
-    { id: 'fachada', label: 'Fachada Simples', icon: FileText },
-    { id: 'letra-caixa', label: 'Letra Caixa em PVC', icon: FileText },
-    { id: 'vidro', label: 'Vidro Temperado', icon: FileText },
-  ];
+  const getTabTitle = () => {
+    const titles: Record<string, string> = {
+      'adesivo': 'Calculadora de Adesivo',
+      'lona': 'Calculadora de Lona',
+      'placa-ps': 'Calculadora de Placa em PS',
+      'placa-acm': 'Calculadora de Placa em ACM',
+      'fachada': 'Calculadora de Fachada Simples',
+      'letra-caixa': 'Calculadora de Letra Caixa em PVC',
+      'vidro': 'Calculadora de Vidro Temperado',
+    };
+    return titles[activeTab];
+  };
 
   const renderCalculator = () => {
+    const calculatorProps = {
+      config: config[activeTab as keyof PricingConfig] as any
+    };
+
     switch (activeTab) {
       case 'adesivo':
         return <AdesivoCalculator config={config.adesivo} />;
@@ -70,56 +79,24 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
       {/* Header */}
-      <div className="bg-white shadow-lg border-b border-blue-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-3">
-              <Calculator className="w-8 h-8 text-blue-600" />
-              <h1 className="text-3xl font-bold text-gray-900">Precificação CV</h1>
-            </div>
-            <button
-              onClick={() => setShowSettings(true)}
-              className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg"
-            >
-              <Settings className="w-4 h-4" />
-              <span>Configurações</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <ModernHeader onSettingsClick={() => setShowSettings(true)} />
 
       {/* Tab Navigation */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-1 overflow-x-auto">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-all duration-200 ${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600 bg-blue-50'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      <ModernTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Calculator Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <ModernCalculatorWrapper title={getTabTitle()}>
           {renderCalculator()}
-        </div>
+        </ModernCalculatorWrapper>
+      </div>
+
+      {/* Background Decorations */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
     </div>
   );
