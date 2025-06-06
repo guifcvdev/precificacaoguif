@@ -19,9 +19,9 @@ const ModernTabs: React.FC<ModernTabsProps> = ({ activeTab, onTabChange }) => {
   ];
 
   return (
-    <div className="bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm sticky top-16 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex space-x-2 overflow-x-auto py-3 scrollbar-hide">
+    <div className="bg-background/95 backdrop-blur-xl border-b border-border shadow-lg sticky top-16 z-40">
+      <div className="container-modern">
+        <div className="flex space-x-1 overflow-x-auto py-4 scrollbar-hide">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -30,46 +30,31 @@ const ModernTabs: React.FC<ModernTabsProps> = ({ activeTab, onTabChange }) => {
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className={`group relative flex items-center space-x-3 px-5 py-3 text-sm font-medium whitespace-nowrap rounded-xl transition-all duration-300 ${
-                  isActive
-                    ? 'text-white shadow-lg transform scale-105 bg-slate-700 dark:bg-slate-700/80'
-                    : 'text-hierarchy-secondary hover:text-hierarchy-primary hover:bg-accent/50 hover:scale-102'
-                }`}
+                className={`tab-modern ${isActive ? 'active' : ''} group min-w-fit`}
               >
-                {isActive && (
-                  <>
-                    <div className={`absolute inset-0 bg-gradient-to-r ${tab.color} opacity-20 rounded-xl transition-all duration-300`} />
-                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full shadow-lg" />
-                  </>
-                )}
-                
-                <div className="relative z-10 flex items-center space-x-3">
-                  <div className={`p-1.5 rounded-lg transition-all duration-300 ${
-                    isActive 
-                      ? 'bg-white/20 shadow-lg' 
-                      : 'group-hover:bg-accent/30'
-                  }`}>
-                    <Icon className={`w-4 h-4 transition-all duration-300 ${
-                      isActive 
-                        ? 'scale-110 text-white' 
-                        : 'group-hover:scale-105 text-hierarchy-secondary group-hover:text-hierarchy-primary'
-                    }`} />
-                  </div>
-                  <span className={`hidden sm:inline transition-all duration-300 ${
-                    isActive 
-                      ? 'font-semibold text-white' 
-                      : 'group-hover:font-medium'
-                  }`}>
-                    {tab.label}
-                  </span>
-                </div>
-                
-                {/* Hover indicator */}
-                <div className={`absolute inset-0 rounded-xl border-2 transition-all duration-300 ${
+                <div className={`p-2 rounded-lg transition-all duration-200 ${
                   isActive 
-                    ? 'border-transparent' 
-                    : 'border-transparent group-hover:border-blue-400/30'
-                }`} />
+                    ? 'bg-primary/20 shadow-lg' 
+                    : 'group-hover:bg-accent/10'
+                }`}>
+                  <Icon className={`w-5 h-5 transition-all duration-200 ${
+                    isActive 
+                      ? 'text-primary scale-110' 
+                      : 'text-hierarchy-secondary group-hover:text-accent group-hover:scale-105'
+                  }`} />
+                </div>
+                <span className={`hidden sm:inline transition-all duration-200 ${
+                  isActive 
+                    ? 'font-semibold text-primary' 
+                    : 'text-hierarchy-secondary group-hover:text-accent-foreground group-hover:font-medium'
+                }`}>
+                  {tab.label}
+                </span>
+                
+                {/* Glow effect para tab ativa */}
+                {isActive && (
+                  <div className="absolute inset-0 rounded-xl border border-primary/30 shadow-lg shadow-primary/20 pointer-events-none" />
+                )}
               </button>
             );
           })}

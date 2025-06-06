@@ -19,24 +19,24 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
   };
 
   return (
-    <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-lg">
+      <div className="container-modern">
         <div className="flex justify-between items-center py-6">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-xl">
-                  <Calculator className="w-7 h-7 text-white" />
+              <div className="relative group">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-primary to-accent shadow-xl group-hover:shadow-2xl transition-all duration-200">
+                  <Calculator className="w-8 h-8 text-white" />
                 </div>
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 opacity-20 blur-lg" />
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary to-accent opacity-20 blur-lg group-hover:opacity-30 transition-all duration-200" />
               </div>
-              <div className="space-y-1">
-                <h1 className="text-3xl font-bold text-hierarchy-primary bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <div className="space-y-2">
+                <h1 className="text-3xl sm:text-4xl font-bold text-hierarchy-primary gradient-text">
                   Precificação CV
                 </h1>
                 {currentBudget && (
-                  <p className="text-sm text-hierarchy-muted font-medium">
-                    Orçamento: <span className="text-hierarchy-secondary">{currentBudget.name}</span>
+                  <p className="text-sm text-hierarchy-secondary font-medium">
+                    Orçamento: <span className="text-hierarchy-accent">{currentBudget.name}</span>
                   </p>
                 )}
               </div>
@@ -49,7 +49,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
                 variant="outline" 
                 size="sm" 
                 onClick={handleExport}
-                className="border-border/60 bg-background/50 hover:bg-accent/80 hover:border-border shadow-md hover:shadow-lg transition-all duration-300"
+                className="modern-button-secondary interactive-element border-border hover:border-primary/30 shadow-md hover:shadow-lg"
               >
                 <Download className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline font-medium">Exportar</span>
@@ -60,7 +60,7 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
               variant="outline" 
               size="sm" 
               onClick={onSettingsClick}
-              className="border-border/60 bg-background/50 hover:bg-accent/80 hover:border-border shadow-md hover:shadow-lg transition-all duration-300"
+              className="modern-button-secondary interactive-element border-border hover:border-primary/30 shadow-md hover:shadow-lg"
             >
               <Settings className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline font-medium">Configurações</span>
