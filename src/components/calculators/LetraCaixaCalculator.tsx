@@ -10,61 +10,44 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
   const [largura, setLargura] = useState<number>(0);
   const [altura, setAltura] = useState<number>(0);
   const [quantidade, setQuantidade] = useState<number>(1);
-  const [espessura, setEspessura] = useState<string>('');
-  const [addOns, setAddOns] = useState<string[]>([]);
+  const [selectedOption, setSelectedOption] = useState<string>('');
   const [total, setTotal] = useState<number>(0);
 
   const area = largura * altura;
   const areaTotal = area * quantidade;
 
-  const espessuraOptions = [
-    { id: '10mm', label: '10mm', price: config.espessura10mm },
-    { id: '15mm', label: '15mm', price: config.espessura15mm },
-    { id: '20mm', label: '20mm', price: config.espessura20mm },
-  ];
-
-  const addOnOptions = [
-    { id: 'pinturaAutomotiva', label: 'Pintura Automotiva', price: config.pinturaAutomotiva },
-    { id: 'fitaDuplaFace', label: 'Fita Dupla-Face', price: config.fitaDuplaFace },
+  const options = [
+    { id: 'pvc10mm', label: 'PVC 10mm', price: config.pvc10mm },
+    { id: 'pvc10mmPinturaAutomotiva', label: 'PVC 10mm + Pintura Automotiva', price: config.pvc10mmPinturaAutomotiva },
+    { id: 'pvc10mmFitaDuplaFace', label: 'PVC 10mm + Fita Dupla-Face', price: config.pvc10mmFitaDuplaFace },
+    { id: 'pvc10mmPinturaFita', label: 'PVC 10mm + Pintura + Fita', price: config.pvc10mmPinturaFita },
+    { id: 'pvc15mm', label: 'PVC 15mm', price: config.pvc15mm },
+    { id: 'pvc15mmPinturaAutomotiva', label: 'PVC 15mm + Pintura Automotiva', price: config.pvc15mmPinturaAutomotiva },
+    { id: 'pvc15mmFitaDuplaFace', label: 'PVC 15mm + Fita Dupla-Face', price: config.pvc15mmFitaDuplaFace },
+    { id: 'pvc15mmPinturaFita', label: 'PVC 15mm + Pintura + Fita', price: config.pvc15mmPinturaFita },
+    { id: 'pvc20mm', label: 'PVC 20mm', price: config.pvc20mm },
+    { id: 'pvc20mmPinturaAutomotiva', label: 'PVC 20mm + Pintura Automotiva', price: config.pvc20mmPinturaAutomotiva },
+    { id: 'pvc20mmFitaDuplaFace', label: 'PVC 20mm + Fita Dupla-Face', price: config.pvc20mmFitaDuplaFace },
+    { id: 'pvc20mmPinturaFita', label: 'PVC 20mm + Pintura + Fita', price: config.pvc20mmPinturaFita },
   ];
 
   useEffect(() => {
-    if (area > 0 && espessura && quantidade > 0) {
-      let pricePerM2 = config.base;
-      
-      const espessuraOption = espessuraOptions.find(opt => opt.id === espessura);
-      if (espessuraOption) {
-        pricePerM2 += espessuraOption.price;
+    if (area > 0 && selectedOption && quantidade > 0) {
+      const option = options.find(opt => opt.id === selectedOption);
+      if (option) {
+        const unitTotal = calculateMinimumCharge(area * option.price);
+        setTotal(unitTotal * quantidade);
       }
-      
-      // Add add-ons
-      addOns.forEach(addOnId => {
-        const addOn = addOnOptions.find(opt => opt.id === addOnId);
-        if (addOn) {
-          pricePerM2 += addOn.price;
-        }
-      });
-      
-      const unitTotal = calculateMinimumCharge(area * pricePerM2);
-      setTotal(unitTotal * quantidade);
     } else {
       setTotal(0);
     }
-  }, [largura, altura, quantidade, espessura, addOns, config]);
-
-  const handleAddOnChange = (addOnId: string, checked: boolean) => {
-    if (checked) {
-      setAddOns([...addOns, addOnId]);
-    } else {
-      setAddOns(addOns.filter(id => id !== addOnId));
-    }
-  };
+  }, [largura, altura, quantidade, selectedOption, config]);
 
   return (
     <div className="p-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Calculadora de Letra Caixa em PVC</h2>
-        <p className="text-gray-600">Configure a espessura e opcionais para calcular o preço por metro quadrado.</p>
+        <p className="text-gray-600">Selecione o tipo de letra caixa e informe as dimensões.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -119,19 +102,19 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-4">
-              Espessura
+              Tipo de Letra Caixa em PVC
             </label>
             <div className="space-y-2">
-              {espessuraOptions.map((option) => (
+              {options.map((option) => (
                 <div key={option.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
                   <div className="flex items-center">
                     <input
                       type="radio"
                       id={option.id}
-                      name="espessura"
+                      name="letraCaixaType"
                       value={option.id}
-                      checked={espessura === option.id}
-                      onChange={(e) => setEspessura(e.target.value)}
+                      checked={selectedOption === option.id}
+                      onChange={(e) => setSelectedOption(e.target.value)}
                       className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
                     <label htmlFor={option.id} className="ml-3 text-sm font-medium text-gray-700">
@@ -139,37 +122,7 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
                     </label>
                   </div>
                   <span className="text-sm text-gray-500">
-                    +{formatCurrency(option.price)}/m²
-                  </span>
-                </div>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Preço base: {formatCurrency(config.base)}/m²
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">
-              Opcionais
-            </label>
-            <div className="space-y-3">
-              {addOnOptions.map((option) => (
-                <div key={option.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id={option.id}
-                      checked={addOns.includes(option.id)}
-                      onChange={(e) => handleAddOnChange(option.id, e.target.checked)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <label htmlFor={option.id} className="ml-3 text-sm font-medium text-gray-700">
-                      {option.label}
-                    </label>
-                  </div>
-                  <span className="text-sm text-gray-500">
-                    +{formatCurrency(option.price)}/m²
+                    {formatCurrency(option.price)}/m²
                   </span>
                 </div>
               ))}
@@ -180,7 +133,7 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
         <div className="bg-gray-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Orçamento</h3>
           
-          {area > 0 && espessura && quantidade > 0 && (
+          {area > 0 && selectedOption && quantidade > 0 && (
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span>Dimensões:</span>
@@ -199,15 +152,9 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
                 <span>{areaTotal.toFixed(2)} m²</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Espessura:</span>
-                <span>{espessura}</span>
+                <span>Tipo:</span>
+                <span>{options.find(opt => opt.id === selectedOption)?.label}</span>
               </div>
-              {addOns.length > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span>Opcionais:</span>
-                  <span>{addOns.length} item(s)</span>
-                </div>
-              )}
               <hr className="my-3" />
               <div className="flex justify-between text-lg font-bold text-blue-600">
                 <span>Total:</span>
@@ -216,9 +163,9 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
             </div>
           )}
 
-          {(area <= 0 || !espessura || quantidade <= 0) && (
+          {(area <= 0 || !selectedOption || quantidade <= 0) && (
             <p className="text-gray-500 text-center py-8">
-              Preencha as dimensões, quantidade e selecione a espessura para ver o orçamento
+              Preencha as dimensões, quantidade e selecione o tipo de letra caixa para ver o orçamento
             </p>
           )}
         </div>

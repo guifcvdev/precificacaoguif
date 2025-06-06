@@ -15,14 +15,18 @@ export interface LonaConfig {
 }
 
 export interface PlacaPSConfig {
-  base: number;
-  espessura1mm: number;
-  espessura2mm: number;
-  transparente: number;
-  leitoso: number;
-  brancoPreto: number;
-  somentePlaca: number;
-  placaAdesivada: number;
+  transparente1mm: number;
+  leitoso1mm: number;
+  brancoPreto1mm: number;
+  transparente1mmAdesivada: number;
+  leitoso1mmAdesivada: number;
+  brancoPreto1mmAdesivada: number;
+  transparente2mm: number;
+  leitoso2mm: number;
+  brancoPreto2mm: number;
+  transparente2mmAdesivada: number;
+  leitoso2mmAdesivada: number;
+  brancoPreto2mmAdesivada: number;
 }
 
 export interface PlacaACMConfig {
@@ -39,12 +43,18 @@ export interface FachadaConfig {
 }
 
 export interface LetraCaixaConfig {
-  base: number;
-  espessura10mm: number;
-  espessura15mm: number;
-  espessura20mm: number;
-  pinturaAutomotiva: number;
-  fitaDuplaFace: number;
+  pvc10mm: number;
+  pvc10mmPinturaAutomotiva: number;
+  pvc10mmFitaDuplaFace: number;
+  pvc10mmPinturaFita: number;
+  pvc15mm: number;
+  pvc15mmPinturaAutomotiva: number;
+  pvc15mmFitaDuplaFace: number;
+  pvc15mmPinturaFita: number;
+  pvc20mm: number;
+  pvc20mmPinturaAutomotiva: number;
+  pvc20mmFitaDuplaFace: number;
+  pvc20mmPinturaFita: number;
 }
 
 export interface VidroConfig {
@@ -79,14 +89,18 @@ export const defaultConfig: PricingConfig = {
     soRefile: 15.00,
   },
   placaPS: {
-    base: 25.00,
-    espessura1mm: 5.00,
-    espessura2mm: 10.00,
-    transparente: 0.00,
-    leitoso: 5.00,
-    brancoPreto: 2.00,
-    somentePlaca: 0.00,
-    placaAdesivada: 10.00,
+    transparente1mm: 30.00,
+    leitoso1mm: 35.00,
+    brancoPreto1mm: 32.00,
+    transparente1mmAdesivada: 40.00,
+    leitoso1mmAdesivada: 45.00,
+    brancoPreto1mmAdesivada: 42.00,
+    transparente2mm: 35.00,
+    leitoso2mm: 40.00,
+    brancoPreto2mm: 37.00,
+    transparente2mmAdesivada: 45.00,
+    leitoso2mmAdesivada: 50.00,
+    brancoPreto2mmAdesivada: 47.00,
   },
   placaACM: {
     preco: 45.00,
@@ -100,12 +114,18 @@ export const defaultConfig: PricingConfig = {
     cantoneira: 8.00,
   },
   letraCaixa: {
-    base: 40.00,
-    espessura10mm: 10.00,
-    espessura15mm: 20.00,
-    espessura20mm: 30.00,
-    pinturaAutomotiva: 15.00,
-    fitaDuplaFace: 5.00,
+    pvc10mm: 50.00,
+    pvc10mmPinturaAutomotiva: 65.00,
+    pvc10mmFitaDuplaFace: 55.00,
+    pvc10mmPinturaFita: 70.00,
+    pvc15mm: 70.00,
+    pvc15mmPinturaAutomotiva: 85.00,
+    pvc15mmFitaDuplaFace: 75.00,
+    pvc15mmPinturaFita: 90.00,
+    pvc20mm: 90.00,
+    pvc20mmPinturaAutomotiva: 105.00,
+    pvc20mmFitaDuplaFace: 95.00,
+    pvc20mmPinturaFita: 110.00,
   },
   vidro: {
     base: 50.00,

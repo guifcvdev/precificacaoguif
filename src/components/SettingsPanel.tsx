@@ -170,14 +170,18 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             title="Placa em PS"
             section="placaPS"
             fields={[
-              { key: 'base', label: 'Preço Base', unit: 'm²' },
-              { key: 'espessura1mm', label: 'Adicional Espessura 1mm', unit: 'm²' },
-              { key: 'espessura2mm', label: 'Adicional Espessura 2mm', unit: 'm²' },
-              { key: 'transparente', label: 'Adicional Transparente', unit: 'm²' },
-              { key: 'leitoso', label: 'Adicional Leitoso', unit: 'm²' },
-              { key: 'brancoPreto', label: 'Adicional Branco/Preto', unit: 'm²' },
-              { key: 'somentePlaca', label: 'Adicional Somente Placa', unit: 'm²' },
-              { key: 'placaAdesivada', label: 'Adicional Placa Adesivada', unit: 'm²' },
+              { key: 'transparente1mm', label: 'Transparente 1mm', unit: 'm²' },
+              { key: 'leitoso1mm', label: 'Leitoso 1mm', unit: 'm²' },
+              { key: 'brancoPreto1mm', label: 'Branco/Preto 1mm', unit: 'm²' },
+              { key: 'transparente1mmAdesivada', label: 'Transparente 1mm Adesivada', unit: 'm²' },
+              { key: 'leitoso1mmAdesivada', label: 'Leitoso 1mm Adesivada', unit: 'm²' },
+              { key: 'brancoPreto1mmAdesivada', label: 'Branco/Preto 1mm Adesivada', unit: 'm²' },
+              { key: 'transparente2mm', label: 'Transparente 2mm', unit: 'm²' },
+              { key: 'leitoso2mm', label: 'Leitoso 2mm', unit: 'm²' },
+              { key: 'brancoPreto2mm', label: 'Branco/Preto 2mm', unit: 'm²' },
+              { key: 'transparente2mmAdesivada', label: 'Transparente 2mm Adesivada', unit: 'm²' },
+              { key: 'leitoso2mmAdesivada', label: 'Leitoso 2mm Adesivada', unit: 'm²' },
+              { key: 'brancoPreto2mmAdesivada', label: 'Branco/Preto 2mm Adesivada', unit: 'm²' },
             ]}
             editConfig={editConfig}
             updateConfig={updateConfig}
@@ -212,12 +216,18 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             title="Letra Caixa em PVC"
             section="letraCaixa"
             fields={[
-              { key: 'base', label: 'Preço Base', unit: 'm²' },
-              { key: 'espessura10mm', label: 'Adicional Espessura 10mm', unit: 'm²' },
-              { key: 'espessura15mm', label: 'Adicional Espessura 15mm', unit: 'm²' },
-              { key: 'espessura20mm', label: 'Adicional Espessura 20mm', unit: 'm²' },
-              { key: 'pinturaAutomotiva', label: 'Adicional Pintura Automotiva', unit: 'm²' },
-              { key: 'fitaDuplaFace', label: 'Adicional Fita Dupla-Face', unit: 'm²' },
+              { key: 'pvc10mm', label: 'PVC 10mm', unit: 'm²' },
+              { key: 'pvc10mmPinturaAutomotiva', label: 'PVC 10mm + Pintura Automotiva', unit: 'm²' },
+              { key: 'pvc10mmFitaDuplaFace', label: 'PVC 10mm + Fita Dupla-Face', unit: 'm²' },
+              { key: 'pvc10mmPinturaFita', label: 'PVC 10mm + Pintura + Fita', unit: 'm²' },
+              { key: 'pvc15mm', label: 'PVC 15mm', unit: 'm²' },
+              { key: 'pvc15mmPinturaAutomotiva', label: 'PVC 15mm + Pintura Automotiva', unit: 'm²' },
+              { key: 'pvc15mmFitaDuplaFace', label: 'PVC 15mm + Fita Dupla-Face', unit: 'm²' },
+              { key: 'pvc15mmPinturaFita', label: 'PVC 15mm + Pintura + Fita', unit: 'm²' },
+              { key: 'pvc20mm', label: 'PVC 20mm', unit: 'm²' },
+              { key: 'pvc20mmPinturaAutomotiva', label: 'PVC 20mm + Pintura Automotiva', unit: 'm²' },
+              { key: 'pvc20mmFitaDuplaFace', label: 'PVC 20mm + Fita Dupla-Face', unit: 'm²' },
+              { key: 'pvc20mmPinturaFita', label: 'PVC 20mm + Pintura + Fita', unit: 'm²' },
             ]}
             editConfig={editConfig}
             updateConfig={updateConfig}
