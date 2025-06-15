@@ -203,12 +203,11 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             title="Letra Caixa em PVC"
             section="letraCaixa"
             fields={[
-              { key: 'base', label: 'Preço Base', unit: 'm²' },
-              { key: 'espessura10mm', label: 'Adicional Espessura 10mm', unit: 'm²' },
-              { key: 'espessura15mm', label: 'Adicional Espessura 15mm', unit: 'm²' },
-              { key: 'espessura20mm', label: 'Adicional Espessura 20mm', unit: 'm²' },
-              { key: 'pinturaAutomotiva', label: 'Adicional Pintura Automotiva', unit: 'm²' },
-              { key: 'fitaDuplaFace', label: 'Adicional Fita Dupla-Face', unit: 'm²' },
+              { key: 'espessura10mm', label: 'Espessura 10mm', unit: 'm²' },
+              { key: 'espessura15mm', label: 'Espessura 15mm', unit: 'm²' },
+              { key: 'espessura20mm', label: 'Espessura 20mm', unit: 'm²' },
+              { key: 'pinturaAutomotiva', label: 'Pintura Automotiva (Opcional)', unit: 'm²' },
+              { key: 'fitaDuplaFace', label: 'Fita Dupla-Face (Opcional)', unit: 'm²' },
             ]}
             editConfig={editConfig}
             updateConfig={updateConfig}

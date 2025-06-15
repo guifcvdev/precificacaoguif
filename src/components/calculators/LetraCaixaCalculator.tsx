@@ -17,6 +17,7 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
   const area = largura * altura;
   const areaTotal = area * quantidade;
 
+  // Agora cada opção de espessura possui um preço fixo.
   const espessuraOptions = [
     { id: '10mm', label: '10mm', price: config.espessura10mm },
     { id: '15mm', label: '15mm', price: config.espessura15mm },
@@ -30,21 +31,17 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
 
   useEffect(() => {
     if (area > 0 && espessura && quantidade > 0) {
-      let pricePerM2 = config.base;
-      
       const espessuraOption = espessuraOptions.find(opt => opt.id === espessura);
-      if (espessuraOption) {
-        pricePerM2 += espessuraOption.price;
-      }
-      
-      // Add add-ons
+      let pricePerM2 = espessuraOption ? espessuraOption.price : 0;
+
+      // Soma opcionais
       addOns.forEach(addOnId => {
         const addOn = addOnOptions.find(opt => opt.id === addOnId);
         if (addOn) {
           pricePerM2 += addOn.price;
         }
       });
-      
+
       const unitTotal = calculateMinimumCharge(area * pricePerM2);
       setTotal(unitTotal * quantidade);
     } else {
@@ -64,7 +61,7 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
     <div className="p-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Calculadora de Letra Caixa em PVC</h2>
-        <p className="text-gray-600">Configure a espessura e opcionais para calcular o preço por metro quadrado.</p>
+        <p className="text-gray-600">Escolha a espessura, adicione opcionais e veja o valor total por m².</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -139,14 +136,11 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
                     </label>
                   </div>
                   <span className="text-sm text-gray-500">
-                    +{formatCurrency(option.price)}/m²
+                    {formatCurrency(option.price)}/m²
                   </span>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Preço base: {formatCurrency(config.base)}/m²
-            </p>
           </div>
 
           <div>
