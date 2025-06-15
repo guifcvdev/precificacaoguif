@@ -17,9 +17,10 @@ const VidroCalculator: React.FC<Props> = ({ config }) => {
   const area = largura * altura;
   const areaTotal = area * quantidade;
 
+  // ATUALIZADO: troca de 9mm para 8mm
   const espessuraOptions = [
     { id: '6mm', label: '6mm', price: config.espessura6mm },
-    { id: '9mm', label: '9mm', price: config.espessura9mm },
+    { id: '8mm', label: '8mm', price: config.espessura8mm },
   ];
 
   useEffect(() => {

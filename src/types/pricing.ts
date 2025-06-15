@@ -49,7 +49,7 @@ export interface LetraCaixaConfig {
  */
 export interface VidroConfig {
   espessura6mm: number;  // preço unitário por m²
-  espessura9mm: number;  // preço unitário por m²
+  espessura8mm: number;  // preço unitário por m² (ATUALIZADO de 9mm para 8mm)
   prolongadores: number; // preço por unidade
 }
 
@@ -101,7 +101,7 @@ export const defaultConfig: PricingConfig = {
   },
   vidro: {
     espessura6mm: 60.0,
-    espessura9mm: 80.0,
+    espessura8mm: 80.0, // ATUALIZADO de 9mm para 8mm
     prolongadores: 25.0,
   },
 };

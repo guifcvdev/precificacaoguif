@@ -218,7 +218,7 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             section="vidro"
             fields={[
               { key: 'espessura6mm', label: 'Espessura 6mm', unit: 'm²' },
-              { key: 'espessura9mm', label: 'Espessura 9mm', unit: 'm²' },
+              { key: 'espessura8mm', label: 'Espessura 8mm', unit: 'm²' },
               { key: 'prolongadores', label: 'Prolongadores', unit: 'unid' },
             ]}
             editConfig={editConfig}
