@@ -217,9 +217,8 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             title="Vidro Temperado"
             section="vidro"
             fields={[
-              { key: 'base', label: 'Preço Base', unit: 'm²' },
-              { key: 'espessura6mm', label: 'Adicional Espessura 6mm', unit: 'm²' },
-              { key: 'espessura8mm', label: 'Adicional Espessura 8mm', unit: 'm²' },
+              { key: 'espessura6mm', label: 'Espessura 6mm', unit: 'm²' },
+              { key: 'espessura9mm', label: 'Espessura 9mm', unit: 'm²' },
               { key: 'prolongadores', label: 'Prolongadores', unit: 'unid' },
             ]}
             editConfig={editConfig}

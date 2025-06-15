@@ -19,23 +19,22 @@ const VidroCalculator: React.FC<Props> = ({ config }) => {
 
   const espessuraOptions = [
     { id: '6mm', label: '6mm', price: config.espessura6mm },
-    { id: '8mm', label: '8mm', price: config.espessura8mm },
+    { id: '9mm', label: '9mm', price: config.espessura9mm },
   ];
 
   useEffect(() => {
     if (area > 0 && espessura && quantidade > 0) {
-      let pricePerM2 = config.base;
-      
       const espessuraOption = espessuraOptions.find(opt => opt.id === espessura);
-      if (espessuraOption) {
-        pricePerM2 += espessuraOption.price;
+      if (!espessuraOption) {
+        setTotal(0);
+        return;
       }
-      
-      const unitAreaTotal = calculateMinimumCharge(area * pricePerM2);
-      const areaTotal = unitAreaTotal * quantidade;
+      // Cálculo formato Placa PS: área x preço espessura, aplica mínimo, depois quantidade
+      const unitValue = calculateMinimumCharge(area * espessuraOption.price);
+      const vidroTotal = unitValue * quantidade;
       const prolongadoresTotal = prolongadores * config.prolongadores;
-      
-      setTotal(areaTotal + prolongadoresTotal);
+
+      setTotal(vidroTotal + prolongadoresTotal);
     } else {
       setTotal(0);
     }
@@ -120,14 +119,11 @@ const VidroCalculator: React.FC<Props> = ({ config }) => {
                     </label>
                   </div>
                   <span className="text-sm text-gray-500">
-                    +{formatCurrency(option.price)}/m²
+                    {formatCurrency(option.price)}/m²
                   </span>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Preço base: {formatCurrency(config.base)}/m²
-            </p>
           </div>
 
           <div>
@@ -175,7 +171,11 @@ const VidroCalculator: React.FC<Props> = ({ config }) => {
               </div>
               <div className="flex justify-between text-sm">
                 <span>Vidro:</span>
-                <span>{formatCurrency(calculateMinimumCharge(area * (config.base + (espessuraOptions.find(opt => opt.id === espessura)?.price || 0))) * quantidade)}</span>
+                <span>
+                  {formatCurrency(
+                    calculateMinimumCharge(area * (espessuraOptions.find(opt => opt.id === espessura)?.price || 0)) * quantidade
+                  )}
+                </span>
               </div>
               {prolongadores > 0 && (
                 <div className="flex justify-between text-sm">

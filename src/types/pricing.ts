@@ -44,11 +44,13 @@ export interface LetraCaixaConfig {
   fitaDuplaFace: number;
 }
 
+/**
+ * VidroConfig: Preço de cada espessura por m² (como Placa PS), prolongadores por unidade.
+ */
 export interface VidroConfig {
-  base: number;
-  espessura6mm: number;
-  espessura8mm: number;
-  prolongadores: number;
+  espessura6mm: number;  // preço unitário por m²
+  espessura9mm: number;  // preço unitário por m²
+  prolongadores: number; // preço por unidade
 }
 
 export interface PricingConfig {
@@ -98,9 +100,8 @@ export const defaultConfig: PricingConfig = {
     fitaDuplaFace: 5.0,
   },
   vidro: {
-    base: 50.0,
-    espessura6mm: 10.0,
-    espessura8mm: 20.0,
+    espessura6mm: 60.0,
+    espessura9mm: 80.0,
     prolongadores: 25.0,
   },
 };
