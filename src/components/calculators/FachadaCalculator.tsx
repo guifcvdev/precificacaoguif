@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { FachadaConfig, formatCurrency, calculateMinimumCharge } from '../../types/pricing';
 
@@ -24,10 +23,10 @@ const FachadaCalculator: React.FC<Props> = ({ config }) => {
 
   const items = [
     { id: 'metalon20x20', label: 'Metalon 20x20', price: config.metalon20x20, unit: 'unid' },
+    { id: 'cantoneira', label: 'Cantoneira 3/4', price: config.cantoneira, unit: 'unid' },
     { id: 'metalon30x20', label: 'Metalon 30x20', price: config.metalon30x20, unit: 'unid' },
     { id: 'acm122', label: 'ACM 1.22m', price: config.acm122, unit: 'unid' },
     { id: 'acm150', label: 'ACM 1.50m', price: config.acm150, unit: 'unid' },
-    { id: 'cantoneira', label: 'Cantoneira 3/4', price: config.cantoneira, unit: 'unid' },
   ];
 
   useEffect(() => {
