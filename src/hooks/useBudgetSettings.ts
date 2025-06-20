@@ -32,7 +32,11 @@ export const useBudgetSettings = () => {
     localStorage.setItem('budgetObservations', JSON.stringify(newObservations));
   };
 
-  const formatBudgetText = (quantity: string | number, total: number) => {
+  const formatBudgetText = (quantity: string | number, total: number, deliveryDays?: string) => {
+    const deliveryText = deliveryDays 
+      ? `- Entrega do pedido em ${deliveryDays} dias úteis após a aprovação de arte e pagamento.`
+      : observations.deliveryTime;
+
     return `Título: Orçamento
 Quantidade: ${quantity}
 Total: R$ ${total.toFixed(2).replace('.', ',')}
@@ -42,7 +46,7 @@ Forma de Pagamento
 ${observations.paymentMethod}
 
 Prazo de Entrega
-${observations.deliveryTime}
+${deliveryText}
 
 ${observations.warranty}`;
   };

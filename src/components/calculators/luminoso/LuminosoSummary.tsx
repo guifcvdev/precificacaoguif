@@ -32,7 +32,7 @@ const LuminosoSummary: React.FC<Props> = ({
   const handleCopyBudget = async () => {
     // Calcular quantidade total considerando lonas e materiais
     const totalQuantity = quantidadeLona + Object.values(quantities).reduce((sum, qty) => sum + qty, 0);
-    const budgetText = formatBudgetText(totalQuantity, total);
+    const budgetText = formatBudgetText(totalQuantity, total, '7');
     
     try {
       await navigator.clipboard.writeText(budgetText);
@@ -109,7 +109,7 @@ const LuminosoSummary: React.FC<Props> = ({
         {total > 0 && (
           <>
             <hr className="my-3" />
-            <div className="flex justify-between text-lg font-bold text-blue-600">
+            <div className="flex justify-between text-lg font-bold budget-price">
               <span>Total:</span>
               <span>{formatCurrency(total)}</span>
             </div>

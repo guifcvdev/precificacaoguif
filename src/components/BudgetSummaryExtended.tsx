@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { formatCurrency, PricingConfig } from '../types/pricing';
 import { Checkbox } from './ui/checkbox';
@@ -29,6 +30,7 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
   const [notaFiscal, setNotaFiscal] = useState<boolean>(false);
   const [cartaoCredito, setCartaoCredito] = useState<string>('');
   const [instalacao, setInstalacao] = useState<string>('');
+  const [prazoEntrega, setPrazoEntrega] = useState<string>('7');
   const [finalTotal, setFinalTotal] = useState<number>(0);
   const { formatBudgetText } = useBudgetSettings();
   const { toast } = useToast();
@@ -46,6 +48,13 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
     { value: '3x', label: '3x', taxa: config.cartaoCredito.taxa3x },
     { value: '6x', label: '6x', taxa: config.cartaoCredito.taxa6x },
     { value: '12x', label: '12x', taxa: config.cartaoCredito.taxa12x },
+  ];
+
+  const prazoOptions = [
+    { value: '3', label: '3 dias úteis' },
+    { value: '7', label: '7 dias úteis' },
+    { value: '15', label: '15 dias úteis' },
+    { value: '30', label: '30 dias úteis' },
   ];
 
   useEffect(() => {
@@ -80,7 +89,7 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
   };
 
   const handleCopyBudget = async () => {
-    const budgetText = formatBudgetText(quantity, finalTotal);
+    const budgetText = formatBudgetText(quantity, finalTotal, prazoEntrega);
     
     try {
       await navigator.clipboard.writeText(budgetText);
@@ -188,6 +197,27 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
               <span className="currency-value">+{formatCurrency((baseTotal * (cartaoOptions.find(o => o.value === cartaoCredito)?.taxa || 0)) / 100)}</span>
             </div>
           )}
+        </div>
+
+        {/* Prazo de Entrega */}
+        <div className="space-y-3">
+          <Label className="form-label">
+            Prazo de Entrega:
+          </Label>
+          <RadioGroup value={prazoEntrega} onValueChange={setPrazoEntrega} className="ml-4">
+            {prazoOptions.map((option) => (
+              <div key={option.value} className="flex items-center space-x-2">
+                <RadioGroupItem 
+                  value={option.value} 
+                  id={`prazo-${option.value}`}
+                  className="checkbox-enhanced"
+                />
+                <Label htmlFor={`prazo-${option.value}`} className="text-body text-sm">
+                  {option.label}
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
         </div>
 
         {/* Instalação */}
