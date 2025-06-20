@@ -46,56 +46,73 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Background usando tons de cinza profundos para criar profundidade */
+    --background: 220 13% 11%;  /* #1C1C1E equivalent */
+    --foreground: 0 0% 93%;     /* #EDEDED - texto principal claro */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    /* Cards com elevação sutil */
+    --card: 220 13% 17%;        /* #2C2C2E - containers */
+    --card-foreground: 0 0% 93%; /* #EDEDED */
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 13% 17%;     /* #2C2C2E */
+    --popover-foreground: 0 0% 93%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Primary com azul suave inspirado no macOS */
+    --primary: 213 94% 68%;     /* Azul suave #007AFF style */
+    --primary-foreground: 220 13% 11%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary com cinza médio */
+    --secondary: 220 13% 23%;   /* #3A3A3C */
+    --secondary-foreground: 0 0% 85%; /* #D9D9D9 */
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    /* Muted para elementos de menor hierarquia */
+    --muted: 220 13% 20%;       /* Cinza médio */
+    --muted-foreground: 0 0% 70%; /* #B3B3B3 */
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Accent com tons suaves */
+    --accent: 220 13% 23%;      /* #3A3A3C */
+    --accent-foreground: 0 0% 85%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive com vermelho suave */
+    --destructive: 0 72% 65%;   /* Vermelho suave */
+    --destructive-foreground: 0 0% 93%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    /* Borders semitranslúcidas para efeito frosted glass */
+    --border: 220 13% 30%;      /* Bordas suaves */
+    --input: 220 13% 20%;       /* Inputs com fundo escuro */
+    --ring: 213 94% 68%;        /* Focus ring azul suave */
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 94.1%;
-    --sidebar-primary-foreground: 240 5.9% 10%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar com variação sutil */
+    --sidebar-background: 220 13% 14%;  /* Ligeiramente mais claro que o fundo */
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 213 94% 68%;
+    --sidebar-primary-foreground: 220 13% 11%;
+    --sidebar-accent: 220 13% 20%;
+    --sidebar-accent-foreground: 0 0% 85%;
+    --sidebar-border: 220 13% 25%;
+    --sidebar-ring: 213 94% 68%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
-    transition: background-color 300ms ease-in-out, color 300ms ease-in-out, border-color 300ms ease-in-out;
+    /* Transições suaves e elegantes entre temas */
+    transition: 
+      background-color 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      color 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      border-color 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      box-shadow 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
   body {
     @apply bg-background text-foreground;
+    /* Suavização de fontes para melhor legibilidade */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar com tema adaptativo */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -105,9 +122,30 @@
     display: none;
   }
 
-  /* Glassmorphism utilities */
+  /* Glassmorphism aprimorado para tema escuro */
   .glass {
     @apply bg-white/10 backdrop-blur-xl border border-white/20;
+  }
+
+  .dark .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  /* Elevation/sombras suaves para profundidade */
+  .elevation-1 {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  .dark .elevation-1 {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .elevation-2 {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .dark .elevation-2 {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -139,13 +177,56 @@
     }
   }
 
-  /* Focus utilities */
+  /* Focus utilities aprimorados */
   .focus-ring {
     @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
 
-  /* Gradient text */
+  .dark .focus-ring {
+    @apply focus:ring-offset-background;
+  }
+
+  /* Gradient text com adaptação para tema escuro */
   .gradient-text {
     @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+  }
+
+  .dark .gradient-text {
+    @apply bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent;
+  }
+
+  /* Text contrast utilities para WCAG compliance */
+  .text-high-contrast {
+    @apply text-foreground;
+  }
+
+  .text-medium-contrast {
+    @apply text-muted-foreground;
+  }
+
+  .text-low-contrast {
+    @apply text-muted-foreground/70;
+  }
+
+  /* Interactive states inspirados no macOS/iOS */
+  .interactive-hover {
+    @apply transition-all duration-200 ease-out hover:scale-[1.02] hover:shadow-lg;
+  }
+
+  .dark .interactive-hover {
+    @apply hover:bg-white/5;
+  }
+
+  .interactive-pressed {
+    @apply transition-all duration-100 ease-out active:scale-[0.98];
+  }
+
+  /* Card styling com profundidade */
+  .card-elevated {
+    @apply bg-card border border-border rounded-lg elevation-1;
+  }
+
+  .dark .card-elevated {
+    @apply bg-card/80 backdrop-blur-sm border-border/50;
   }
 }
