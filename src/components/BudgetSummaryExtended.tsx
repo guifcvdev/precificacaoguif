@@ -68,6 +68,10 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
     setFinalTotal(total);
   }, [baseTotal, notaFiscal, cartaoCredito, instalacao, config]);
 
+  const handleNotaFiscalChange = (checked: boolean | "indeterminate") => {
+    setNotaFiscal(checked === true);
+  };
+
   if (!hasValidData) {
     return (
       <div className="summary-box">
@@ -97,7 +101,7 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
             <Checkbox
               id="notaFiscal"
               checked={notaFiscal}
-              onCheckedChange={setNotaFiscal}
+              onCheckedChange={handleNotaFiscalChange}
               className="checkbox-enhanced"
             />
             <Label htmlFor="notaFiscal" className="form-label">

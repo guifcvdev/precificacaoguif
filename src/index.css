@@ -131,17 +131,17 @@
     @apply bg-white/5 backdrop-blur-xl border border-white/10;
   }
 
-  /* Elevation/sombras suaves para profundidade */
+  /* Elevation/sombras suaves para profundidade - definidas sem dependência circular */
   .elevation-1 {
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   }
 
-  .dark .elevation-1 {
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  }
-
   .elevation-2 {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .dark .elevation-1 {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
   }
 
   .dark .elevation-2 {
@@ -242,13 +242,15 @@
     @apply transition-all duration-100 ease-out active:scale-[0.98];
   }
 
-  /* Card styling com profundidade aprimorada */
+  /* Card styling com profundidade aprimorada - removendo dependência circular */
   .card-elevated {
-    @apply bg-card border border-border rounded-lg elevation-1;
+    @apply bg-card border border-border rounded-lg;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   }
 
   .dark .card-elevated {
-    @apply bg-card border-border elevation-2;
+    @apply bg-card border-border;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
   }
 
   /* Summary box otimizado para tema escuro */
