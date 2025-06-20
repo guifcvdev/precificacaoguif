@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { ArrowDown, Settings, Save, X } from 'lucide-react';
 import { PricingConfig, formatCurrency } from '../types/pricing';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { CurrencyInput } from './ui/currency-input';
 
 interface Props {
   config: PricingConfig;
@@ -32,18 +34,12 @@ const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, 
             <label className="block text-sm font-medium text-foreground">
               {field.label} {field.unit && `(${field.unit})`}
             </label>
-            <div className="relative group">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm font-medium">
-                R$
-              </span>
-              <input
-                type="text"
-                value={editConfig[section]?.[field.key] || ''}
-                onChange={(e) => updateConfig(section, field.key, e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-background/50 border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200 placeholder:text-muted-foreground hover:bg-background/70"
-                placeholder="0,00"
-              />
-            </div>
+            <CurrencyInput
+              value={editConfig[section]?.[field.key] || ''}
+              onChange={(value) => updateConfig(section, field.key, value)}
+              placeholder="R$ 0,00"
+              className="hover:bg-background/70"
+            />
           </div>
         ))}
       </div>
@@ -54,48 +50,53 @@ const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, 
 ConfigSection.displayName = 'ConfigSection';
 
 const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
-  // Convert numbers to strings for editing
-  const convertConfigToStrings = (config: PricingConfig) => {
+  // Convert numbers to formatted currency strings for editing
+  const convertConfigToCurrency = (config: PricingConfig) => {
     const result: any = {};
     Object.keys(config).forEach(section => {
       result[section] = {};
       Object.keys(config[section as keyof PricingConfig] as any).forEach(field => {
         const value = (config[section as keyof PricingConfig] as any)[field];
-        result[section][field] = value.toString().replace('.', ',');
+        result[section][field] = new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(value);
       });
     });
     return result;
   };
 
-  const convertStringsToNumbers = (stringConfig: any): PricingConfig => {
+  const convertCurrencyToNumbers = (currencyConfig: any): PricingConfig => {
     const result: any = {};
-    Object.keys(stringConfig).forEach(section => {
+    Object.keys(currencyConfig).forEach(section => {
       result[section] = {};
-      Object.keys(stringConfig[section]).forEach(field => {
-        const stringValue = stringConfig[section][field];
-        const numericValue = parseFloat(stringValue.replace(',', '.')) || 0;
+      Object.keys(currencyConfig[section]).forEach(field => {
+        const currencyValue = currencyConfig[section][field];
+        // Remove R$, pontos e substitui vírgula por ponto para parseFloat
+        const cleanValue = currencyValue.replace(/[R$\s.]/g, '').replace(',', '.');
+        const numericValue = parseFloat(cleanValue) || 0;
         result[section][field] = numericValue;
       });
     });
     return result as PricingConfig;
   };
 
-  const [editConfig, setEditConfig] = useState(convertConfigToStrings(config));
+  const [editConfig, setEditConfig] = useState(convertConfigToCurrency(config));
 
   const handleSave = () => {
-    const numericConfig = convertStringsToNumbers(editConfig);
+    const numericConfig = convertCurrencyToNumbers(editConfig);
     onSave(numericConfig);
     onClose();
   };
 
   const updateConfig = (section: string, field: string, value: string) => {
-    const cleanValue = value.replace(/[^0-9,]/g, '');
-    
     setEditConfig(prev => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: cleanValue
+        [field]: value
       }
     }));
   };
