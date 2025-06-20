@@ -1,6 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { LuminosoConfig, formatCurrency, calculateMinimumCharge } from '../../types/pricing';
+import { LuminosoConfig, calculateMinimumCharge } from '../../types/pricing';
+import LuminosoDimensionsForm from './luminoso/LuminosoDimensionsForm';
+import LuminosoMaterialsForm from './luminoso/LuminosoMaterialsForm';
+import LuminosoSummary from './luminoso/LuminosoSummary';
 
 interface Props {
   config: LuminosoConfig;
@@ -28,7 +31,6 @@ const LuminosoCalculator: React.FC<Props> = ({ config }) => {
   const [total, setTotal] = useState<number>(0);
 
   const areaLona = larguraLona * alturaLona;
-  const areaLonaTotal = areaLona * quantidadeLona;
 
   const items = [
     { id: 'metalon20x20', label: 'Metalon 20x20', price: config.metalon20x20, unit: 'unid' },
@@ -84,146 +86,31 @@ const LuminosoCalculator: React.FC<Props> = ({ config }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">
-              Dimensões da Lona Backlight
-            </label>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Largura backlight (m)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={larguraLona || ''}
-                  onChange={(e) => setLarguraLona(parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Altura backlight (m)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={alturaLona || ''}
-                  onChange={(e) => setAlturaLona(parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Quantidade</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={quantidadeLona || ''}
-                  onChange={(e) => setQuantidadeLona(parseInt(e.target.value) || 1)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="1"
-                />
-              </div>
-            </div>
-            {areaLona > 0 && (
-              <p className="text-sm text-gray-600 mt-2">
-                Área unitária backlight: {areaLona.toFixed(2)} m² | Área total backlight: {areaLonaTotal.toFixed(2)} m² - Preço: {formatCurrency(config.lona)}/m²
-              </p>
-            )}
-          </div>
+          <LuminosoDimensionsForm
+            larguraLona={larguraLona}
+            alturaLona={alturaLona}
+            quantidadeLona={quantidadeLona}
+            config={config}
+            onLarguraChange={setLarguraLona}
+            onAlturaChange={setAlturaLona}
+            onQuantidadeChange={setQuantidadeLona}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">
-              Materiais Adicionais
-            </label>
-            <div className="space-y-4">
-              {items.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">
-                      {item.label}
-                    </label>
-                    <p className="text-xs text-gray-500">
-                      {formatCurrency(item.price)}/{item.unit}
-                    </p>
-                  </div>
-                  <div className="w-24">
-                    <input
-                      type="number"
-                      min="0"
-                      value={quantities[item.id as keyof typeof quantities] || ''}
-                      onChange={(e) => handleQuantityChange(item.id, parseFloat(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <LuminosoMaterialsForm
+            config={config}
+            quantities={quantities}
+            onQuantityChange={handleQuantityChange}
+          />
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Orçamento</h3>
-          
-          <div className="space-y-3">
-            {areaLona > 0 && quantidadeLona > 0 && (
-              <>
-                <div className="flex justify-between text-sm">
-                  <span>Dimensões da Lona Backlight:</span>
-                  <span>{larguraLona.toFixed(2)} x {alturaLona.toFixed(2)} m</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Quantidade de Lonas Backlight:</span>
-                  <span>{quantidadeLona} unidade(s)</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Área unitária backlight:</span>
-                  <span>{areaLona.toFixed(2)} m²</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Área total backlight:</span>
-                  <span>{areaLonaTotal.toFixed(2)} m²</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Custo da Lona Backlight:</span>
-                  <span>{formatCurrency(calculateMinimumCharge(areaLona * config.lona) * quantidadeLona)}</span>
-                </div>
-              </>
-            )}
-            
-            {Object.entries(quantities).map(([key, quantity]) => {
-              if (quantity > 0) {
-                const item = items.find(item => item.id === key);
-                if (item) {
-                  return (
-                    <div key={key} className="flex justify-between text-sm">
-                      <span>{item.label} ({quantity}x):</span>
-                      <span>{formatCurrency(quantity * item.price)}</span>
-                    </div>
-                  );
-                }
-              }
-              return null;
-            })}
-            
-            {total > 0 && (
-              <>
-                <hr className="my-3" />
-                <div className="flex justify-between text-lg font-bold text-blue-600">
-                  <span>Total:</span>
-                  <span>{formatCurrency(total)}</span>
-                </div>
-              </>
-            )}
-          </div>
-
-          {total === 0 && (
-            <p className="text-gray-500 text-center py-8">
-              Preencha as dimensões da lona backlight ou as quantidades dos materiais para ver o orçamento
-            </p>
-          )}
-        </div>
+        <LuminosoSummary
+          larguraLona={larguraLona}
+          alturaLona={alturaLona}
+          quantidadeLona={quantidadeLona}
+          quantities={quantities}
+          config={config}
+          total={total}
+        />
       </div>
     </div>
   );
