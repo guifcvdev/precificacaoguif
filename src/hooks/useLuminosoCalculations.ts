@@ -74,7 +74,8 @@ export const useLuminosoCalculations = (config: LuminosoConfig) => {
     luminosoMaterials.forEach(material => {
       const quantity = quantities[material.id] || 0;
       if (quantity > 0) {
-        totalValue += quantity * config[material.id];
+        const materialPrice = config[material.id] as number;
+        totalValue += quantity * materialPrice;
       }
     });
     

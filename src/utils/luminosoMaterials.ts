@@ -1,8 +1,6 @@
 
-import { LuminosoConfig } from '../types/pricing';
-
 export interface LuminosoMaterial {
-  id: keyof LuminosoConfig;
+  id: keyof Omit<import('../types/pricing').LuminosoConfig, 'estruturaMetalica'>;
   label: string;
   unit: string;
 }
@@ -24,8 +22,9 @@ export const luminosoMaterials: LuminosoMaterial[] = [
 ];
 
 export const getInitialQuantities = (): Record<string, number> => {
-  return luminosoMaterials.reduce((acc, material) => {
-    acc[material.id] = 0;
-    return acc;
-  }, {} as Record<string, number>);
+  const quantities: Record<string, number> = {};
+  luminosoMaterials.forEach(material => {
+    quantities[material.id] = 0;
+  });
+  return quantities;
 };

@@ -96,10 +96,11 @@ const LuminosoSummary: React.FC<Props> = ({
         {luminosoMaterials.map((material) => {
           const quantity = quantities[material.id];
           if (quantity > 0) {
+            const materialPrice = config[material.id] as number;
             return (
               <div key={material.id} className="flex justify-between text-sm">
                 <span>{material.label} ({quantity}x):</span>
-                <span>{formatCurrency(quantity * config[material.id])}</span>
+                <span>{formatCurrency(quantity * materialPrice)}</span>
               </div>
             );
           }
