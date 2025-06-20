@@ -1,4 +1,3 @@
-
 export interface AdesivoConfig {
   corteEspecial: number;
   soRefile: number;
@@ -53,6 +52,23 @@ export interface VidroConfig {
   prolongadores: number; // preço por unidade
 }
 
+export interface LuminosoConfig {
+  lona: number;
+  metalon20x20: number;
+  acm122: number;
+  acm150: number;
+  lampadaTubular122: number;
+  lampadaTubular60: number;
+  moduloLed17w: number;
+  moduloLed15w: number;
+  fonteChaveada5a: number;
+  fonteChaveada10a: number;
+  fonteChaveada15a: number;
+  fonteChaveada20a: number;
+  fonteChaveada30a: number;
+  luminosoRedondoOval: number;
+}
+
 export interface PricingConfig {
   adesivo: AdesivoConfig;
   lona: LonaConfig;
@@ -61,6 +77,7 @@ export interface PricingConfig {
   fachada: FachadaConfig;
   letraCaixa: LetraCaixaConfig;
   vidro: VidroConfig;
+  luminoso: LuminosoConfig;
 }
 
 export const defaultConfig: PricingConfig = {
@@ -103,6 +120,22 @@ export const defaultConfig: PricingConfig = {
     espessura6mm: 60.0,
     espessura8mm: 80.0, // ATUALIZADO de 9mm para 8mm
     prolongadores: 25.0,
+  },
+  luminoso: {
+    lona: 20.0,
+    metalon20x20: 15.0,
+    acm122: 120.0,
+    acm150: 150.0,
+    lampadaTubular122: 25.0,
+    lampadaTubular60: 15.0,
+    moduloLed17w: 8.0,
+    moduloLed15w: 7.0,
+    fonteChaveada5a: 45.0,
+    fonteChaveada10a: 65.0,
+    fonteChaveada15a: 85.0,
+    fonteChaveada20a: 105.0,
+    fonteChaveada30a: 145.0,
+    luminosoRedondoOval: 200.0,
   },
 };
 

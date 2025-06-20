@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, Package, Square, Layers, Building, Type, Shield } from 'lucide-react';
+import { FileText, Package, Square, Layers, Building, Type, Shield, Lightbulb } from 'lucide-react';
 
 interface ModernTabsProps {
   activeTab: string;
@@ -16,6 +16,7 @@ const ModernTabs: React.FC<ModernTabsProps> = ({ activeTab, onTabChange }) => {
     { id: 'fachada', label: 'Fachada Simples', icon: Building, color: 'from-orange-500 to-red-500' },
     { id: 'letra-caixa', label: 'Letra Caixa em PVC', icon: Type, color: 'from-teal-500 to-cyan-500' },
     { id: 'vidro', label: 'Vidro Temperado', icon: Shield, color: 'from-indigo-500 to-purple-500' },
+    { id: 'luminoso', label: 'Luminoso', icon: Lightbulb, color: 'from-yellow-500 to-orange-500' },
   ];
 
   return (

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowDown, Settings, Save, X } from 'lucide-react';
 import { PricingConfig, formatCurrency } from '../types/pricing';
@@ -221,6 +220,29 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
               { key: 'espessura6mm', label: 'Espessura 6mm', unit: 'm²' },
               { key: 'espessura8mm', label: 'Espessura 8mm', unit: 'm²' },
               { key: 'prolongadores', label: 'Prolongadores', unit: 'unid' },
+            ]}
+            editConfig={editConfig}
+            updateConfig={updateConfig}
+          />
+
+          <ConfigSection
+            title="Luminoso"
+            section="luminoso"
+            fields={[
+              { key: 'lona', label: 'Lona', unit: 'm²' },
+              { key: 'metalon20x20', label: 'Metalon 20x20', unit: 'unid' },
+              { key: 'acm122', label: 'ACM 1.22m', unit: 'unid' },
+              { key: 'acm150', label: 'ACM 1.50m', unit: 'unid' },
+              { key: 'lampadaTubular122', label: 'Lâmpada Tubular 1,22m', unit: 'unid' },
+              { key: 'lampadaTubular60', label: 'Lâmpada Tubular 60cm', unit: 'unid' },
+              { key: 'moduloLed17w', label: 'Módulo LED 1,7w Lente 160º', unit: 'unid' },
+              { key: 'moduloLed15w', label: 'Módulo LED 1,5w Mega Lente', unit: 'unid' },
+              { key: 'fonteChaveada5a', label: 'Fonte Chaveada 5a', unit: 'unid' },
+              { key: 'fonteChaveada10a', label: 'Fonte Chaveada 10a', unit: 'unid' },
+              { key: 'fonteChaveada15a', label: 'Fonte Chaveada 15a', unit: 'unid' },
+              { key: 'fonteChaveada20a', label: 'Fonte Chaveada 20a', unit: 'unid' },
+              { key: 'fonteChaveada30a', label: 'Fonte Chaveada 30a', unit: 'unid' },
+              { key: 'luminosoRedondoOval', label: 'Luminoso Redondo ou Oval', unit: 'unid' },
             ]}
             editConfig={editConfig}
             updateConfig={updateConfig}
