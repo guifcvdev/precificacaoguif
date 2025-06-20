@@ -3,6 +3,7 @@ import React from 'react';
 import { Calculator, Settings, Download } from 'lucide-react';
 import { Button } from './ui/button';
 import { useBudgets } from '../hooks/useBudgets';
+import ThemeToggle from './ThemeToggle';
 
 interface ModernHeaderProps {
   onSettingsClick: () => void;
@@ -46,6 +47,8 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
                 <span className="hidden sm:inline">Exportar</span>
               </Button>
             )}
+
+            <ThemeToggle />
 
             <Button variant="outline" size="sm" onClick={onSettingsClick}>
               <Settings className="w-4 h-4 mr-2" />
