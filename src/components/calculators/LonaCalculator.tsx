@@ -1,12 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
-import { LonaConfig, formatCurrency, calculateMinimumCharge } from '../../types/pricing';
+import { LonaConfig, formatCurrency, calculateMinimumCharge, PricingConfig } from '../../types/pricing';
+import BudgetSummaryExtended from '../BudgetSummaryExtended';
 
 interface Props {
   config: LonaConfig;
+  fullConfig: PricingConfig;
 }
 
-const LonaCalculator: React.FC<Props> = ({ config }) => {
+const LonaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
   const [largura, setLargura] = useState<number>(0);
   const [altura, setAltura] = useState<number>(0);
   const [quantidade, setQuantidade] = useState<number>(1);
@@ -34,6 +35,33 @@ const LonaCalculator: React.FC<Props> = ({ config }) => {
       setTotal(0);
     }
   }, [largura, altura, quantidade, selectedOption, config]);
+
+  const hasValidData = area > 0 && selectedOption && quantidade > 0;
+
+  const productDetails = (
+    <>
+      <div className="flex justify-between text-sm">
+        <span>Dimensões:</span>
+        <span>{largura.toFixed(2)} x {altura.toFixed(2)} m</span>
+      </div>
+      <div className="flex justify-between text-sm">
+        <span>Quantidade:</span>
+        <span>{quantidade} unidade(s)</span>
+      </div>
+      <div className="flex justify-between text-sm">
+        <span>Área unitária:</span>
+        <span>{area.toFixed(2)} m²</span>
+      </div>
+      <div className="flex justify-between text-sm">
+        <span>Área total:</span>
+        <span>{areaTotal.toFixed(2)} m²</span>
+      </div>
+      <div className="flex justify-between text-sm">
+        <span>Tipo:</span>
+        <span>{options.find(opt => opt.id === selectedOption)?.label}</span>
+      </div>
+    </>
+  );
 
   return (
     <div className="p-6">
@@ -122,45 +150,13 @@ const LonaCalculator: React.FC<Props> = ({ config }) => {
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Orçamento</h3>
-          
-          {area > 0 && selectedOption && quantidade > 0 && (
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span>Dimensões:</span>
-                <span>{largura.toFixed(2)} x {altura.toFixed(2)} m</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Quantidade:</span>
-                <span>{quantidade} unidade(s)</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Área unitária:</span>
-                <span>{area.toFixed(2)} m²</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Área total:</span>
-                <span>{areaTotal.toFixed(2)} m²</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Tipo:</span>
-                <span>{options.find(opt => opt.id === selectedOption)?.label}</span>
-              </div>
-              <hr className="my-3" />
-              <div className="flex justify-between text-lg font-bold text-blue-600">
-                <span>Total:</span>
-                <span>{formatCurrency(total)}</span>
-              </div>
-            </div>
-          )}
-
-          {(area <= 0 || !selectedOption || quantidade <= 0) && (
-            <p className="text-gray-500 text-center py-8">
-              Preencha as dimensões, quantidade e selecione o tipo de lona para ver o orçamento
-            </p>
-          )}
-        </div>
+        <BudgetSummaryExtended
+          baseTotal={total}
+          config={fullConfig}
+          productDetails={productDetails}
+          hasValidData={hasValidData}
+          emptyMessage="Preencha as dimensões, quantidade e selecione o tipo de lona para ver o orçamento"
+        />
       </div>
     </div>
   );

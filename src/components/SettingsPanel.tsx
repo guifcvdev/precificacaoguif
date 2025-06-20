@@ -247,6 +247,43 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             editConfig={editConfig}
             updateConfig={updateConfig}
           />
+
+          <ConfigSection
+            title="Nota Fiscal"
+            section="notaFiscal"
+            fields={[
+              { key: 'percentual', label: 'Percentual da Nota Fiscal', unit: '%' },
+            ]}
+            editConfig={editConfig}
+            updateConfig={updateConfig}
+          />
+
+          <ConfigSection
+            title="Cartão de Crédito"
+            section="cartaoCredito"
+            fields={[
+              { key: 'taxa3x', label: 'Taxa 3x', unit: '%' },
+              { key: 'taxa6x', label: 'Taxa 6x', unit: '%' },
+              { key: 'taxa12x', label: 'Taxa 12x', unit: '%' },
+            ]}
+            editConfig={editConfig}
+            updateConfig={updateConfig}
+          />
+
+          <ConfigSection
+            title="Instalação por Localidade"
+            section="instalacao"
+            fields={[
+              { key: 'jacarei', label: 'Jacareí', unit: 'serviço' },
+              { key: 'sjCampos', label: 'S.J.Campos', unit: 'serviço' },
+              { key: 'cacapavaTaubate', label: 'Caçapava/Taubaté', unit: 'serviço' },
+              { key: 'litoral', label: 'Litoral', unit: 'serviço' },
+              { key: 'guararemaSantaIsabel', label: 'Guararema/Sta Isabel', unit: 'serviço' },
+              { key: 'santaBranca', label: 'Sta Branca', unit: 'serviço' },
+            ]}
+            editConfig={editConfig}
+            updateConfig={updateConfig}
+          />
         </div>
       </div>
 

@@ -1,12 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
-import { LetraCaixaConfig, formatCurrency, calculateMinimumCharge } from '../../types/pricing';
+import { LetraCaixaConfig, formatCurrency, calculateMinimumCharge, PricingConfig } from '../../types/pricing';
+import BudgetSummaryExtended from '../BudgetSummaryExtended';
 
 interface Props {
   config: LetraCaixaConfig;
+  fullConfig: PricingConfig;
 }
 
-const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
+const LetraCaixaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
   const [largura, setLargura] = useState<number>(0);
   const [altura, setAltura] = useState<number>(0);
   const [quantidade, setQuantidade] = useState<number>(1);
@@ -17,7 +18,6 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
   const area = largura * altura;
   const areaTotal = area * quantidade;
 
-  // Agora cada opção de espessura possui um preço fixo.
   const espessuraOptions = [
     { id: '10mm', label: '10mm', price: config.espessura10mm },
     { id: '15mm', label: '15mm', price: config.espessura15mm },
@@ -56,6 +56,39 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
       setAddOns(addOns.filter(id => id !== addOnId));
     }
   };
+
+  const hasValidData = area > 0 && espessura && quantidade > 0;
+
+  const productDetails = (
+    <>
+      <div className="flex justify-between text-sm">
+        <span>Dimensões:</span>
+        <span>{largura.toFixed(2)} x {altura.toFixed(2)} m</span>
+      </div>
+      <div className="flex justify-between text-sm">
+        <span>Quantidade:</span>
+        <span>{quantidade} unidade(s)</span>
+      </div>
+      <div className="flex justify-between text-sm">
+        <span>Área unitária:</span>
+        <span>{area.toFixed(2)} m²</span>
+      </div>
+      <div className="flex justify-between text-sm">
+        <span>Área total:</span>
+        <span>{areaTotal.toFixed(2)} m²</span>
+      </div>
+      <div className="flex justify-between text-sm">
+        <span>Espessura:</span>
+        <span>{espessura}</span>
+      </div>
+      {addOns.length > 0 && (
+        <div className="flex justify-between text-sm">
+          <span>Opcionais:</span>
+          <span>{addOns.length} item(s)</span>
+        </div>
+      )}
+    </>
+  );
 
   return (
     <div className="p-6">
@@ -171,51 +204,13 @@ const LetraCaixaCalculator: React.FC<Props> = ({ config }) => {
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Orçamento</h3>
-          
-          {area > 0 && espessura && quantidade > 0 && (
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span>Dimensões:</span>
-                <span>{largura.toFixed(2)} x {altura.toFixed(2)} m</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Quantidade:</span>
-                <span>{quantidade} unidade(s)</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Área unitária:</span>
-                <span>{area.toFixed(2)} m²</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Área total:</span>
-                <span>{areaTotal.toFixed(2)} m²</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Espessura:</span>
-                <span>{espessura}</span>
-              </div>
-              {addOns.length > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span>Opcionais:</span>
-                  <span>{addOns.length} item(s)</span>
-                </div>
-              )}
-              <hr className="my-3" />
-              <div className="flex justify-between text-lg font-bold text-blue-600">
-                <span>Total:</span>
-                <span>{formatCurrency(total)}</span>
-              </div>
-            </div>
-          )}
-
-          {(area <= 0 || !espessura || quantidade <= 0) && (
-            <p className="text-gray-500 text-center py-8">
-              Preencha as dimensões, quantidade e selecione a espessura para ver o orçamento
-            </p>
-          )}
-        </div>
+        <BudgetSummaryExtended
+          baseTotal={total}
+          config={fullConfig}
+          productDetails={productDetails}
+          hasValidData={hasValidData}
+          emptyMessage="Preencha as dimensões, quantidade e selecione a espessura para ver o orçamento"
+        />
       </div>
     </div>
   );

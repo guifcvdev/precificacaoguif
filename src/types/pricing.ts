@@ -1,3 +1,4 @@
+
 export interface AdesivoConfig {
   corteEspecial: number;
   soRefile: number;
@@ -31,25 +32,18 @@ export interface FachadaConfig {
   cantoneira: number;
 }
 
-/**
- * LetraCaixaConfig: Agora o preço é por espessura (por m²), não mais preço base + adicional.
- * Opcionais permanecem.
- */
 export interface LetraCaixaConfig {
-  espessura10mm: number; // preço unitário por m²
-  espessura15mm: number; // preço unitário por m²
-  espessura20mm: number; // preço unitário por m²
+  espessura10mm: number;
+  espessura15mm: number;
+  espessura20mm: number;
   pinturaAutomotiva: number;
   fitaDuplaFace: number;
 }
 
-/**
- * VidroConfig: Preço de cada espessura por m² (como Placa PS), prolongadores por unidade.
- */
 export interface VidroConfig {
-  espessura6mm: number;  // preço unitário por m²
-  espessura8mm: number;  // preço unitário por m² (ATUALIZADO de 9mm para 8mm)
-  prolongadores: number; // preço por unidade
+  espessura6mm: number;
+  espessura8mm: number;
+  prolongadores: number;
 }
 
 export interface LuminosoConfig {
@@ -69,6 +63,26 @@ export interface LuminosoConfig {
   luminosoRedondoOval: number;
 }
 
+// Novas configurações solicitadas
+export interface NotaFiscalConfig {
+  percentual: number;
+}
+
+export interface CartaoCreditoConfig {
+  taxa3x: number;
+  taxa6x: number;
+  taxa12x: number;
+}
+
+export interface InstalacaoConfig {
+  jacarei: number;
+  sjCampos: number;
+  cacapavaTaubate: number;
+  litoral: number;
+  guararemaSantaIsabel: number;
+  santaBranca: number;
+}
+
 export interface PricingConfig {
   adesivo: AdesivoConfig;
   lona: LonaConfig;
@@ -78,6 +92,9 @@ export interface PricingConfig {
   letraCaixa: LetraCaixaConfig;
   vidro: VidroConfig;
   luminoso: LuminosoConfig;
+  notaFiscal: NotaFiscalConfig;
+  cartaoCredito: CartaoCreditoConfig;
+  instalacao: InstalacaoConfig;
 }
 
 export const defaultConfig: PricingConfig = {
@@ -110,15 +127,15 @@ export const defaultConfig: PricingConfig = {
     cantoneira: 8.0,
   },
   letraCaixa: {
-    espessura10mm: 50.0, // 40+10
-    espessura15mm: 60.0, // 40+20
-    espessura20mm: 70.0, // 40+30
+    espessura10mm: 50.0,
+    espessura15mm: 60.0,
+    espessura20mm: 70.0,
     pinturaAutomotiva: 15.0,
     fitaDuplaFace: 5.0,
   },
   vidro: {
     espessura6mm: 60.0,
-    espessura8mm: 80.0, // ATUALIZADO de 9mm para 8mm
+    espessura8mm: 80.0,
     prolongadores: 25.0,
   },
   luminoso: {
@@ -136,6 +153,22 @@ export const defaultConfig: PricingConfig = {
     fonteChaveada20a: 105.0,
     fonteChaveada30a: 145.0,
     luminosoRedondoOval: 200.0,
+  },
+  notaFiscal: {
+    percentual: 15.0,
+  },
+  cartaoCredito: {
+    taxa3x: 5.0,
+    taxa6x: 8.0,
+    taxa12x: 12.0,
+  },
+  instalacao: {
+    jacarei: 100.0,
+    sjCampos: 120.0,
+    cacapavaTaubate: 150.0,
+    litoral: 200.0,
+    guararemaSantaIsabel: 180.0,
+    santaBranca: 160.0,
   },
 };
 

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { FachadaConfig, formatCurrency, calculateMinimumCharge } from '../../types/pricing';
+import { FachadaConfig, formatCurrency, calculateMinimumCharge, PricingConfig } from '../../types/pricing';
+import BudgetSummaryExtended from '../BudgetSummaryExtended';
 
 interface Props {
   config: FachadaConfig;
+  fullConfig: PricingConfig;
 }
 
-const FachadaCalculator: React.FC<Props> = ({ config }) => {
+const FachadaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
   const [larguraLona, setLarguraLona] = useState<number>(0);
   const [alturaLona, setAlturaLona] = useState<number>(0);
   const [quantidadeLona, setQuantidadeLona] = useState<number>(1);
@@ -57,6 +59,52 @@ const FachadaCalculator: React.FC<Props> = ({ config }) => {
       [itemId]: value
     }));
   };
+
+  const hasValidData = total > 0;
+
+  const productDetails = (
+    <>
+      {areaLona > 0 && quantidadeLona > 0 && (
+        <>
+          <div className="flex justify-between text-sm">
+            <span>Dimensões da Lona:</span>
+            <span>{larguraLona.toFixed(2)} x {alturaLona.toFixed(2)} m</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Quantidade de Lonas:</span>
+            <span>{quantidadeLona} unidade(s)</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Área unitária:</span>
+            <span>{areaLona.toFixed(2)} m²</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Área total:</span>
+            <span>{areaLonaTotal.toFixed(2)} m²</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Custo da Lona:</span>
+            <span>{formatCurrency(calculateMinimumCharge(areaLona * config.lona) * quantidadeLona)}</span>
+          </div>
+        </>
+      )}
+      
+      {Object.entries(quantities).map(([key, quantity]) => {
+        if (quantity > 0) {
+          const item = items.find(item => item.id === key);
+          if (item) {
+            return (
+              <div key={key} className="flex justify-between text-sm">
+                <span>{item.label} ({quantity}x):</span>
+                <span>{formatCurrency(quantity * item.price)}</span>
+              </div>
+            );
+          }
+        }
+        return null;
+      })}
+    </>
+  );
 
   return (
     <div className="p-6">
@@ -146,67 +194,13 @@ const FachadaCalculator: React.FC<Props> = ({ config }) => {
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Orçamento</h3>
-          
-          <div className="space-y-3">
-            {areaLona > 0 && quantidadeLona > 0 && (
-              <>
-                <div className="flex justify-between text-sm">
-                  <span>Dimensões da Lona:</span>
-                  <span>{larguraLona.toFixed(2)} x {alturaLona.toFixed(2)} m</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Quantidade de Lonas:</span>
-                  <span>{quantidadeLona} unidade(s)</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Área unitária:</span>
-                  <span>{areaLona.toFixed(2)} m²</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Área total:</span>
-                  <span>{areaLonaTotal.toFixed(2)} m²</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Custo da Lona:</span>
-                  <span>{formatCurrency(calculateMinimumCharge(areaLona * config.lona) * quantidadeLona)}</span>
-                </div>
-              </>
-            )}
-            
-            {Object.entries(quantities).map(([key, quantity]) => {
-              if (quantity > 0) {
-                const item = items.find(item => item.id === key);
-                if (item) {
-                  return (
-                    <div key={key} className="flex justify-between text-sm">
-                      <span>{item.label} ({quantity}x):</span>
-                      <span>{formatCurrency(quantity * item.price)}</span>
-                    </div>
-                  );
-                }
-              }
-              return null;
-            })}
-            
-            {total > 0 && (
-              <>
-                <hr className="my-3" />
-                <div className="flex justify-between text-lg font-bold text-blue-600">
-                  <span>Total:</span>
-                  <span>{formatCurrency(total)}</span>
-                </div>
-              </>
-            )}
-          </div>
-
-          {total === 0 && (
-            <p className="text-gray-500 text-center py-8">
-              Preencha as dimensões da lona ou as quantidades dos materiais para ver o orçamento
-            </p>
-          )}
-        </div>
+        <BudgetSummaryExtended
+          baseTotal={total}
+          config={fullConfig}
+          productDetails={productDetails}
+          hasValidData={hasValidData}
+          emptyMessage="Preencha as dimensões da lona ou as quantidades dos materiais para ver o orçamento"
+        />
       </div>
     </div>
   );

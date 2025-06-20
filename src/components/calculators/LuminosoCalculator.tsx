@@ -1,16 +1,17 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { LuminosoConfig, calculateMinimumCharge } from '../../types/pricing';
+import { LuminosoConfig, calculateMinimumCharge, PricingConfig, formatCurrency } from '../../types/pricing';
 import LuminosoDimensionsForm from './luminoso/LuminosoDimensionsForm';
 import LuminosoMaterialsForm from './luminoso/LuminosoMaterialsForm';
-import LuminosoSummary from './luminoso/LuminosoSummary';
+import BudgetSummaryExtended from '../BudgetSummaryExtended';
 import { getInitialQuantities, luminosoMaterials } from '../../utils/luminosoMaterials';
 
 interface Props {
   config: LuminosoConfig;
+  fullConfig: PricingConfig;
 }
 
-const LuminosoCalculator: React.FC<Props> = ({ config }) => {
+const LuminosoCalculator: React.FC<Props> = ({ config, fullConfig }) => {
   const [larguraLona, setLarguraLona] = useState<number>(0);
   const [alturaLona, setAlturaLona] = useState<number>(0);
   const [quantidadeLona, setQuantidadeLona] = useState<number>(1);
@@ -20,7 +21,7 @@ const LuminosoCalculator: React.FC<Props> = ({ config }) => {
   const areaLona = useMemo(() => larguraLona * alturaLona, [larguraLona, alturaLona]);
 
   const handleQuantityChange = useCallback((itemId: string, value: number) => {
-    const validValue = Math.max(0, value || 0); // Validação para não aceitar valores negativos
+    const validValue = Math.max(0, value || 0);
     setQuantities(prev => ({
       ...prev,
       [itemId]: validValue
@@ -46,6 +47,50 @@ const LuminosoCalculator: React.FC<Props> = ({ config }) => {
     
     setTotal(totalValue);
   }, [areaLona, quantidadeLona, quantities, config]);
+
+  const hasValidData = total > 0;
+
+  const productDetails = (
+    <>
+      {areaLona > 0 && quantidadeLona > 0 && (
+        <>
+          <div className="flex justify-between text-sm">
+            <span>Dimensões da Lona:</span>
+            <span>{larguraLona.toFixed(2)} x {alturaLona.toFixed(2)} m</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Quantidade de Lonas:</span>
+            <span>{quantidadeLona} unidade(s)</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Área unitária:</span>
+            <span>{areaLona.toFixed(2)} m²</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Área total:</span>
+            <span>{(areaLona * quantidadeLona).toFixed(2)} m²</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Custo da Lona:</span>
+            <span>{formatCurrency(calculateMinimumCharge(areaLona * config.lona) * quantidadeLona)}</span>
+          </div>
+        </>
+      )}
+      
+      {luminosoMaterials.map(material => {
+        const quantity = quantities[material.id] || 0;
+        if (quantity > 0) {
+          return (
+            <div key={material.id} className="flex justify-between text-sm">
+              <span>{material.label} ({quantity}x):</span>
+              <span>{formatCurrency(quantity * config[material.id])}</span>
+            </div>
+          );
+        }
+        return null;
+      })}
+    </>
+  );
 
   return (
     <div className="p-6">
@@ -73,13 +118,12 @@ const LuminosoCalculator: React.FC<Props> = ({ config }) => {
           />
         </div>
 
-        <LuminosoSummary
-          larguraLona={larguraLona}
-          alturaLona={alturaLona}
-          quantidadeLona={quantidadeLona}
-          quantities={quantities}
-          config={config}
-          total={total}
+        <BudgetSummaryExtended
+          baseTotal={total}
+          config={fullConfig}
+          productDetails={productDetails}
+          hasValidData={hasValidData}
+          emptyMessage="Configure as dimensões da lona ou as quantidades dos materiais para ver o orçamento"
         />
       </div>
     </div>
