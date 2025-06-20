@@ -1,10 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { formatCurrency, PricingConfig } from '../types/pricing';
 import { Checkbox } from './ui/checkbox';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Label } from './ui/label';
 import { Separator } from './ui/separator';
+import { Button } from './ui/button';
+import { Copy } from 'lucide-react';
+import { useBudgetSettings } from '../hooks/useBudgetSettings';
+import { useToast } from '../hooks/use-toast';
 
 interface BudgetSummaryExtendedProps {
   baseTotal: number;
@@ -12,6 +15,7 @@ interface BudgetSummaryExtendedProps {
   productDetails: React.ReactNode;
   hasValidData: boolean;
   emptyMessage?: string;
+  quantity?: string | number;
 }
 
 const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
@@ -19,12 +23,15 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
   config,
   productDetails,
   hasValidData,
-  emptyMessage = "Preencha os dados para ver o orçamento"
+  emptyMessage = "Preencha os dados para ver o orçamento",
+  quantity = "1"
 }) => {
   const [notaFiscal, setNotaFiscal] = useState<boolean>(false);
   const [cartaoCredito, setCartaoCredito] = useState<string>('');
   const [instalacao, setInstalacao] = useState<string>('');
   const [finalTotal, setFinalTotal] = useState<number>(0);
+  const { formatBudgetText } = useBudgetSettings();
+  const { toast } = useToast();
 
   const instalacaoOptions = [
     { value: 'jacarei', label: 'Jacareí', price: config.instalacao.jacarei },
@@ -72,6 +79,25 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
     setNotaFiscal(checked === true);
   };
 
+  const handleCopyBudget = async () => {
+    const budgetText = formatBudgetText(quantity, finalTotal);
+    
+    try {
+      await navigator.clipboard.writeText(budgetText);
+      toast({
+        title: "Orçamento copiado",
+        description: "O orçamento foi copiado para a área de transferência.",
+      });
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      toast({
+        title: "Erro ao copiar",
+        description: "Não foi possível copiar o orçamento.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!hasValidData) {
     return (
       <div className="summary-box">
@@ -83,7 +109,18 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
 
   return (
     <div className="summary-box">
-      <h3 className="section-header">Resumo do Orçamento</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="section-header mb-0">Resumo do Orçamento</h3>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCopyBudget}
+          className="flex items-center gap-2"
+        >
+          <Copy className="w-4 h-4" />
+          Copiar
+        </Button>
+      </div>
       
       <div className="space-y-4">
         {productDetails}

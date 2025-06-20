@@ -4,6 +4,7 @@ import { PricingConfig } from '../types/pricing';
 import SettingsLayout from './settings/SettingsLayout';
 import SettingsHeader from './settings/SettingsHeader';
 import ConfigSection from './settings/ConfigSection';
+import BudgetObservationsSettings from './settings/BudgetObservationsSettings';
 import { settingsConfig } from './settings/settingsConfig';
 import { convertConfigToCurrency, convertCurrencyToNumbers } from './settings/configUtils';
 
@@ -44,6 +45,10 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
         </div>
 
         <div className="space-y-6">
+          {/* Configurações das Observações do Orçamento */}
+          <BudgetObservationsSettings />
+
+          {/* Configurações de Preços */}
           {settingsConfig.map((sectionConfig) => (
             <ConfigSection
               key={sectionConfig.section}

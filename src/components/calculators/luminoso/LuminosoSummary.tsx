@@ -2,6 +2,10 @@
 import React from 'react';
 import { LuminosoConfig, formatCurrency, calculateMinimumCharge } from '../../../types/pricing';
 import { luminosoMaterials } from '../../../utils/luminosoMaterials';
+import { Button } from '../../ui/button';
+import { Copy } from 'lucide-react';
+import { useBudgetSettings } from '../../../hooks/useBudgetSettings';
+import { useToast } from '../../../hooks/use-toast';
 
 interface Props {
   larguraLona: number;
@@ -22,10 +26,46 @@ const LuminosoSummary: React.FC<Props> = ({
 }) => {
   const areaLona = larguraLona * alturaLona;
   const areaLonaTotal = areaLona * quantidadeLona;
+  const { formatBudgetText } = useBudgetSettings();
+  const { toast } = useToast();
+
+  const handleCopyBudget = async () => {
+    // Calcular quantidade total considerando lonas e materiais
+    const totalQuantity = quantidadeLona + Object.values(quantities).reduce((sum, qty) => sum + qty, 0);
+    const budgetText = formatBudgetText(totalQuantity, total);
+    
+    try {
+      await navigator.clipboard.writeText(budgetText);
+      toast({
+        title: "Orçamento copiado",
+        description: "O orçamento foi copiado para a área de transferência.",
+      });
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      toast({
+        title: "Erro ao copiar",
+        description: "Não foi possível copiar o orçamento.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="bg-gray-50 rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Orçamento</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-gray-900">Resumo do Orçamento</h3>
+        {total > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopyBudget}
+            className="flex items-center gap-2"
+          >
+            <Copy className="w-4 h-4" />
+            Copiar
+          </Button>
+        )}
+      </div>
       
       <div className="space-y-3">
         {areaLona > 0 && quantidadeLona > 0 && (
