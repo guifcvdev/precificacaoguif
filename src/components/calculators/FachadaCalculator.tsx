@@ -1,7 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { FachadaConfig, formatCurrency, calculateMinimumCharge, PricingConfig } from '../../types/pricing';
 import BudgetSummaryExtended from '../BudgetSummaryExtended';
+import LonaForm from './fachada/LonaForm';
+import EstruturaMetalicaForm from './fachada/EstruturaMetalicaForm';
+import MateriaisAdicionaisForm from './fachada/MateriaisAdicionaisForm';
+import { useFachadaCalculations } from './fachada/useFachadaCalculations';
 
 interface Props {
   config: FachadaConfig;
@@ -9,107 +13,29 @@ interface Props {
 }
 
 const FachadaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
-  const [larguraLona, setLarguraLona] = useState<number>(0);
-  const [alturaLona, setAlturaLona] = useState<number>(0);
-  const [quantidadeLona, setQuantidadeLona] = useState<number>(1);
-  
-  // Estados para estrutura metálica
-  const [larguraEstrutura, setLarguraEstrutura] = useState<number>(0);
-  const [alturaEstrutura, setAlturaEstrutura] = useState<number>(0);
-  const [travasHorizontais, setTravasHorizontais] = useState<number>(0);
-  const [travasVerticais, setTravasVerticais] = useState<number>(0);
-  
-  const [quantities, setQuantities] = useState({
-    metalon20x20: 0,
-    metalon30x20: 0,
-    acm122: 0,
-    acm150: 0,
-    cantoneira: 0,
-  });
-  const [total, setTotal] = useState<number>(0);
-
-  const areaLona = larguraLona * alturaLona;
-  const areaLonaTotal = areaLona * quantidadeLona;
-
-  // Cálculos da estrutura metálica
-  const areaEstrutura = larguraEstrutura * alturaEstrutura;
-  
-  const calcularEstruturaMetalica = () => {
-    if (larguraEstrutura <= 0 || alturaEstrutura <= 0) {
-      return {
-        metrosLineares: 0,
-        barrasNecessarias: 0,
-        barrasInteiras: 0,
-        custoTotal: 0,
-        custoPorM2: 0
-      };
-    }
-
-    // Cálculo dos metros lineares
-    const perimetro = 2 * (larguraEstrutura + alturaEstrutura);
-    const metrosTravasHorizontais = travasHorizontais * larguraEstrutura;
-    const metrosTravasVerticais = travasVerticais * alturaEstrutura;
-    const metrosLineares = perimetro + metrosTravasHorizontais + metrosTravasVerticais;
-    
-    // Cálculo de barras necessárias
-    const comprimentoBarra = config.estruturaMetalica.comprimentoBarra;
-    const barrasNecessarias = metrosLineares / comprimentoBarra;
-    const barrasInteiras = Math.ceil(barrasNecessarias);
-    
-    // Cálculo do custo
-    const custoTotal = barrasInteiras * config.estruturaMetalica.precoPorBarra;
-    const custoPorM2 = areaEstrutura > 0 ? custoTotal / areaEstrutura : 0;
-
-    return {
-      metrosLineares,
-      barrasNecessarias,
-      barrasInteiras,
-      custoTotal,
-      custoPorM2
-    };
-  };
-
-  const estruturaCalc = calcularEstruturaMetalica();
-
-  const items = [
-    { id: 'metalon20x20', label: 'Metalon 20x20', price: config.metalon20x20, unit: 'unid' },
-    { id: 'cantoneira', label: 'Cantoneira 3/4', price: config.cantoneira, unit: 'unid' },
-    { id: 'metalon30x20', label: 'Metalon 30x20', price: config.metalon30x20, unit: 'unid' },
-    { id: 'acm122', label: 'ACM 1.22m', price: config.acm122, unit: 'unid' },
-    { id: 'acm150', label: 'ACM 1.50m', price: config.acm150, unit: 'unid' },
-  ];
-
-  useEffect(() => {
-    let totalValue = 0;
-    
-    // Calculate lona cost
-    if (areaLona > 0 && quantidadeLona > 0) {
-      const unitLonaTotal = calculateMinimumCharge(areaLona * config.lona);
-      totalValue += unitLonaTotal * quantidadeLona;
-    }
-    
-    // Calculate unit items cost
-    Object.entries(quantities).forEach(([key, quantity]) => {
-      if (quantity > 0) {
-        const item = items.find(item => item.id === key);
-        if (item) {
-          totalValue += quantity * item.price;
-        }
-      }
-    });
-    
-    // Add estrutura metálica cost
-    totalValue += estruturaCalc.custoTotal;
-    
-    setTotal(totalValue);
-  }, [larguraLona, alturaLona, quantidadeLona, quantities, config, estruturaCalc.custoTotal]);
-
-  const handleQuantityChange = (itemId: string, value: number) => {
-    setQuantities(prev => ({
-      ...prev,
-      [itemId]: value
-    }));
-  };
+  const {
+    larguraLona,
+    alturaLona,
+    quantidadeLona,
+    areaLona,
+    areaLonaTotal,
+    setLarguraLona,
+    setAlturaLona,
+    setQuantidadeLona,
+    larguraEstrutura,
+    alturaEstrutura,
+    travasHorizontais,
+    travasVerticais,
+    estruturaCalc,
+    setLarguraEstrutura,
+    setAlturaEstrutura,
+    setTravasHorizontais,
+    setTravasVerticais,
+    quantities,
+    items,
+    handleQuantityChange,
+    total,
+  } = useFachadaCalculations(config);
 
   const hasValidData = total > 0;
 
@@ -148,7 +74,7 @@ const FachadaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
           </div>
           <div className="flex justify-between text-sm">
             <span>Área da Estrutura:</span>
-            <span>{areaEstrutura.toFixed(2)} m²</span>
+            <span>{(larguraEstrutura * alturaEstrutura).toFixed(2)} m²</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Metros Lineares:</span>
@@ -199,147 +125,34 @@ const FachadaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">
-              Dimensões da Lona
-            </label>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Largura (m)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={larguraLona || ''}
-                  onChange={(e) => setLarguraLona(parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Altura (m)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={alturaLona || ''}
-                  onChange={(e) => setAlturaLona(parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Quantidade</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={quantidadeLona || ''}
-                  onChange={(e) => setQuantidadeLona(parseInt(e.target.value) || 1)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="1"
-                />
-              </div>
-            </div>
-            {areaLona > 0 && (
-              <p className="text-sm text-gray-600 mt-2">
-                Área unitária: {areaLona.toFixed(2)} m² | Área total: {areaLonaTotal.toFixed(2)} m² - Preço: {formatCurrency(config.lona)}/m²
-              </p>
-            )}
-          </div>
+          <LonaForm
+            larguraLona={larguraLona}
+            alturaLona={alturaLona}
+            quantidadeLona={quantidadeLona}
+            lonaPrice={config.lona}
+            onLarguraChange={setLarguraLona}
+            onAlturaChange={setAlturaLona}
+            onQuantidadeChange={setQuantidadeLona}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">
-              Estrutura Metálica
-            </label>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Largura (m)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={larguraEstrutura || ''}
-                  onChange={(e) => setLarguraEstrutura(parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Altura (m)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={alturaEstrutura || ''}
-                  onChange={(e) => setAlturaEstrutura(parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="0.00"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Travas Horizontais</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={travasHorizontais || ''}
-                  onChange={(e) => setTravasHorizontais(parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="0"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Travas Verticais</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={travasVerticais || ''}
-                  onChange={(e) => setTravasVerticais(parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="0"
-                />
-              </div>
-            </div>
-            {estruturaCalc.metrosLineares > 0 && (
-              <div className="text-sm text-gray-600 mt-2 space-y-1">
-                <p>Metros lineares: {estruturaCalc.metrosLineares.toFixed(2)} m</p>
-                <p>Barras necessárias: {estruturaCalc.barrasNecessarias.toFixed(2)} ({estruturaCalc.barrasInteiras} a pagar)</p>
-                <p>Preço: {formatCurrency(config.estruturaMetalica.precoPorBarra)}/barra de {config.estruturaMetalica.comprimentoBarra}m</p>
-                <p>Custo por m²: {formatCurrency(estruturaCalc.custoPorM2)}</p>
-              </div>
-            )}
-          </div>
+          <EstruturaMetalicaForm
+            larguraEstrutura={larguraEstrutura}
+            alturaEstrutura={alturaEstrutura}
+            travasHorizontais={travasHorizontais}
+            travasVerticais={travasVerticais}
+            estruturaCalc={estruturaCalc}
+            estruturaConfig={config.estruturaMetalica}
+            onLarguraChange={setLarguraEstrutura}
+            onAlturaChange={setAlturaEstrutura}
+            onTravasHorizontaisChange={setTravasHorizontais}
+            onTravasVerticaisChange={setTravasVerticais}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">
-              Materiais Adicionais
-            </label>
-            <div className="space-y-4">
-              {items.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">
-                      {item.label}
-                    </label>
-                    <p className="text-xs text-gray-500">
-                      {formatCurrency(item.price)}/{item.unit}
-                    </p>
-                  </div>
-                  <div className="w-24">
-                    <input
-                      type="number"
-                      min="0"
-                      value={quantities[item.id as keyof typeof quantities] || ''}
-                      onChange={(e) => handleQuantityChange(item.id, parseFloat(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <MateriaisAdicionaisForm
+            items={items}
+            quantities={quantities}
+            onQuantityChange={handleQuantityChange}
+          />
         </div>
 
         <BudgetSummaryExtended
