@@ -24,6 +24,21 @@ const LuminosoDimensionsForm: React.FC<Props> = ({
   const areaLona = larguraLona * alturaLona;
   const areaLonaTotal = areaLona * quantidadeLona;
 
+  const handleLarguraChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value) || 0;
+    onLarguraChange(Math.max(0, value)); // Validação para não aceitar valores negativos
+  };
+
+  const handleAlturaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value) || 0;
+    onAlturaChange(Math.max(0, value)); // Validação para não aceitar valores negativos
+  };
+
+  const handleQuantidadeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value) || 1;
+    onQuantidadeChange(Math.max(1, value)); // Mínimo 1 unidade
+  };
+
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-4">
@@ -37,7 +52,7 @@ const LuminosoDimensionsForm: React.FC<Props> = ({
             min="0"
             step="0.01"
             value={larguraLona || ''}
-            onChange={(e) => onLarguraChange(parseFloat(e.target.value) || 0)}
+            onChange={handleLarguraChange}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="0.00"
           />
@@ -49,7 +64,7 @@ const LuminosoDimensionsForm: React.FC<Props> = ({
             min="0"
             step="0.01"
             value={alturaLona || ''}
-            onChange={(e) => onAlturaChange(parseFloat(e.target.value) || 0)}
+            onChange={handleAlturaChange}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="0.00"
           />
@@ -60,7 +75,7 @@ const LuminosoDimensionsForm: React.FC<Props> = ({
             type="number"
             min="1"
             value={quantidadeLona || ''}
-            onChange={(e) => onQuantidadeChange(parseInt(e.target.value) || 1)}
+            onChange={handleQuantidadeChange}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="1"
           />

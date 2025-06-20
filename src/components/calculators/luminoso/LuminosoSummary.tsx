@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { LuminosoConfig, formatCurrency, calculateMinimumCharge } from '../../../types/pricing';
+import { luminosoMaterials } from '../../../utils/luminosoMaterials';
 
 interface Props {
   larguraLona: number;
@@ -21,22 +22,6 @@ const LuminosoSummary: React.FC<Props> = ({
 }) => {
   const areaLona = larguraLona * alturaLona;
   const areaLonaTotal = areaLona * quantidadeLona;
-
-  const items = [
-    { id: 'metalon20x20', label: 'Metalon 20x20', price: config.metalon20x20, unit: 'unid' },
-    { id: 'acm122', label: 'ACM 1.22m', price: config.acm122, unit: 'unid' },
-    { id: 'acm150', label: 'ACM 1.50m', price: config.acm150, unit: 'unid' },
-    { id: 'lampadaTubular122', label: 'Lâmpada Tubular 1,22m', price: config.lampadaTubular122, unit: 'unid' },
-    { id: 'lampadaTubular60', label: 'Lâmpada Tubular 60cm', price: config.lampadaTubular60, unit: 'unid' },
-    { id: 'moduloLed17w', label: 'Módulo LED 1,7w Lente 160º', price: config.moduloLed17w, unit: 'unid' },
-    { id: 'moduloLed15w', label: 'Módulo LED 1,5w Mega Lente', price: config.moduloLed15w, unit: 'unid' },
-    { id: 'fonteChaveada5a', label: 'Fonte Chaveada 5a', price: config.fonteChaveada5a, unit: 'unid' },
-    { id: 'fonteChaveada10a', label: 'Fonte Chaveada 10a', price: config.fonteChaveada10a, unit: 'unid' },
-    { id: 'fonteChaveada15a', label: 'Fonte Chaveada 15a', price: config.fonteChaveada15a, unit: 'unid' },
-    { id: 'fonteChaveada20a', label: 'Fonte Chaveada 20a', price: config.fonteChaveada20a, unit: 'unid' },
-    { id: 'fonteChaveada30a', label: 'Fonte Chaveada 30a', price: config.fonteChaveada30a, unit: 'unid' },
-    { id: 'luminosoRedondoOval', label: 'Luminoso Redondo ou Oval', price: config.luminosoRedondoOval, unit: 'unid' },
-  ];
 
   return (
     <div className="bg-gray-50 rounded-lg p-6">
@@ -68,17 +53,15 @@ const LuminosoSummary: React.FC<Props> = ({
           </>
         )}
         
-        {Object.entries(quantities).map(([key, quantity]) => {
+        {luminosoMaterials.map((material) => {
+          const quantity = quantities[material.id];
           if (quantity > 0) {
-            const item = items.find(item => item.id === key);
-            if (item) {
-              return (
-                <div key={key} className="flex justify-between text-sm">
-                  <span>{item.label} ({quantity}x):</span>
-                  <span>{formatCurrency(quantity * item.price)}</span>
-                </div>
-              );
-            }
+            return (
+              <div key={material.id} className="flex justify-between text-sm">
+                <span>{material.label} ({quantity}x):</span>
+                <span>{formatCurrency(quantity * config[material.id])}</span>
+              </div>
+            );
           }
           return null;
         })}
