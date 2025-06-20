@@ -95,8 +95,8 @@ const EstruturaMetalicaForm: React.FC<EstruturaMetalicaFormProps> = ({
         <div className="text-sm text-gray-600 mt-2 space-y-1">
           <p>Metros lineares: {estruturaCalc.metrosLineares.toFixed(2)} m</p>
           <p>Barras necessárias: {estruturaCalc.barrasNecessarias.toFixed(2)} ({estruturaCalc.barrasInteiras} a pagar)</p>
-          <p>Preço: {formatCurrency(estruturaConfig.precoPorBarra)}/barra de {estruturaConfig.comprimentoBarra}m</p>
-          <p>Custo por m²: {formatCurrency(estruturaCalc.custoPorM2)}</p>
+          <p>Preço: R$ 34,00/barra de {estruturaConfig.comprimentoBarra}m</p>
+          <p>Custo por m² (informativo): {formatCurrency(estruturaCalc.custoPorM2)}</p>
         </div>
       )}
     </div>

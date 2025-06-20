@@ -46,7 +46,11 @@ export const useFachadaCalculations = (config: FachadaConfig) => {
     const barrasNecessarias = metrosLineares / comprimentoBarra;
     const barrasInteiras = Math.ceil(barrasNecessarias);
     
-    const custoTotal = barrasInteiras * config.estruturaMetalica.precoPorBarra;
+    // Novo cálculo: preço fixo de R$ 34,00 por barra
+    const precoPorBarra = 34.00;
+    const custoTotal = barrasInteiras * precoPorBarra;
+    
+    // Custo por m² é informativo: total dividido pela área
     const custoPorM2 = areaEstrutura > 0 ? custoTotal / areaEstrutura : 0;
 
     return {
