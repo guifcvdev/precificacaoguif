@@ -3,7 +3,6 @@ import React from 'react';
 import { Calculator, Settings, Download } from 'lucide-react';
 import { Button } from './ui/button';
 import { useBudgets } from '../hooks/useBudgets';
-import ThemeToggle from './ThemeToggle';
 
 interface ModernHeaderProps {
   onSettingsClick: () => void;
@@ -28,11 +27,11 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
                 <Calculator className="w-6 h-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold gradient-text">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Precificação CV
                 </h1>
                 {currentBudget && (
-                  <p className="text-caption">
+                  <p className="text-muted-foreground text-sm">
                     Orçamento: {currentBudget.name}
                   </p>
                 )}
@@ -42,15 +41,13 @@ const ModernHeader: React.FC<ModernHeaderProps> = ({ onSettingsClick }) => {
 
           <div className="flex items-center space-x-3">
             {currentBudget && (
-              <Button variant="outline" size="sm" onClick={handleExport} className="button-hover-light">
+              <Button variant="outline" size="sm" onClick={handleExport} className="hover:bg-accent/50">
                 <Download className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Exportar</span>
               </Button>
             )}
 
-            <ThemeToggle />
-
-            <Button variant="outline" size="sm" onClick={onSettingsClick} className="button-hover-light">
+            <Button variant="outline" size="sm" onClick={onSettingsClick} className="hover:bg-accent/50">
               <Settings className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Configurações</span>
             </Button>
