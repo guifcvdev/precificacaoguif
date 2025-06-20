@@ -7,6 +7,7 @@ import PlacaACMCalculator from '../components/calculators/PlacaACMCalculator';
 import FachadaCalculator from '../components/calculators/FachadaCalculator';
 import LetraCaixaCalculator from '../components/calculators/LetraCaixaCalculator';
 import VidroCalculator from '../components/calculators/VidroCalculator';
+import LuminosoCalculator from '../components/calculators/LuminosoCalculator';
 import SettingsPanel from '../components/SettingsPanel';
 import ModernHeader from '../components/ModernHeader';
 import ModernTabs from '../components/ModernTabs';
@@ -39,6 +40,7 @@ const Index = () => {
       'fachada': 'Calculadora de Fachada Simples',
       'letra-caixa': 'Calculadora de Letra Caixa em PVC',
       'vidro': 'Calculadora de Vidro Temperado',
+      'luminoso': 'Calculadora de Luminoso',
     };
     return titles[activeTab];
   };
@@ -63,6 +65,8 @@ const Index = () => {
         return <LetraCaixaCalculator config={config.letraCaixa} />;
       case 'vidro':
         return <VidroCalculator config={config.vidro} />;
+      case 'luminoso':
+        return <LuminosoCalculator config={config.luminoso} />;
       default:
         return <AdesivoCalculator config={config.adesivo} />;
     }
