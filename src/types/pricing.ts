@@ -1,4 +1,3 @@
-
 export interface AdesivoConfig {
   corteEspecial: number;
   soRefile: number;
@@ -64,6 +63,11 @@ export interface LuminosoConfig {
   fonteChaveada20a: number;
   fonteChaveada30a: number;
   luminosoRedondoOval: number;
+  // Novos parâmetros para estrutura metálica
+  estruturaMetalica: {
+    precoPorBarra: number;
+    comprimentoBarra: number;
+  };
 }
 
 // Novas configurações solicitadas
@@ -158,6 +162,10 @@ export const defaultConfig: PricingConfig = {
     fonteChaveada20a: 105.0,
     fonteChaveada30a: 145.0,
     luminosoRedondoOval: 200.0,
+    estruturaMetalica: {
+      precoPorBarra: 34.0,
+      comprimentoBarra: 6.0,
+    },
   },
   notaFiscal: {
     percentual: 15.0,

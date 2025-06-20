@@ -1,4 +1,3 @@
-
 export interface ConfigField {
   key: string;
   label: string;
@@ -98,6 +97,8 @@ export const settingsConfig: ConfigSectionData[] = [
       { key: 'fonteChaveada20a', label: 'Fonte Chaveada 20a', unit: 'unid' },
       { key: 'fonteChaveada30a', label: 'Fonte Chaveada 30a', unit: 'unid' },
       { key: 'luminosoRedondoOval', label: 'Luminoso Redondo ou Oval', unit: 'unid' },
+      { key: 'estruturaMetalica.precoPorBarra', label: 'Estrutura Metálica - Preço por Barra', unit: 'unid' },
+      { key: 'estruturaMetalica.comprimentoBarra', label: 'Estrutura Metálica - Comprimento da Barra', unit: 'm' },
     ]
   },
   {
