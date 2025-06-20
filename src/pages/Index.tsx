@@ -46,29 +46,25 @@ const Index = () => {
   };
 
   const renderCalculator = () => {
-    const calculatorProps = {
-      config: config[activeTab as keyof PricingConfig] as any
-    };
-
     switch (activeTab) {
       case 'adesivo':
-        return <AdesivoCalculator config={config.adesivo} />;
+        return <AdesivoCalculator config={config.adesivo} fullConfig={config} />;
       case 'lona':
-        return <LonaCalculator config={config.lona} />;
+        return <LonaCalculator config={config.lona} fullConfig={config} />;
       case 'placa-ps':
-        return <PlacaPSCalculator config={config.placaPS} />;
+        return <PlacaPSCalculator config={config.placaPS} fullConfig={config} />;
       case 'placa-acm':
-        return <PlacaACMCalculator config={config.placaACM} />;
+        return <PlacaACMCalculator config={config.placaACM} fullConfig={config} />;
       case 'fachada':
-        return <FachadaCalculator config={config.fachada} />;
+        return <FachadaCalculator config={config.fachada} fullConfig={config} />;
       case 'letra-caixa':
-        return <LetraCaixaCalculator config={config.letraCaixa} />;
+        return <LetraCaixaCalculator config={config.letraCaixa} fullConfig={config} />;
       case 'vidro':
-        return <VidroCalculator config={config.vidro} />;
+        return <VidroCalculator config={config.vidro} fullConfig={config} />;
       case 'luminoso':
-        return <LuminosoCalculator config={config.luminoso} />;
+        return <LuminosoCalculator config={config.luminoso} fullConfig={config} />;
       default:
-        return <AdesivoCalculator config={config.adesivo} />;
+        return <AdesivoCalculator config={config.adesivo} fullConfig={config} />;
     }
   };
 
