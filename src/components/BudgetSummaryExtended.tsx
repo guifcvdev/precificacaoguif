@@ -1,6 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { formatCurrency, PricingConfig } from '../types/pricing';
+import { Checkbox } from './ui/checkbox';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { Label } from './ui/label';
+import { Separator } from './ui/separator';
 
 interface BudgetSummaryExtendedProps {
   baseTotal: number;
@@ -66,104 +70,95 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
 
   if (!hasValidData) {
     return (
-      <div className="bg-gray-50 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Orçamento</h3>
-        <p className="text-gray-500 text-center py-8">{emptyMessage}</p>
+      <div className="summary-box">
+        <h3 className="section-header">Resumo do Orçamento</h3>
+        <p className="text-caption text-center py-8">{emptyMessage}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Orçamento</h3>
+    <div className="summary-box">
+      <h3 className="section-header">Resumo do Orçamento</h3>
       
-      <div className="space-y-3">
+      <div className="space-y-4">
         {productDetails}
         
-        <div className="flex justify-between text-sm">
+        <div className="flex justify-between text-body text-sm">
           <span>Subtotal do Produto:</span>
-          <span>{formatCurrency(baseTotal)}</span>
+          <span className="currency-value">{formatCurrency(baseTotal)}</span>
         </div>
         
-        <hr className="my-3" />
+        <Separator className="separator-enhanced" />
         
         {/* Nota Fiscal */}
-        <div className="space-y-2">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
+        <div className="space-y-3">
+          <div className="flex items-center space-x-3">
+            <Checkbox
               id="notaFiscal"
               checked={notaFiscal}
-              onChange={(e) => setNotaFiscal(e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              onCheckedChange={setNotaFiscal}
+              className="checkbox-enhanced"
             />
-            <label htmlFor="notaFiscal" className="ml-2 text-sm font-medium text-gray-700">
+            <Label htmlFor="notaFiscal" className="form-label">
               Nota Fiscal (+{config.notaFiscal.percentual}%)
-            </label>
+            </Label>
           </div>
           {notaFiscal && (
-            <div className="flex justify-between text-sm text-blue-600 ml-6">
+            <div className="flex justify-between text-sm text-primary ml-6">
               <span>Taxa Nota Fiscal:</span>
-              <span>+{formatCurrency((baseTotal * config.notaFiscal.percentual) / 100)}</span>
+              <span className="currency-value">+{formatCurrency((baseTotal * config.notaFiscal.percentual) / 100)}</span>
             </div>
           )}
         </div>
 
         {/* Cartão de Crédito */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
+        <div className="space-y-3">
+          <Label className="form-label">
             Custos Cartão de Crédito:
-          </label>
-          <div className="space-y-1 ml-4">
+          </Label>
+          <RadioGroup value={cartaoCredito} onValueChange={setCartaoCredito} className="ml-4">
             {cartaoOptions.map((option) => (
-              <div key={option.value} className="flex items-center">
-                <input
-                  type="radio"
+              <div key={option.value} className="flex items-center space-x-2">
+                <RadioGroupItem 
+                  value={option.value} 
                   id={`cartao-${option.value}`}
-                  name="cartaoCredito"
-                  value={option.value}
-                  checked={cartaoCredito === option.value}
-                  onChange={(e) => setCartaoCredito(e.target.value)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  className="checkbox-enhanced"
                 />
-                <label htmlFor={`cartao-${option.value}`} className="ml-2 text-sm text-gray-700">
+                <Label htmlFor={`cartao-${option.value}`} className="text-body text-sm">
                   {option.label} (+{option.taxa}%)
-                </label>
+                </Label>
               </div>
             ))}
-            <div className="flex items-center">
-              <input
-                type="radio"
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem 
+                value="" 
                 id="cartao-none"
-                name="cartaoCredito"
-                value=""
-                checked={cartaoCredito === ''}
-                onChange={(e) => setCartaoCredito(e.target.value)}
-                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                className="checkbox-enhanced"
               />
-              <label htmlFor="cartao-none" className="ml-2 text-sm text-gray-700">
+              <Label htmlFor="cartao-none" className="text-body text-sm">
                 Não aplicar
-              </label>
+              </Label>
             </div>
-          </div>
+          </RadioGroup>
           {cartaoCredito && (
-            <div className="flex justify-between text-sm text-blue-600 ml-6">
+            <div className="flex justify-between text-sm text-primary ml-6">
               <span>Taxa Cartão {cartaoCredito}:</span>
-              <span>+{formatCurrency((baseTotal * (cartaoOptions.find(o => o.value === cartaoCredito)?.taxa || 0)) / 100)}</span>
+              <span className="currency-value">+{formatCurrency((baseTotal * (cartaoOptions.find(o => o.value === cartaoCredito)?.taxa || 0)) / 100)}</span>
             </div>
           )}
         </div>
 
         {/* Instalação */}
-        <div className="space-y-2">
-          <label htmlFor="instalacao" className="block text-sm font-medium text-gray-700">
+        <div className="space-y-3">
+          <Label htmlFor="instalacao" className="form-label">
             Custo de Instalação:
-          </label>
+          </Label>
           <select
             id="instalacao"
             value={instalacao}
             onChange={(e) => setInstalacao(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:border-transparent input-enhanced"
           >
             <option value="">Selecione a localidade</option>
             {instalacaoOptions.map((option) => (
@@ -173,17 +168,17 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
             ))}
           </select>
           {instalacao && (
-            <div className="flex justify-between text-sm text-blue-600">
+            <div className="flex justify-between text-sm text-primary">
               <span>Instalação:</span>
-              <span>+{formatCurrency(instalacaoOptions.find(o => o.value === instalacao)?.price || 0)}</span>
+              <span className="currency-value">+{formatCurrency(instalacaoOptions.find(o => o.value === instalacao)?.price || 0)}</span>
             </div>
           )}
         </div>
         
-        <hr className="my-3" />
-        <div className="flex justify-between text-lg font-bold text-blue-600">
-          <span>Total:</span>
-          <span>{formatCurrency(finalTotal)}</span>
+        <Separator className="separator-enhanced" />
+        <div className="flex justify-between text-lg font-bold">
+          <span className="text-title">Total:</span>
+          <span className="currency-value text-lg">{formatCurrency(finalTotal)}</span>
         </div>
       </div>
     </div>
