@@ -1,3 +1,4 @@
+
 export interface AdesivoConfig {
   corteEspecial: number;
   soRefile: number;
@@ -24,8 +25,6 @@ export interface PlacaACMConfig {
 
 export interface FachadaConfig {
   lona: number;
-  metalon20x20: number;
-  metalon30x20: number;
   acm122: number;
   acm150: number;
   cantoneira: number;
@@ -124,8 +123,6 @@ export const defaultConfig: PricingConfig = {
   },
   fachada: {
     lona: 20.0,
-    metalon20x20: 15.0,
-    metalon30x20: 18.0,
     acm122: 120.0,
     acm150: 150.0,
     cantoneira: 8.0,

@@ -1,3 +1,4 @@
+
 export interface ConfigField {
   key: string;
   label: string;
@@ -52,8 +53,6 @@ export const settingsConfig: ConfigSectionData[] = [
     section: "fachada",
     fields: [
       { key: 'lona', label: 'Lona', unit: 'm²' },
-      { key: 'metalon20x20', label: 'Metalon 20x20', unit: 'unid' },
-      { key: 'metalon30x20', label: 'Metalon 30x20', unit: 'unid' },
       { key: 'acm122', label: 'ACM 1.22m', unit: 'unid' },
       { key: 'acm150', label: 'ACM 1.50m', unit: 'unid' },
       { key: 'cantoneira', label: 'Cantoneira 3/4', unit: 'unid' },

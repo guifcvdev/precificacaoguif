@@ -13,8 +13,6 @@ export const useFachadaCalculations = (config: FachadaConfig) => {
   const [travasVerticais, setTravasVerticais] = useState<number>(0);
   
   const [quantities, setQuantities] = useState({
-    metalon20x20: 0,
-    metalon30x20: 0,
     acm122: 0,
     acm150: 0,
     cantoneira: 0,
@@ -65,9 +63,7 @@ export const useFachadaCalculations = (config: FachadaConfig) => {
   const estruturaCalc = calcularEstruturaMetalica();
 
   const items = [
-    { id: 'metalon20x20', label: 'Metalon 20x20', price: config.metalon20x20, unit: 'unid' },
     { id: 'cantoneira', label: 'Cantoneira 3/4', price: config.cantoneira, unit: 'unid' },
-    { id: 'metalon30x20', label: 'Metalon 30x20', price: config.metalon30x20, unit: 'unid' },
     { id: 'acm122', label: 'ACM 1.22m', price: config.acm122, unit: 'unid' },
     { id: 'acm150', label: 'ACM 1.50m', price: config.acm150, unit: 'unid' },
   ];
