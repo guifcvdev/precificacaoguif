@@ -1,4 +1,3 @@
-
 export interface AdesivoConfig {
   corteEspecial: number;
   soRefile: number;
@@ -30,6 +29,11 @@ export interface FachadaConfig {
   acm122: number;
   acm150: number;
   cantoneira: number;
+  // Novos parâmetros para estrutura metálica
+  estruturaMetalica: {
+    precoPorBarra: number;
+    comprimentoBarra: number;
+  };
 }
 
 export interface LetraCaixaConfig {
@@ -125,6 +129,10 @@ export const defaultConfig: PricingConfig = {
     acm122: 120.0,
     acm150: 150.0,
     cantoneira: 8.0,
+    estruturaMetalica: {
+      precoPorBarra: 34.0,
+      comprimentoBarra: 6.0,
+    },
   },
   letraCaixa: {
     espessura10mm: 50.0,

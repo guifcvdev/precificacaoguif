@@ -11,32 +11,54 @@ interface ConfigSectionProps {
   updateConfig: (section: string, field: string, value: string) => void;
 }
 
-const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, editConfig, updateConfig }) => (
-  <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
-    <CardHeader className="pb-4">
-      <CardTitle className="text-xl font-semibold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-        {title}
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {fields.map(field => (
-          <div key={`${section}-${field.key}`} className="space-y-2">
-            <label className="block text-sm font-medium text-foreground">
-              {field.label} {field.unit && `(${field.unit})`}
-            </label>
-            <CurrencyInput
-              value={editConfig[section]?.[field.key] || ''}
-              onChange={(value) => updateConfig(section, field.key, value)}
-              placeholder="R$ 0,00"
-              className="hover:bg-background/70"
-            />
-          </div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-));
+const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, editConfig, updateConfig }) => {
+  const getFieldValue = (field: string) => {
+    if (field.includes('.')) {
+      const [parentField, childField] = field.split('.');
+      return editConfig[section]?.[parentField]?.[childField] || '';
+    }
+    return editConfig[section]?.[field] || '';
+  };
+
+  const handleFieldChange = (field: string, value: string) => {
+    if (field.includes('.')) {
+      const [parentField, childField] = field.split('.');
+      // Create nested object update
+      const currentParent = editConfig[section]?.[parentField] || {};
+      const updatedParent = { ...currentParent, [childField]: value };
+      updateConfig(section, parentField, updatedParent);
+    } else {
+      updateConfig(section, field, value);
+    }
+  };
+
+  return (
+    <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-semibold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {fields.map(field => (
+            <div key={`${section}-${field.key}`} className="space-y-2">
+              <label className="block text-sm font-medium text-foreground">
+                {field.label} {field.unit && `(${field.unit})`}
+              </label>
+              <CurrencyInput
+                value={getFieldValue(field.key)}
+                onChange={(value) => handleFieldChange(field.key, value)}
+                placeholder="R$ 0,00"
+                className="hover:bg-background/70"
+              />
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
 
 ConfigSection.displayName = 'ConfigSection';
 

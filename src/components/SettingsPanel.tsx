@@ -22,7 +22,7 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
     onClose();
   };
 
-  const updateConfig = (section: string, field: string, value: string) => {
+  const updateConfig = (section: string, field: string, value: string | object) => {
     setEditConfig(prev => ({
       ...prev,
       [section]: {

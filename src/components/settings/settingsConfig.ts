@@ -1,4 +1,3 @@
-
 export interface ConfigField {
   key: string;
   label: string;
@@ -58,6 +57,8 @@ export const settingsConfig: ConfigSectionData[] = [
       { key: 'acm122', label: 'ACM 1.22m', unit: 'unid' },
       { key: 'acm150', label: 'ACM 1.50m', unit: 'unid' },
       { key: 'cantoneira', label: 'Cantoneira 3/4', unit: 'unid' },
+      { key: 'estruturaMetalica.precoPorBarra', label: 'Estrutura Metálica - Preço por Barra', unit: 'unid' },
+      { key: 'estruturaMetalica.comprimentoBarra', label: 'Estrutura Metálica - Comprimento da Barra', unit: 'm' },
     ]
   },
   {

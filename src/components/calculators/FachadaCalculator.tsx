@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { FachadaConfig, formatCurrency, calculateMinimumCharge, PricingConfig } from '../../types/pricing';
 import BudgetSummaryExtended from '../BudgetSummaryExtended';
@@ -11,6 +12,13 @@ const FachadaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
   const [larguraLona, setLarguraLona] = useState<number>(0);
   const [alturaLona, setAlturaLona] = useState<number>(0);
   const [quantidadeLona, setQuantidadeLona] = useState<number>(1);
+  
+  // Estados para estrutura metálica
+  const [larguraEstrutura, setLarguraEstrutura] = useState<number>(0);
+  const [alturaEstrutura, setAlturaEstrutura] = useState<number>(0);
+  const [travasHorizontais, setTravasHorizontais] = useState<number>(0);
+  const [travasVerticais, setTravasVerticais] = useState<number>(0);
+  
   const [quantities, setQuantities] = useState({
     metalon20x20: 0,
     metalon30x20: 0,
@@ -22,6 +30,46 @@ const FachadaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
 
   const areaLona = larguraLona * alturaLona;
   const areaLonaTotal = areaLona * quantidadeLona;
+
+  // Cálculos da estrutura metálica
+  const areaEstrutura = larguraEstrutura * alturaEstrutura;
+  
+  const calcularEstruturaMetalica = () => {
+    if (larguraEstrutura <= 0 || alturaEstrutura <= 0) {
+      return {
+        metrosLineares: 0,
+        barrasNecessarias: 0,
+        barrasInteiras: 0,
+        custoTotal: 0,
+        custoPorM2: 0
+      };
+    }
+
+    // Cálculo dos metros lineares
+    const perimetro = 2 * (larguraEstrutura + alturaEstrutura);
+    const metrosTravasHorizontais = travasHorizontais * larguraEstrutura;
+    const metrosTravasVerticais = travasVerticais * alturaEstrutura;
+    const metrosLineares = perimetro + metrosTravasHorizontais + metrosTravasVerticais;
+    
+    // Cálculo de barras necessárias
+    const comprimentoBarra = config.estruturaMetalica.comprimentoBarra;
+    const barrasNecessarias = metrosLineares / comprimentoBarra;
+    const barrasInteiras = Math.ceil(barrasNecessarias);
+    
+    // Cálculo do custo
+    const custoTotal = barrasInteiras * config.estruturaMetalica.precoPorBarra;
+    const custoPorM2 = areaEstrutura > 0 ? custoTotal / areaEstrutura : 0;
+
+    return {
+      metrosLineares,
+      barrasNecessarias,
+      barrasInteiras,
+      custoTotal,
+      custoPorM2
+    };
+  };
+
+  const estruturaCalc = calcularEstruturaMetalica();
 
   const items = [
     { id: 'metalon20x20', label: 'Metalon 20x20', price: config.metalon20x20, unit: 'unid' },
@@ -50,8 +98,11 @@ const FachadaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
       }
     });
     
+    // Add estrutura metálica cost
+    totalValue += estruturaCalc.custoTotal;
+    
     setTotal(totalValue);
-  }, [larguraLona, alturaLona, quantidadeLona, quantities, config]);
+  }, [larguraLona, alturaLona, quantidadeLona, quantities, config, estruturaCalc.custoTotal]);
 
   const handleQuantityChange = (itemId: string, value: number) => {
     setQuantities(prev => ({
@@ -88,6 +139,39 @@ const FachadaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
           </div>
         </>
       )}
+
+      {estruturaCalc.custoTotal > 0 && (
+        <>
+          <div className="flex justify-between text-sm">
+            <span>Dimensões da Estrutura:</span>
+            <span>{larguraEstrutura.toFixed(2)} x {alturaEstrutura.toFixed(2)} m</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Área da Estrutura:</span>
+            <span>{areaEstrutura.toFixed(2)} m²</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Metros Lineares:</span>
+            <span>{estruturaCalc.metrosLineares.toFixed(2)} m</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Barras Necessárias:</span>
+            <span>{estruturaCalc.barrasNecessarias.toFixed(2)} barras</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Barras a Pagar:</span>
+            <span>{estruturaCalc.barrasInteiras} barras</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Custo da Estrutura:</span>
+            <span>{formatCurrency(estruturaCalc.custoTotal)}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Custo por m²:</span>
+            <span>{formatCurrency(estruturaCalc.custoPorM2)}</span>
+          </div>
+        </>
+      )}
       
       {Object.entries(quantities).map(([key, quantity]) => {
         if (quantity > 0) {
@@ -110,7 +194,7 @@ const FachadaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
     <div className="p-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Calculadora de Fachada Simples</h2>
-        <p className="text-gray-600">Configure as dimensões da lona e as quantidades dos materiais necessários.</p>
+        <p className="text-gray-600">Configure as dimensões da lona, estrutura metálica e as quantidades dos materiais necessários.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -165,6 +249,70 @@ const FachadaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-4">
+              Estrutura Metálica
+            </label>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Largura (m)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={larguraEstrutura || ''}
+                  onChange={(e) => setLarguraEstrutura(parseFloat(e.target.value) || 0)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Altura (m)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={alturaEstrutura || ''}
+                  onChange={(e) => setAlturaEstrutura(parseFloat(e.target.value) || 0)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Travas Horizontais</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={travasHorizontais || ''}
+                  onChange={(e) => setTravasHorizontais(parseInt(e.target.value) || 0)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="0"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Travas Verticais</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={travasVerticais || ''}
+                  onChange={(e) => setTravasVerticais(parseInt(e.target.value) || 0)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+            {estruturaCalc.metrosLineares > 0 && (
+              <div className="text-sm text-gray-600 mt-2 space-y-1">
+                <p>Metros lineares: {estruturaCalc.metrosLineares.toFixed(2)} m</p>
+                <p>Barras necessárias: {estruturaCalc.barrasNecessarias.toFixed(2)} ({estruturaCalc.barrasInteiras} a pagar)</p>
+                <p>Preço: {formatCurrency(config.estruturaMetalica.precoPorBarra)}/barra de {config.estruturaMetalica.comprimentoBarra}m</p>
+                <p>Custo por m²: {formatCurrency(estruturaCalc.custoPorM2)}</p>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-4">
               Materiais Adicionais
             </label>
             <div className="space-y-4">
@@ -199,7 +347,7 @@ const FachadaCalculator: React.FC<Props> = ({ config, fullConfig }) => {
           config={fullConfig}
           productDetails={productDetails}
           hasValidData={hasValidData}
-          emptyMessage="Preencha as dimensões da lona ou as quantidades dos materiais para ver o orçamento"
+          emptyMessage="Preencha as dimensões da lona ou estrutura metálica para ver o orçamento"
         />
       </div>
     </div>
