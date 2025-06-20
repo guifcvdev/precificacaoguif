@@ -1,4 +1,5 @@
 
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,7 +15,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 213 100% 65%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -23,26 +24,26 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 213 100% 65%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 213 100% 65%;
 
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: 213 100% 65%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-accent-foreground: 213 100% 65%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 213 100% 65%;
   }
 }
 
@@ -72,18 +73,22 @@
     display: none;
   }
 
-  /* Glassmorphism effect */
+  /* Glassmorphism effect enhanced */
   .glass {
-    @apply bg-white/10 backdrop-blur-xl border border-white/20;
+    @apply bg-white/20 backdrop-blur-xl border border-white/30;
   }
 
-  /* Elevation shadows */
+  /* Elevation shadows with blue tint */
   .elevation-1 {
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px 0 rgba(0, 122, 255, 0.08), 0 1px 2px 0 rgba(0, 122, 255, 0.04);
   }
 
   .elevation-2 {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1px rgba(0, 122, 255, 0.12), 0 2px 4px -1px rgba(0, 122, 255, 0.08);
+  }
+
+  .elevation-3 {
+    box-shadow: 0 10px 15px -3px rgba(0, 122, 255, 0.15), 0 4px 6px -2px rgba(0, 122, 255, 0.1);
   }
 }
 
@@ -120,7 +125,7 @@
     @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
 
-  /* Gradient text */
+  /* Gradient text with blue-purple theme */
   .gradient-text {
     @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
   }
@@ -151,15 +156,14 @@
     @apply transition-all duration-100 ease-out active:scale-[0.98];
   }
 
-  /* Card styling */
+  /* Card styling with enhanced elevation */
   .card-elevated {
-    @apply bg-card border border-border rounded-lg;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    @apply bg-card border border-border rounded-lg elevation-2;
   }
 
-  /* Summary box */
+  /* Summary box with subtle blue accent */
   .summary-box {
-    @apply bg-muted/30 border border-border rounded-lg p-4;
+    @apply bg-gradient-to-br from-blue-50/50 to-purple-50/30 border border-blue-200/50 rounded-lg p-4;
   }
 
   /* Form elements */
@@ -171,12 +175,12 @@
     @apply text-caption;
   }
 
-  /* Input styling */
+  /* Input styling with blue accent */
   .input-enhanced {
-    @apply bg-background border-border text-foreground placeholder:text-muted-foreground;
+    @apply bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:ring-primary/20;
   }
 
-  /* Checkbox and radio buttons */
+  /* Checkbox and radio buttons with primary color */
   .checkbox-enhanced {
     @apply border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary;
   }
@@ -186,12 +190,12 @@
     @apply bg-border;
   }
 
-  /* Button hover states */
+  /* Button hover states with blue accent */
   .button-hover-light {
-    @apply hover:bg-accent/50;
+    @apply hover:bg-blue-50/50;
   }
 
-  /* Currency values */
+  /* Currency values with primary color */
   .currency-value {
     @apply font-semibold text-primary;
   }
@@ -201,8 +205,19 @@
     @apply text-title text-lg font-semibold mb-4;
   }
 
-  /* Background patterns */
+  /* Background patterns with blue tint */
   .bg-subtle {
-    @apply bg-muted/20;
+    @apply bg-blue-50/30;
+  }
+
+  /* Blue gradient decorator */
+  .gradient-decorator {
+    @apply bg-gradient-to-r from-blue-500 to-purple-500;
+  }
+
+  /* Enhanced card with backdrop blur */
+  .card-backdrop {
+    @apply bg-card/80 backdrop-blur-xl border-border/50 shadow-xl hover:shadow-2xl;
   }
 }
+
