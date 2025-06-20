@@ -22,7 +22,7 @@ const ModernTabs: React.FC<ModernTabsProps> = ({ activeTab, onTabChange }) => {
   return (
     <div className="bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex space-x-1 overflow-x-auto py-2 scrollbar-hide">
+        <div className="flex space-x-1 overflow-x-auto py-3 scrollbar-hide">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -31,7 +31,7 @@ const ModernTabs: React.FC<ModernTabsProps> = ({ activeTab, onTabChange }) => {
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className={`group relative flex items-center space-x-2 px-4 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300 ${
+                className={`group relative flex items-center space-x-2 px-4 py-3 pb-4 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-300 ${
                   isActive
                     ? 'text-white shadow-lg transform scale-105'
                     : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
@@ -47,7 +47,7 @@ const ModernTabs: React.FC<ModernTabsProps> = ({ activeTab, onTabChange }) => {
                   <span className="hidden sm:inline">{tab.label}</span>
                 </div>
                 {isActive && (
-                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-white rounded-full" />
+                  <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-white rounded-full" />
                 )}
               </button>
             );
