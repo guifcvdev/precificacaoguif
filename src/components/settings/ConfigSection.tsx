@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { CurrencyInput } from '../ui/currency-input';
+import { PercentageInput } from '../ui/percentage-input';
 
 interface ConfigSectionProps {
   title: string;
@@ -32,6 +33,11 @@ const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, 
     }
   };
 
+  const isPercentageField = (sectionName: string, fieldKey: string) => {
+    return (sectionName === 'notaFiscal' && fieldKey === 'percentual') ||
+           (sectionName === 'cartaoCredito' && (fieldKey === 'taxa3x' || fieldKey === 'taxa6x' || fieldKey === 'taxa12x'));
+  };
+
   return (
     <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
       <CardHeader className="pb-4">
@@ -46,12 +52,20 @@ const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, 
               <label className="block text-sm font-medium text-foreground">
                 {field.label} {field.unit && `(${field.unit})`}
               </label>
-              <CurrencyInput
-                value={getFieldValue(field.key)}
-                onChange={(value) => handleFieldChange(field.key, value)}
-                placeholder="R$ 0,00"
-                className="hover:bg-background/70"
-              />
+              {isPercentageField(section, field.key) ? (
+                <PercentageInput
+                  value={getFieldValue(field.key)}
+                  onChange={(value) => handleFieldChange(field.key, value)}
+                  className="hover:bg-background/70"
+                />
+              ) : (
+                <CurrencyInput
+                  value={getFieldValue(field.key)}
+                  onChange={(value) => handleFieldChange(field.key, value)}
+                  placeholder="R$ 0,00"
+                  className="hover:bg-background/70"
+                />
+              )}
             </div>
           ))}
         </div>
