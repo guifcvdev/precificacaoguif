@@ -51,7 +51,7 @@ const ModernTabs: React.FC<ModernTabsProps> = ({
   }];
   return <div className="bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-center lg:justify-start space-x-1 overflow-x-auto py-4 pb-6 scrollbar-hide mx-0">
+        <div className="flex justify-center lg:justify-start space-x-1 overflow-x-auto py-4 pb-6 scrollbar-hide mx-0 px-[22px]">
           {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
