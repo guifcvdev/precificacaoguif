@@ -53,7 +53,7 @@ const AdesivoCalculator: React.FC<Props> = ({
   };
   return <div className="p-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Calculadora de Adesivo</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Calculadora de Luminoso</h2>
         <p className="text-gray-600">Selecione as opções desejadas e informe as dimensões.</p>
       </div>
 
