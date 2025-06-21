@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { formatCurrency, PricingConfig } from '../types/pricing';
 import { useBudgetSettings } from '../hooks/useBudgetSettings';
@@ -42,6 +41,7 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
     { value: 'litoral', label: 'Litoral', price: config.instalacao.litoral },
     { value: 'guararemaSantaIsabel', label: 'Guararema/Sta Isabel', price: config.instalacao.guararemaSantaIsabel },
     { value: 'santaBranca', label: 'Sta Branca', price: config.instalacao.santaBranca },
+    { value: 'saoPaulo', label: 'São Paulo', price: config.instalacao.saoPaulo },
   ];
 
   const cartaoOptions = [

@@ -127,6 +127,7 @@ export const settingsConfig: ConfigSectionData[] = [
       { key: 'litoral', label: 'Litoral', unit: 'serviço' },
       { key: 'guararemaSantaIsabel', label: 'Guararema/Sta Isabel', unit: 'serviço' },
       { key: 'santaBranca', label: 'Sta Branca', unit: 'serviço' },
+      { key: 'saoPaulo', label: 'São Paulo', unit: 'serviço' },
     ]
   }
 ];

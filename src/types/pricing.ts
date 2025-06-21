@@ -88,6 +88,7 @@ export interface InstalacaoConfig {
   litoral: number;
   guararemaSantaIsabel: number;
   santaBranca: number;
+  saoPaulo: number;
 }
 
 export interface PricingConfig {
@@ -182,6 +183,7 @@ export const defaultConfig: PricingConfig = {
     litoral: 200.0,
     guararemaSantaIsabel: 180.0,
     santaBranca: 160.0,
+    saoPaulo: 250.0,
   },
 };
 
