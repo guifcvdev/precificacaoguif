@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { formatCurrency, PricingConfig } from '../types/pricing';
 import { useBudgetSettings } from '../hooks/useBudgetSettings';
@@ -34,27 +35,28 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
   const { formatBudgetText } = useBudgetSettings();
   const { toast } = useToast();
 
+  // Safety checks for config properties
   const instalacaoOptions = [
-    { value: 'jacarei', label: 'Jacareí', price: config.instalacao.jacarei },
-    { value: 'sjCampos', label: 'S.J.Campos', price: config.instalacao.sjCampos },
-    { value: 'cacapavaTaubate', label: 'Caçapava/Taubaté', price: config.instalacao.cacapavaTaubate },
-    { value: 'litoral', label: 'Litoral', price: config.instalacao.litoral },
-    { value: 'guararemaSantaIsabel', label: 'Guararema/Sta Isabel', price: config.instalacao.guararemaSantaIsabel },
-    { value: 'santaBranca', label: 'Sta Branca', price: config.instalacao.santaBranca },
-    { value: 'saoPaulo', label: 'São Paulo', price: config.instalacao.saoPaulo },
+    { value: 'jacarei', label: 'Jacareí', price: config?.instalacao?.jacarei || 0 },
+    { value: 'sjCampos', label: 'S.J.Campos', price: config?.instalacao?.sjCampos || 0 },
+    { value: 'cacapavaTaubate', label: 'Caçapava/Taubaté', price: config?.instalacao?.cacapavaTaubate || 0 },
+    { value: 'litoral', label: 'Litoral', price: config?.instalacao?.litoral || 0 },
+    { value: 'guararemaSantaIsabel', label: 'Guararema/Sta Isabel', price: config?.instalacao?.guararemaSantaIsabel || 0 },
+    { value: 'santaBranca', label: 'Sta Branca', price: config?.instalacao?.santaBranca || 0 },
+    { value: 'saoPaulo', label: 'São Paulo', price: config?.instalacao?.saoPaulo || 0 },
   ];
 
   const cartaoOptions = [
-    { value: '3x', label: '3x', taxa: config.cartaoCredito.taxa3x },
-    { value: '6x', label: '6x', taxa: config.cartaoCredito.taxa6x },
-    { value: '12x', label: '12x', taxa: config.cartaoCredito.taxa12x },
+    { value: '3x', label: '3x', taxa: config?.cartaoCredito?.taxa3x || 0 },
+    { value: '6x', label: '6x', taxa: config?.cartaoCredito?.taxa6x || 0 },
+    { value: '12x', label: '12x', taxa: config?.cartaoCredito?.taxa12x || 0 },
   ];
 
   useEffect(() => {
     let total = baseTotal;
 
     // Adicionar taxa de nota fiscal
-    if (notaFiscal) {
+    if (notaFiscal && config?.notaFiscal?.percentual) {
       total += (baseTotal * config.notaFiscal.percentual) / 100;
     }
 
@@ -110,6 +112,16 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
       <div className="summary-box">
         <h3 className="section-header">Resumo do Orçamento</h3>
         <p className="text-caption text-center py-8">{emptyMessage}</p>
+      </div>
+    );
+  }
+
+  // Add safety check for config
+  if (!config) {
+    return (
+      <div className="summary-box">
+        <h3 className="section-header">Resumo do Orçamento</h3>
+        <p className="text-caption text-center py-8">Configuração não carregada</p>
       </div>
     );
   }
