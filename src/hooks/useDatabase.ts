@@ -12,9 +12,12 @@ export const useDatabase = () => {
   const initializeDatabase = async () => {
     if (isInitializing || isInitialized) return;
 
-    const databaseUrl = import.meta.env.VITE_DATABASE_URL;
+    // Check for database URL from localStorage first, then environment
+    const localConfig = localStorage.getItem('databaseConnectionString');
+    const databaseUrl = localConfig || import.meta.env.VITE_DATABASE_URL;
+    
     if (!databaseUrl) {
-      setError('VITE_DATABASE_URL não configurada');
+      setError('Banco de dados não configurado. Configure a string de conexão nas configurações.');
       return;
     }
 
@@ -54,11 +57,13 @@ export const useDatabase = () => {
   };
 
   useEffect(() => {
-    const databaseUrl = import.meta.env.VITE_DATABASE_URL;
+    const localConfig = localStorage.getItem('databaseConnectionString');
+    const databaseUrl = localConfig || import.meta.env.VITE_DATABASE_URL;
+    
     if (databaseUrl) {
       initializeDatabase();
     } else {
-      setError('VITE_DATABASE_URL não configurada');
+      setError('Banco de dados não configurado. Configure a string de conexão nas configurações.');
     }
   }, []);
 

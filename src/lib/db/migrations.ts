@@ -1,12 +1,22 @@
-import { db } from './connection';
+
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 import { sql } from 'drizzle-orm';
+import * as schema from './schema';
 
 export const runMigrations = async () => {
-  if (!db) {
-    throw new Error('Database connection not available. Please configure VITE_DATABASE_URL.');
+  // Get database URL from localStorage first, then environment
+  const localConfig = localStorage.getItem('databaseConnectionString');
+  const databaseUrl = localConfig || import.meta.env.VITE_DATABASE_URL;
+  
+  if (!databaseUrl) {
+    throw new Error('Database connection not available. Please configure the connection string in settings.');
   }
 
   try {
+    const sqlConnection = neon(databaseUrl);
+    const db = drizzle(sqlConnection, { schema });
+
     // Create extension for UUID generation
     await db.execute(sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
     
