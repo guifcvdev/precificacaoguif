@@ -12,11 +12,7 @@ import SettingsPanel from '../components/SettingsPanel';
 import ModernHeader from '../components/ModernHeader';
 import ModernTabs from '../components/ModernTabs';
 import ModernCalculatorWrapper from '../components/ModernCalculatorWrapper';
-import DatabaseStatus from '../components/DatabaseStatus';
 import { PricingConfig, defaultConfig } from '../types/pricing';
-import { Link } from 'react-router-dom';
-import { Button } from '../components/ui/button';
-import { Database } from 'lucide-react';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('adesivo');
@@ -86,21 +82,6 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
       {/* Header */}
       <ModernHeader onSettingsClick={() => setShowSettings(true)} />
-
-      {/* Database Status and Test Link */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div className="flex-1">
-            <DatabaseStatus />
-          </div>
-          <Link to="/database-test">
-            <Button variant="outline" size="sm" className="whitespace-nowrap">
-              <Database className="h-4 w-4 mr-2" />
-              Testar Banco
-            </Button>
-          </Link>
-        </div>
-      </div>
 
       {/* Tab Navigation */}
       <ModernTabs activeTab={activeTab} onTabChange={setActiveTab} />
