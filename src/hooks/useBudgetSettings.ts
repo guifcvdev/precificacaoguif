@@ -37,7 +37,7 @@ export const useBudgetSettings = () => {
       ? `- Entrega do pedido em ${deliveryDays} dias úteis após a aprovação de arte e pagamento.`
       : observations.deliveryTime;
 
-    return `Título: Orçamento
+    return `Orçamento
 Quantidade: ${quantity}
 Total: R$ ${total.toFixed(2).replace('.', ',')}
 

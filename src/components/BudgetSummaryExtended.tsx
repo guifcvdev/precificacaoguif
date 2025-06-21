@@ -86,10 +86,15 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
     
     try {
       await navigator.clipboard.writeText(budgetText);
-      toast({
+      const toastInstance = toast({
         title: "Orçamento copiado",
         description: "O orçamento foi copiado para a área de transferência.",
       });
+      
+      // Fechar automaticamente após 3 segundos
+      setTimeout(() => {
+        toastInstance.dismiss();
+      }, 3000);
     } catch (error) {
       console.error('Error copying to clipboard:', error);
       toast({
