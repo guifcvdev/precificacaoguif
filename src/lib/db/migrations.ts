@@ -1,8 +1,11 @@
-
 import { db } from './connection';
 import { sql } from 'drizzle-orm';
 
 export const runMigrations = async () => {
+  if (!db) {
+    throw new Error('Database connection not available. Please configure VITE_DATABASE_URL.');
+  }
+
   try {
     // Create extension for UUID generation
     await db.execute(sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);

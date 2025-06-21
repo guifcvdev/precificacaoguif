@@ -12,6 +12,12 @@ export const useDatabase = () => {
   const initializeDatabase = async () => {
     if (isInitializing || isInitialized) return;
 
+    const databaseUrl = import.meta.env.VITE_DATABASE_URL;
+    if (!databaseUrl) {
+      setError('VITE_DATABASE_URL não configurada');
+      return;
+    }
+
     setIsInitializing(true);
     setError(null);
 
@@ -51,6 +57,8 @@ export const useDatabase = () => {
     const databaseUrl = import.meta.env.VITE_DATABASE_URL;
     if (databaseUrl) {
       initializeDatabase();
+    } else {
+      setError('VITE_DATABASE_URL não configurada');
     }
   }, []);
 

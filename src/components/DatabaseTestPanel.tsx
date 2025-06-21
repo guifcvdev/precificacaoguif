@@ -16,7 +16,15 @@ const DatabaseTestPanel: React.FC = () => {
   const [testName, setTestName] = useState('Usuário Teste');
   const { toast } = useToast();
 
+  // Check if database is available
+  const isDatabaseAvailable = !!db && !!import.meta.env.VITE_DATABASE_URL;
+
   const runMigrationsTest = async () => {
+    if (!isDatabaseAvailable) {
+      setTestResult('❌ Banco de dados não disponível. Configure VITE_DATABASE_URL.');
+      return;
+    }
+
     setIsLoading(true);
     setTestResult('');
     
@@ -41,6 +49,11 @@ const DatabaseTestPanel: React.FC = () => {
   };
 
   const testDatabaseConnection = async () => {
+    if (!isDatabaseAvailable) {
+      setTestResult('❌ Banco de dados não disponível. Configure VITE_DATABASE_URL.');
+      return;
+    }
+
     setIsLoading(true);
     setTestResult('');
     
@@ -66,6 +79,11 @@ const DatabaseTestPanel: React.FC = () => {
   };
 
   const testUserCreation = async () => {
+    if (!isDatabaseAvailable) {
+      setTestResult('❌ Banco de dados não disponível. Configure VITE_DATABASE_URL.');
+      return;
+    }
+
     setIsLoading(true);
     setTestResult('');
     
@@ -78,8 +96,9 @@ const DatabaseTestPanel: React.FC = () => {
       `);
       
       // Verificar se foi inserido
-      const users = await db.execute(sql`SELECT * FROM users WHERE email = ${testEmail}`);
-      setTestResult(`✅ Usuário criado/atualizado com sucesso! Total de usuários: ${users.length}`);
+      const users = await db.execute(sql`SELECT COUNT(*) as count FROM users WHERE email = ${testEmail}`);
+      const userCount = users.rows?.[0]?.count || 0;
+      setTestResult(`✅ Usuário criado/atualizado com sucesso! Usuário encontrado: ${userCount > 0 ? 'Sim' : 'Não'}`);
       toast({
         title: "Sucesso",
         description: "Usuário de teste criado com sucesso.",
@@ -98,6 +117,11 @@ const DatabaseTestPanel: React.FC = () => {
   };
 
   const listTables = async () => {
+    if (!isDatabaseAvailable) {
+      setTestResult('❌ Banco de dados não disponível. Configure VITE_DATABASE_URL.');
+      return;
+    }
+
     setIsLoading(true);
     setTestResult('');
     
@@ -109,8 +133,8 @@ const DatabaseTestPanel: React.FC = () => {
         ORDER BY table_name
       `);
       
-      const tableNames = tables.map((table: any) => table.table_name).join(', ');
-      setTestResult(`✅ Tabelas encontradas: ${tableNames || 'Nenhuma tabela encontrada'}`);
+      const tableNames = tables.rows?.map((table: any) => table.table_name).join(', ') || 'Nenhuma tabela encontrada';
+      setTestResult(`✅ Tabelas encontradas: ${tableNames}`);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
       setTestResult(`❌ Erro ao listar tabelas: ${errorMsg}`);
@@ -118,6 +142,18 @@ const DatabaseTestPanel: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  if (!isDatabaseAvailable) {
+    return (
+      <Alert variant="destructive" className="mb-4">
+        <AlertDescription>
+          <strong>Banco de dados não configurado</strong>
+          <br />
+          Configure a variável VITE_DATABASE_URL para usar as funcionalidades do banco de dados.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="space-y-6">
