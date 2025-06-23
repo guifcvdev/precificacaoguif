@@ -4,29 +4,38 @@ import { PricingConfig } from '../types/pricing';
 export const configService = {
   async saveConfig(config: PricingConfig) {
     try {
-      // Primeiro, vamos buscar o registro existente
+      // Buscar configuração existente
       const { data: existingConfig, error: fetchError } = await supabase
-        .from('config_fields')
-        .select('*');
+        .from('pricing_configs')
+        .select('*')
+        .eq('is_default', true)
+        .single();
 
-      if (fetchError) throw fetchError;
+      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 é o código para "não encontrado"
+        throw fetchError;
+      }
 
-      // Para cada seção no config
-      for (const [sectionKey, sectionData] of Object.entries(config)) {
-        for (const [fieldKey, value] of Object.entries(sectionData)) {
-          const { error } = await supabase
-            .from('config_fields')
-            .upsert({
-              section_key: sectionKey,
-              field_key: fieldKey,
-              value: value,
-              updated_at: new Date().toISOString()
-            }, {
-              onConflict: 'section_key,field_key'
-            });
+      if (existingConfig) {
+        // Atualizar configuração existente
+        const { error } = await supabase
+          .from('pricing_configs')
+          .update({
+            config_data: config,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingConfig.id);
 
-          if (error) throw error;
-        }
+        if (error) throw error;
+      } else {
+        // Criar nova configuração
+        const { error } = await supabase
+          .from('pricing_configs')
+          .insert({
+            config_data: config,
+            is_default: true
+          });
+
+        if (error) throw error;
       }
 
       return { success: true };
@@ -39,24 +48,19 @@ export const configService = {
   async loadConfig(): Promise<PricingConfig | null> {
     try {
       const { data, error } = await supabase
-        .from('config_fields')
-        .select('*');
+        .from('pricing_configs')
+        .select('config_data')
+        .eq('is_default', true)
+        .single();
 
-      if (error) throw error;
-
-      if (!data || data.length === 0) return null;
-
-      // Converter os dados do formato do banco para o formato do PricingConfig
-      const config: PricingConfig = {};
-      
-      data.forEach(item => {
-        if (!config[item.section_key]) {
-          config[item.section_key] = {};
+      if (error) {
+        if (error.code === 'PGRST116') { // Não encontrado
+          return null;
         }
-        config[item.section_key][item.field_key] = item.value;
-      });
+        throw error;
+      }
 
-      return config;
+      return data?.config_data as PricingConfig || null;
     } catch (error) {
       console.error('Erro ao carregar configurações:', error);
       return null;
