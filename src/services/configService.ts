@@ -4,19 +4,7 @@ import { PricingConfig } from '../types/pricing';
 export const configService = {
   async saveConfig(config: PricingConfig) {
     try {
-      // Abordagem simplificada: deletar todos os registros e inserir um novo
-      // Isso evita problemas com consultas complexas
-      const { error: deleteError } = await supabase
-        .from('pricing_configs')
-        .delete()
-        .filter('id', 'gt', 0);
-      
-      if (deleteError) {
-        console.error('Erro ao limpar configurações:', deleteError);
-        // Continuar mesmo com erro, pois a tabela pode estar vazia
-      }
-      
-      // Inserir nova configuração
+      // Abordagem mais simples: apenas inserir sem tentar deletar
       const { error } = await supabase
         .from('pricing_configs')
         .insert({
@@ -25,7 +13,7 @@ export const configService = {
         });
 
       if (error) {
-        console.error('Erro ao inserir configurações:', error);
+        console.error('Erro ao salvar configurações:', error);
         return { success: false, error };
       }
 
@@ -38,10 +26,10 @@ export const configService = {
 
   async loadConfig(): Promise<PricingConfig | null> {
     try {
-      // Simplificar a consulta para evitar erros
+      // Consulta mais simples possível
       const { data, error } = await supabase
         .from('pricing_configs')
-        .select('*')
+        .select('config_data')
         .limit(1);
 
       if (error) {

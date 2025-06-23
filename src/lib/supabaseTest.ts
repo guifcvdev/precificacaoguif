@@ -1,10 +1,10 @@
 import { supabase } from './supabaseClient';
+import { defaultConfig } from '../types/pricing';
 
 export const testSupabaseConnection = async () => {
   try {
-    // Teste simples para verificar se o Supabase está respondendo
-    // Usar uma consulta mais simples que não depende de tabelas específicas
-    const { data, error } = await supabase.rpc('get_server_version');
+    // Teste mais simples possível - apenas verificar se o Supabase responde
+    const { data, error } = await supabase.from('pricing_configs').select('id').limit(1);
     
     if (error) {
       console.error('Erro ao conectar com o Supabase:', error);
@@ -21,18 +21,7 @@ export const testSupabaseConnection = async () => {
 
 export const createInitialConfig = async (config: any) => {
   try {
-    // Limpar tabela existente - usar uma abordagem mais segura
-    const { error: deleteError } = await supabase
-      .from('pricing_configs')
-      .delete()
-      .filter('id', 'gt', 0);
-    
-    if (deleteError) {
-      console.error('Erro ao limpar configurações existentes:', deleteError);
-      // Continuar mesmo com erro, pois a tabela pode estar vazia
-    }
-    
-    // Inserir configuração inicial
+    // Abordagem mais simples: inserir diretamente sem tentar limpar antes
     const { data, error } = await supabase
       .from('pricing_configs')
       .insert({
