@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PricingConfig } from '../types/pricing';
 import SettingsLayout from './settings/SettingsLayout';
@@ -7,7 +6,6 @@ import ConfigSection from './settings/ConfigSection';
 import BudgetObservationsSettings from './settings/BudgetObservationsSettings';
 import DatabaseStatus from './DatabaseStatus';
 import DatabaseTestPanel from './DatabaseTestPanel';
-import DatabaseConnectionConfig from './database/DatabaseConnectionConfig';
 import { settingsConfig } from './settings/settingsConfig';
 import { convertConfigToCurrency, convertCurrencyToNumbers } from './settings/configUtils';
 
@@ -48,11 +46,6 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
         </div>
 
         <div className="space-y-6">
-          {/* Configuração da Conexão com Banco de Dados */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <DatabaseConnectionConfig />
-          </div>
-
           {/* Status e Testes do Banco de Dados */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h2 className="text-xl font-semibold mb-4">Status e Verificações do Banco de Dados</h2>
