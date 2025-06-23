@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useDatabase } from '../hooks/useDatabase';
 import { Alert, AlertDescription } from './ui/alert';
@@ -12,7 +11,7 @@ const DatabaseStatus: React.FC = () => {
     return (
       <div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
         <Loader className="h-4 w-4 animate-spin text-blue-600" />
-        <span className="text-sm text-blue-800">Conectando ao banco de dados...</span>
+        <span className="text-sm text-blue-800">Conectando ao Supabase...</span>
       </div>
     );
   }
@@ -23,10 +22,6 @@ const DatabaseStatus: React.FC = () => {
         <XCircle className="h-4 w-4" />
         <AlertDescription className="ml-2">
           <strong>Erro na conexão:</strong> {error}
-          <br />
-          <span className="text-xs mt-1 block">
-            Verifique se a variável VITE_DATABASE_URL está configurada corretamente.
-          </span>
         </AlertDescription>
       </Alert>
     );
@@ -36,7 +31,7 @@ const DatabaseStatus: React.FC = () => {
     return (
       <div className="flex items-center space-x-2 p-3 bg-green-50 rounded-lg border border-green-200">
         <CheckCircle className="h-4 w-4 text-green-600" />
-        <span className="text-sm text-green-800">Conectado ao Neon Database</span>
+        <span className="text-sm text-green-800">Conectado ao Supabase</span>
         <Database className="h-4 w-4 text-green-600" />
       </div>
     );

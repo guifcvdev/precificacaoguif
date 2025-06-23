@@ -1,44 +1,35 @@
-
 import React from 'react';
 import { Button } from '../ui/button';
-import { db } from '../../lib/db/connection';
-import { sql } from 'drizzle-orm';
+import { supabase } from '../../lib/supabaseClient';
 
 interface Props {
-  isDatabaseAvailable: boolean;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
   setTestResult: (result: string) => void;
 }
 
 const DatabaseTableList: React.FC<Props> = ({
-  isDatabaseAvailable,
   isLoading,
   setIsLoading,
   setTestResult
 }) => {
   const listTables = async () => {
-    if (!isDatabaseAvailable) {
-      setTestResult('❌ Banco de dados não disponível. Configure VITE_DATABASE_URL.');
-      return;
-    }
-
     setIsLoading(true);
     setTestResult('');
     
     try {
-      const tables = await db.execute(sql`
-        SELECT table_name 
-        FROM information_schema.tables 
-        WHERE table_schema = 'public'
-        ORDER BY table_name
-      `);
+      const { data, error } = await supabase
+        .from('config_sections')
+        .select('title')
+        .order('title');
+
+      if (error) throw error;
       
-      const tableNames = tables.rows?.map((table: any) => table.table_name).join(', ') || 'Nenhuma tabela encontrada';
-      setTestResult(`✅ Tabelas encontradas: ${tableNames}`);
+      const tableNames = data.map(section => section.title).join(', ') || 'Nenhuma seção encontrada';
+      setTestResult(`✅ Seções configuradas: ${tableNames}`);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
-      setTestResult(`❌ Erro ao listar tabelas: ${errorMsg}`);
+      setTestResult(`❌ Erro ao listar seções: ${errorMsg}`);
     } finally {
       setIsLoading(false);
     }
@@ -51,7 +42,7 @@ const DatabaseTableList: React.FC<Props> = ({
       variant="outline"
       className="w-full"
     >
-      {isLoading ? 'Listando...' : 'Listar Tabelas'}
+      {isLoading ? 'Listando...' : 'Listar Seções'}
     </Button>
   );
 };

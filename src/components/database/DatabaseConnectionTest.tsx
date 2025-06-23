@@ -1,20 +1,15 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '../ui/button';
-import { Alert, AlertDescription } from '../ui/alert';
 import { useToast } from '../../hooks/use-toast';
-import { db } from '../../lib/db/connection';
-import { sql } from 'drizzle-orm';
+import { supabase } from '../../lib/supabaseClient';
 
 interface Props {
-  isDatabaseAvailable: boolean;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
   setTestResult: (result: string) => void;
 }
 
 const DatabaseConnectionTest: React.FC<Props> = ({
-  isDatabaseAvailable,
   isLoading,
   setIsLoading,
   setTestResult
@@ -22,27 +17,25 @@ const DatabaseConnectionTest: React.FC<Props> = ({
   const { toast } = useToast();
 
   const testDatabaseConnection = async () => {
-    if (!isDatabaseAvailable) {
-      setTestResult('❌ Banco de dados não disponível. Configure VITE_DATABASE_URL.');
-      return;
-    }
-
     setIsLoading(true);
     setTestResult('');
     
     try {
-      const result = await db.execute(sql`SELECT NOW() as current_time`);
-      setTestResult(`✅ Conexão testada com sucesso! Hora do servidor: ${new Date().toLocaleString()}`);
+      const { data, error } = await supabase.from('config_sections').select('count');
+      
+      if (error) throw error;
+      
+      setTestResult(`✅ Conexão com Supabase testada com sucesso! ${new Date().toLocaleString()}`);
       toast({
         title: "Sucesso",
-        description: "Conexão com banco testada com sucesso.",
+        description: "Conexão com Supabase testada com sucesso.",
       });
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
       setTestResult(`❌ Erro na conexão: ${errorMsg}`);
       toast({
         title: "Erro",
-        description: "Falha ao testar conexão com banco.",
+        description: "Falha ao testar conexão com Supabase.",
         variant: "destructive",
       });
     } finally {
@@ -56,7 +49,7 @@ const DatabaseConnectionTest: React.FC<Props> = ({
       disabled={isLoading}
       className="w-full"
     >
-      {isLoading ? 'Testando...' : 'Testar Conexão'}
+      {isLoading ? 'Testando...' : 'Testar Conexão com Supabase'}
     </Button>
   );
 };

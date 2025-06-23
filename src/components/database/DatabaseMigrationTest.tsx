@@ -1,18 +1,15 @@
-
 import React from 'react';
 import { Button } from '../ui/button';
 import { useToast } from '../../hooks/use-toast';
-import { runMigrations } from '../../lib/db/migrations';
+import { supabase } from '../../lib/supabaseClient';
 
 interface Props {
-  isDatabaseAvailable: boolean;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
   setTestResult: (result: string) => void;
 }
 
 const DatabaseMigrationTest: React.FC<Props> = ({
-  isDatabaseAvailable,
   isLoading,
   setIsLoading,
   setTestResult
@@ -20,27 +17,26 @@ const DatabaseMigrationTest: React.FC<Props> = ({
   const { toast } = useToast();
 
   const runMigrationsTest = async () => {
-    if (!isDatabaseAvailable) {
-      setTestResult('❌ Banco de dados não disponível. Configure VITE_DATABASE_URL.');
-      return;
-    }
-
     setIsLoading(true);
     setTestResult('');
     
     try {
-      await runMigrations();
-      setTestResult('✅ Migrações executadas com sucesso!');
+      // Aqui você pode adicionar a lógica específica para migrações do Supabase
+      const { data, error } = await supabase.from('config_sections').select('count');
+      
+      if (error) throw error;
+      
+      setTestResult('✅ Verificação de tabelas concluída com sucesso!');
       toast({
         title: "Sucesso",
-        description: "Migrações do banco executadas com sucesso.",
+        description: "Verificação de tabelas concluída com sucesso.",
       });
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
-      setTestResult(`❌ Erro nas migrações: ${errorMsg}`);
+      setTestResult(`❌ Erro na verificação: ${errorMsg}`);
       toast({
         title: "Erro",
-        description: "Falha ao executar migrações.",
+        description: "Falha ao verificar tabelas.",
         variant: "destructive",
       });
     } finally {
@@ -55,7 +51,7 @@ const DatabaseMigrationTest: React.FC<Props> = ({
       variant="outline"
       className="w-full"
     >
-      {isLoading ? 'Executando...' : 'Executar Migrações'}
+      {isLoading ? 'Verificando...' : 'Verificar Tabelas'}
     </Button>
   );
 };

@@ -1,21 +1,17 @@
-
 import React, { useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { useToast } from '../../hooks/use-toast';
-import { db } from '../../lib/db/connection';
-import { sql } from 'drizzle-orm';
+import { supabase } from '../../lib/supabaseClient';
 
 interface Props {
-  isDatabaseAvailable: boolean;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
   setTestResult: (result: string) => void;
 }
 
 const DatabaseUserTest: React.FC<Props> = ({
-  isDatabaseAvailable,
   isLoading,
   setIsLoading,
   setTestResult
@@ -25,34 +21,46 @@ const DatabaseUserTest: React.FC<Props> = ({
   const { toast } = useToast();
 
   const testUserCreation = async () => {
-    if (!isDatabaseAvailable) {
-      setTestResult('❌ Banco de dados não disponível. Configure VITE_DATABASE_URL.');
-      return;
-    }
-
     setIsLoading(true);
     setTestResult('');
     
     try {
-      await db.execute(sql`
-        INSERT INTO users (email, name) 
-        VALUES (${testEmail}, ${testName}) 
-        ON CONFLICT (email) DO UPDATE SET name = ${testName}
-      `);
+      const { data: existingUser, error: selectError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', testEmail)
+        .single();
+
+      if (selectError && selectError.code !== 'PGRST116') {
+        throw selectError;
+      }
+
+      if (existingUser) {
+        const { error: updateError } = await supabase
+          .from('users')
+          .update({ name: testName })
+          .eq('id', existingUser.id);
+
+        if (updateError) throw updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([{ email: testEmail, name: testName }]);
+
+        if (insertError) throw insertError;
+      }
       
-      const users = await db.execute(sql`SELECT COUNT(*) as count FROM users WHERE email = ${testEmail}`);
-      const userCount = users.rows?.[0]?.count || 0;
-      setTestResult(`✅ Usuário criado/atualizado com sucesso! Usuário encontrado: ${userCount > 0 ? 'Sim' : 'Não'}`);
+      setTestResult(`✅ Usuário ${existingUser ? 'atualizado' : 'criado'} com sucesso!`);
       toast({
         title: "Sucesso",
-        description: "Usuário de teste criado com sucesso.",
+        description: `Usuário de teste ${existingUser ? 'atualizado' : 'criado'} com sucesso.`,
       });
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
-      setTestResult(`❌ Erro ao criar usuário: ${errorMsg}`);
+      setTestResult(`❌ Erro ao manipular usuário: ${errorMsg}`);
       toast({
         title: "Erro",
-        description: "Falha ao criar usuário de teste.",
+        description: "Falha ao manipular usuário de teste.",
         variant: "destructive",
       });
     } finally {
@@ -88,7 +96,7 @@ const DatabaseUserTest: React.FC<Props> = ({
         disabled={isLoading || !testEmail || !testName}
         className="w-full"
       >
-        {isLoading ? 'Criando...' : 'Criar Usuário Teste'}
+        {isLoading ? 'Processando...' : 'Criar/Atualizar Usuário Teste'}
       </Button>
     </div>
   );
