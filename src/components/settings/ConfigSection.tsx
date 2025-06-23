@@ -26,24 +26,36 @@ const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, 
 
   const handleFieldChange = async (field: string, value: string) => {
     try {
+      let updatedConfig = { ...editConfig };
+
       if (field.includes('.')) {
         const [parentField, childField] = field.split('.');
-        // Create nested object update
-        const currentParent = editConfig[section]?.[parentField] || {};
-        const updatedParent = { ...currentParent, [childField]: value };
-        updateConfig(section, parentField, updatedParent);
+        // Atualiza o objeto aninhado mantendo a estrutura existente
+        updatedConfig = {
+          ...updatedConfig,
+          [section]: {
+            ...updatedConfig[section],
+            [parentField]: {
+              ...updatedConfig[section]?.[parentField],
+              [childField]: value
+            }
+          }
+        };
+        updateConfig(section, parentField, updatedConfig[section][parentField]);
       } else {
+        // Atualiza o campo direto mantendo a estrutura existente
+        updatedConfig = {
+          ...updatedConfig,
+          [section]: {
+            ...updatedConfig[section],
+            [field]: value
+          }
+        };
         updateConfig(section, field, value);
       }
 
       // Salvar no Supabase
-      const { success, error } = await configService.saveConfig({
-        ...editConfig,
-        [section]: {
-          ...editConfig[section],
-          [field]: value
-        }
-      });
+      const { success, error } = await configService.saveConfig(updatedConfig);
 
       if (!success && error) {
         throw error;
