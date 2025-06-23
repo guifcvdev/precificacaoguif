@@ -1,87 +1,65 @@
-
-import { db } from '../lib/db/connection';
-import { pricingConfigs, budgetSettings } from '../lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { supabase } from '../lib/supabaseClient';
 import { PricingConfig } from '../types/pricing';
-import { BudgetObservations } from '../hooks/useBudgetSettings';
 
 export const configService = {
-  async getPricingConfig(userId: string): Promise<PricingConfig | null> {
-    const result = await db
-      .select()
-      .from(pricingConfigs)
-      .where(eq(pricingConfigs.userId, userId))
-      .limit(1);
+  async saveConfig(config: PricingConfig) {
+    try {
+      // Primeiro, vamos buscar o registro existente
+      const { data: existingConfig, error: fetchError } = await supabase
+        .from('config_fields')
+        .select('*');
 
-    if (result.length === 0) return null;
+      if (fetchError) throw fetchError;
 
-    return result[0].configData as PricingConfig;
-  },
+      // Para cada seção no config
+      for (const [sectionKey, sectionData] of Object.entries(config)) {
+        for (const [fieldKey, value] of Object.entries(sectionData)) {
+          const { error } = await supabase
+            .from('config_fields')
+            .upsert({
+              section_key: sectionKey,
+              field_key: fieldKey,
+              value: value,
+              updated_at: new Date().toISOString()
+            }, {
+              onConflict: 'section_key,field_key'
+            });
 
-  async savePricingConfig(userId: string, config: PricingConfig): Promise<void> {
-    const existing = await db
-      .select()
-      .from(pricingConfigs)
-      .where(eq(pricingConfigs.userId, userId))
-      .limit(1);
+          if (error) throw error;
+        }
+      }
 
-    if (existing.length > 0) {
-      await db
-        .update(pricingConfigs)
-        .set({
-          configData: config,
-          updatedAt: new Date(),
-        })
-        .where(eq(pricingConfigs.userId, userId));
-    } else {
-      await db.insert(pricingConfigs).values({
-        userId,
-        configData: config,
-        isDefault: true,
-      });
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao salvar configurações:', error);
+      return { success: false, error };
     }
   },
 
-  async getBudgetSettings(userId: string): Promise<BudgetObservations | null> {
-    const result = await db
-      .select()
-      .from(budgetSettings)
-      .where(eq(budgetSettings.userId, userId))
-      .limit(1);
+  async loadConfig(): Promise<PricingConfig | null> {
+    try {
+      const { data, error } = await supabase
+        .from('config_fields')
+        .select('*');
 
-    if (result.length === 0) return null;
+      if (error) throw error;
 
-    return {
-      paymentMethod: result[0].paymentMethod || '',
-      deliveryTime: result[0].deliveryTime || '',
-      warranty: result[0].warranty || '',
-    };
-  },
+      if (!data || data.length === 0) return null;
 
-  async saveBudgetSettings(userId: string, settings: BudgetObservations): Promise<void> {
-    const existing = await db
-      .select()
-      .from(budgetSettings)
-      .where(eq(budgetSettings.userId, userId))
-      .limit(1);
-
-    if (existing.length > 0) {
-      await db
-        .update(budgetSettings)
-        .set({
-          paymentMethod: settings.paymentMethod,
-          deliveryTime: settings.deliveryTime,
-          warranty: settings.warranty,
-          updatedAt: new Date(),
-        })
-        .where(eq(budgetSettings.userId, userId));
-    } else {
-      await db.insert(budgetSettings).values({
-        userId,
-        paymentMethod: settings.paymentMethod,
-        deliveryTime: settings.deliveryTime,
-        warranty: settings.warranty,
+      // Converter os dados do formato do banco para o formato do PricingConfig
+      const config: PricingConfig = {};
+      
+      data.forEach(item => {
+        if (!config[item.section_key]) {
+          config[item.section_key] = {};
+        }
+        config[item.section_key][item.field_key] = item.value;
       });
+
+      return config;
+    } catch (error) {
+      console.error('Erro ao carregar configurações:', error);
+      return null;
     }
-  },
+  }
 };

@@ -1,8 +1,9 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { CurrencyInput } from '../ui/currency-input';
 import { PercentageInput } from '../ui/percentage-input';
+import { configService } from '../../services/configService';
+import { useToast } from '../../hooks/use-toast';
 
 interface ConfigSectionProps {
   title: string;
@@ -13,6 +14,8 @@ interface ConfigSectionProps {
 }
 
 const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, editConfig, updateConfig }) => {
+  const { toast } = useToast();
+
   const getFieldValue = (field: string) => {
     if (field.includes('.')) {
       const [parentField, childField] = field.split('.');
@@ -21,15 +24,37 @@ const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, 
     return editConfig[section]?.[field] || '';
   };
 
-  const handleFieldChange = (field: string, value: string) => {
-    if (field.includes('.')) {
-      const [parentField, childField] = field.split('.');
-      // Create nested object update
-      const currentParent = editConfig[section]?.[parentField] || {};
-      const updatedParent = { ...currentParent, [childField]: value };
-      updateConfig(section, parentField, updatedParent);
-    } else {
-      updateConfig(section, field, value);
+  const handleFieldChange = async (field: string, value: string) => {
+    try {
+      if (field.includes('.')) {
+        const [parentField, childField] = field.split('.');
+        // Create nested object update
+        const currentParent = editConfig[section]?.[parentField] || {};
+        const updatedParent = { ...currentParent, [childField]: value };
+        updateConfig(section, parentField, updatedParent);
+      } else {
+        updateConfig(section, field, value);
+      }
+
+      // Salvar no Supabase
+      const { success, error } = await configService.saveConfig({
+        ...editConfig,
+        [section]: {
+          ...editConfig[section],
+          [field]: value
+        }
+      });
+
+      if (!success && error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error('Erro ao salvar configuração:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar a configuração.",
+        variant: "destructive"
+      });
     }
   };
 

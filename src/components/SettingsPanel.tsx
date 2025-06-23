@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PricingConfig } from '../types/pricing';
 import SettingsLayout from './settings/SettingsLayout';
 import SettingsHeader from './settings/SettingsHeader';
@@ -6,6 +6,8 @@ import ConfigSection from './settings/ConfigSection';
 import BudgetObservationsSettings from './settings/BudgetObservationsSettings';
 import { settingsConfig } from './settings/settingsConfig';
 import { convertConfigToCurrency, convertCurrencyToNumbers } from './settings/configUtils';
+import { configService } from '../services/configService';
+import { useToast } from '../hooks/use-toast';
 
 interface Props {
   config: PricingConfig;
@@ -15,11 +17,52 @@ interface Props {
 
 const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
   const [editConfig, setEditConfig] = useState(convertConfigToCurrency(config));
+  const { toast } = useToast();
 
-  const handleSave = () => {
-    const numericConfig = convertCurrencyToNumbers(editConfig);
-    onSave(numericConfig);
-    onClose();
+  useEffect(() => {
+    loadConfig();
+  }, []);
+
+  const loadConfig = async () => {
+    try {
+      const savedConfig = await configService.loadConfig();
+      if (savedConfig) {
+        setEditConfig(convertConfigToCurrency(savedConfig));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar configurações:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar as configurações.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const numericConfig = convertCurrencyToNumbers(editConfig);
+      const { success, error } = await configService.saveConfig(numericConfig);
+      
+      if (!success && error) {
+        throw error;
+      }
+
+      onSave(numericConfig);
+      onClose();
+      
+      toast({
+        title: "Sucesso",
+        description: "Configurações salvas com sucesso."
+      });
+    } catch (error) {
+      console.error('Erro ao salvar configurações:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar as configurações.",
+        variant: "destructive"
+      });
+    }
   };
 
   const updateConfig = (section: string, field: string, value: string | object) => {
