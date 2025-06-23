@@ -5,17 +5,17 @@ export const configService = {
   async saveConfig(config: PricingConfig) {
     try {
       // Buscar configuração existente
-      const { data: existingConfig, error: fetchError } = await supabase
+      const { data: existingConfigs, error: fetchError } = await supabase
         .from('pricing_configs')
         .select('*')
-        .eq('is_default', true)
-        .single();
+        .eq('is_default', true);
 
-      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 é o código para "não encontrado"
-        throw fetchError;
+      if (fetchError) {
+        console.error('Erro ao buscar configurações:', fetchError);
+        return { success: false, error: fetchError };
       }
 
-      if (existingConfig) {
+      if (existingConfigs && existingConfigs.length > 0) {
         // Atualizar configuração existente
         const { error } = await supabase
           .from('pricing_configs')
@@ -23,9 +23,12 @@ export const configService = {
             config_data: config,
             updated_at: new Date().toISOString()
           })
-          .eq('id', existingConfig.id);
+          .eq('id', existingConfigs[0].id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Erro ao atualizar configurações:', error);
+          return { success: false, error };
+        }
       } else {
         // Criar nova configuração
         const { error } = await supabase
@@ -35,7 +38,10 @@ export const configService = {
             is_default: true
           });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Erro ao inserir configurações:', error);
+          return { success: false, error };
+        }
       }
 
       return { success: true };
@@ -50,17 +56,16 @@ export const configService = {
       const { data, error } = await supabase
         .from('pricing_configs')
         .select('config_data')
-        .eq('is_default', true)
-        .single();
+        .eq('is_default', true);
 
       if (error) {
-        if (error.code === 'PGRST116') { // Não encontrado
-          return null;
-        }
-        throw error;
+        console.error('Erro ao carregar configurações:', error);
+        return null;
       }
 
-      return data?.config_data as PricingConfig || null;
+      if (!data || data.length === 0) return null;
+
+      return data[0].config_data as PricingConfig;
     } catch (error) {
       console.error('Erro ao carregar configurações:', error);
       return null;

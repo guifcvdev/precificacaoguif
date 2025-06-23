@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PricingConfig } from '../types/pricing';
+import { PricingConfig, defaultConfig } from '../types/pricing';
 import SettingsLayout from './settings/SettingsLayout';
 import SettingsHeader from './settings/SettingsHeader';
 import ConfigSection from './settings/ConfigSection';
@@ -8,6 +8,8 @@ import { settingsConfig } from './settings/settingsConfig';
 import { convertConfigToCurrency, convertCurrencyToNumbers } from './settings/configUtils';
 import { configService } from '../services/configService';
 import { useToast } from '../hooks/use-toast';
+import { Button } from './ui/button';
+import { testSupabaseConnection, createInitialConfig } from '../lib/supabaseTest';
 
 interface Props {
   config: PricingConfig;
@@ -17,14 +19,31 @@ interface Props {
 
 const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
   const [editConfig, setEditConfig] = useState(convertConfigToCurrency(config));
+  const [isLoading, setIsLoading] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     loadConfig();
+    checkConnection();
   }, []);
+
+  const checkConnection = async () => {
+    const result = await testSupabaseConnection();
+    setConnectionStatus(result.success ? 'Conectado' : 'Erro de conexão');
+    
+    if (!result.success) {
+      toast({
+        title: "Erro de conexão",
+        description: "Não foi possível conectar ao Supabase. Verifique o console para mais detalhes.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const loadConfig = async () => {
     try {
+      setIsLoading(true);
       const savedConfig = await configService.loadConfig();
       if (savedConfig) {
         setEditConfig(convertConfigToCurrency(savedConfig));
@@ -36,11 +55,14 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
         description: "Não foi possível carregar as configurações.",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSave = async () => {
     try {
+      setIsLoading(true);
       const numericConfig = convertCurrencyToNumbers(editConfig);
       const { success, error } = await configService.saveConfig(numericConfig);
       
@@ -62,6 +84,35 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
         description: "Não foi possível salvar as configurações.",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const initializeConfig = async () => {
+    try {
+      setIsLoading(true);
+      const result = await createInitialConfig(defaultConfig);
+      
+      if (!result.success) {
+        throw result.error;
+      }
+      
+      setEditConfig(convertConfigToCurrency(defaultConfig));
+      
+      toast({
+        title: "Sucesso",
+        description: "Configurações inicializadas com sucesso."
+      });
+    } catch (error) {
+      console.error('Erro ao inicializar configurações:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível inicializar as configurações.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,6 +135,30 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
           <p className="text-blue-800">
             <strong>Importante:</strong> Todos os produtos que utilizam cálculo por m² têm um valor mínimo de R$ 20,00 automaticamente aplicado.
           </p>
+          
+          {connectionStatus && (
+            <div className={`mt-2 p-2 rounded ${connectionStatus === 'Conectado' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              Status da conexão: {connectionStatus}
+            </div>
+          )}
+          
+          <div className="mt-4 flex space-x-4">
+            <Button 
+              onClick={initializeConfig} 
+              disabled={isLoading}
+              variant="outline"
+            >
+              {isLoading ? 'Processando...' : 'Inicializar Configurações'}
+            </Button>
+            
+            <Button 
+              onClick={checkConnection} 
+              disabled={isLoading}
+              variant="outline"
+            >
+              Testar Conexão
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-6">
