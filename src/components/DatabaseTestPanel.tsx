@@ -4,6 +4,7 @@ import DatabaseConnectionTest from './database/DatabaseConnectionTest';
 import DatabaseMigrationTest from './database/DatabaseMigrationTest';
 import DatabaseTableList from './database/DatabaseTableList';
 import DatabaseUserTest from './database/DatabaseUserTest';
+import BudgetObservationsTest from './database/BudgetObservationsTest';
 import { supabase } from '../lib/supabaseClient';
 
 const DatabaseTestPanel: React.FC = () => {
@@ -30,6 +31,8 @@ const DatabaseTestPanel: React.FC = () => {
           setIsLoading={setIsLoading}
           setTestResult={setTestResult}
         />
+        
+        <BudgetObservationsTest />
       </div>
 
       <DatabaseUserTest

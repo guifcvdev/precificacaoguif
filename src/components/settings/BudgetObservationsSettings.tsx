@@ -1,22 +1,24 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
 import { useBudgetSettings } from '../../hooks/useBudgetSettings';
 import { useToast } from '../../hooks/use-toast';
+import { configService } from '../../services/configService';
 
 const BudgetObservationsSettings: React.FC = () => {
-  const { observations, saveObservations } = useBudgetSettings();
+  const { observations, saveObservations, isLoading } = useBudgetSettings();
   const [editObservations, setEditObservations] = useState(observations);
+  const [initializationStatus, setInitializationStatus] = useState<string | null>(null);
+  const [localIsLoading, setLocalIsLoading] = useState(false);
   const { toast } = useToast();
+  
+  useEffect(() => {
+    setEditObservations(observations);
+  }, [observations]);
 
   const handleSave = () => {
     saveObservations(editObservations);
-    toast({
-      title: "Configurações salvas",
-      description: "As observações do orçamento foram atualizadas.",
-    });
   };
 
   const handleReset = () => {
@@ -26,6 +28,57 @@ const BudgetObservationsSettings: React.FC = () => {
       warranty: "*GARANTIA DE 3 MESES PARA O SERVIÇO ENTREGUE CONFORME A LEI Nº 8.078, DE 11 DE SETEMBRO DE 1990. Art. 26."
     };
     setEditObservations(defaultObservations);
+  };
+  
+  const initializeTable = async () => {
+    setLocalIsLoading(true);
+    setInitializationStatus("Inicializando...");
+    
+    try {
+      // Criar tabela
+      const createResult = await configService.createBudgetObservationsTable();
+      
+      if (!createResult.success) {
+        setInitializationStatus(`Erro ao criar tabela: ${createResult.error.message}`);
+        toast({
+          title: "Erro",
+          description: "Não foi possível criar a tabela de observações.",
+          variant: "destructive"
+        });
+        setLocalIsLoading(false);
+        return;
+      }
+      
+      // Inserir dados padrão
+      const saveResult = await configService.saveBudgetObservations(editObservations);
+      
+      if (!saveResult.success) {
+        setInitializationStatus(`Erro ao inserir dados: ${saveResult.error.message}`);
+        toast({
+          title: "Erro",
+          description: "Não foi possível inserir os dados padrão.",
+          variant: "destructive"
+        });
+        setLocalIsLoading(false);
+        return;
+      }
+      
+      setInitializationStatus("Tabela e dados inicializados com sucesso!");
+      toast({
+        title: "Sucesso",
+        description: "Tabela de observações inicializada com sucesso."
+      });
+    } catch (error) {
+      console.error("Exceção ao inicializar tabela:", error);
+      setInitializationStatus("Erro ao inicializar");
+      toast({
+        title: "Erro",
+        description: "Não foi possível inicializar a tabela de observações.",
+        variant: "destructive"
+      });
+    } finally {
+      setLocalIsLoading(false);
+    }
   };
 
   return (
@@ -37,6 +90,18 @@ const BudgetObservationsSettings: React.FC = () => {
         <p className="text-sm text-muted-foreground">
           Configure as observações que serão incluídas quando o orçamento for copiado
         </p>
+        
+        {initializationStatus && (
+          <div className={`mt-2 p-2 rounded ${
+            initializationStatus.includes("sucesso") 
+              ? 'bg-green-100 text-green-800' 
+              : initializationStatus.includes("Erro") 
+                ? 'bg-red-100 text-red-800' 
+                : 'bg-blue-100 text-blue-800'
+          }`}>
+            {initializationStatus}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
@@ -73,11 +138,14 @@ const BudgetObservationsSettings: React.FC = () => {
         </div>
 
         <div className="flex gap-3">
-          <Button onClick={handleSave} className="flex-1">
-            Salvar Alterações
+          <Button onClick={handleSave} className="flex-1" disabled={isLoading || localIsLoading}>
+            {isLoading ? 'Salvando...' : 'Salvar Alterações'}
           </Button>
-          <Button variant="outline" onClick={handleReset}>
+          <Button variant="outline" onClick={handleReset} disabled={isLoading || localIsLoading}>
             Restaurar Padrão
+          </Button>
+          <Button variant="outline" onClick={initializeTable} disabled={isLoading || localIsLoading}>
+            {localIsLoading ? 'Inicializando...' : 'Inicializar Tabela'}
           </Button>
         </div>
       </CardContent>

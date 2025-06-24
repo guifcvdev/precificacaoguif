@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
 import { useToast } from './use-toast';
+import { configService } from '../services/configService';
 
 export interface BudgetObservations {
   paymentMethod: string;
@@ -16,6 +16,7 @@ const defaultObservations: BudgetObservations = {
 
 export const useBudgetSettings = () => {
   const [observations, setObservations] = useState<BudgetObservations>(defaultObservations);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -23,48 +24,33 @@ export const useBudgetSettings = () => {
   }, []);
 
   const loadObservations = async () => {
+    setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('budget_observations')
-        .select('*')
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-
+      const data = await configService.loadBudgetObservations();
+      
       if (data) {
-        setObservations({
-          paymentMethod: data.payment_method || defaultObservations.paymentMethod,
-          deliveryTime: data.delivery_time || defaultObservations.deliveryTime,
-          warranty: data.warranty || defaultObservations.warranty
-        });
+        setObservations(data);
+      } else {
+        // Se não encontrar dados, usar os valores padrão
+        setObservations(defaultObservations);
       }
     } catch (error) {
-      console.error('Erro ao carregar observações:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar as observações do orçamento.",
-        variant: "destructive"
-      });
+      console.error('Exceção ao carregar observações:', error);
+      // Usar os valores padrão em caso de exceção
+      setObservations(defaultObservations);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const saveObservations = async (newObservations: BudgetObservations) => {
+    setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from('budget_observations')
-        .upsert({
-          id: 1, // Usando um ID fixo já que só teremos um registro
-          payment_method: newObservations.paymentMethod,
-          delivery_time: newObservations.deliveryTime,
-          warranty: newObservations.warranty,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'id'
-        });
-
-      if (error) throw error;
+      const result = await configService.saveBudgetObservations(newObservations);
+      
+      if (!result.success) {
+        throw result.error;
+      }
 
       setObservations(newObservations);
       toast({
@@ -72,12 +58,15 @@ export const useBudgetSettings = () => {
         description: "Observações do orçamento salvas com sucesso."
       });
     } catch (error) {
-      console.error('Erro ao salvar observações:', error);
+      console.error('Exceção ao salvar observações:', error);
       toast({
         title: "Erro",
         description: "Não foi possível salvar as observações do orçamento.",
         variant: "destructive"
       });
+      // Manter os valores atuais mesmo em caso de erro
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -103,6 +92,7 @@ ${observations.warranty}`;
   return {
     observations,
     saveObservations,
-    formatBudgetText
+    formatBudgetText,
+    isLoading
   };
 };
