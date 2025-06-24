@@ -1,34 +1,41 @@
-
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import * as schema from './schema';
+import { supabase } from '../supabaseClient';
 
-// Check if database URL is available from environment or localStorage
+// Função para obter a URL do banco de dados
 const getDatabaseUrl = () => {
-  // First try localStorage (user configuration)
+  // Primeiro tenta localStorage (configuração do usuário)
   const localConfig = localStorage.getItem('databaseConnectionString');
   if (localConfig) {
     return localConfig;
   }
   
-  // Fallback to environment variable
+  // Fallback para variável de ambiente
   return import.meta.env.VITE_DATABASE_URL;
 };
 
+// Obter URL do banco de dados
 const databaseUrl = getDatabaseUrl();
 
-// Only create connection if URL is provided
-let sql: any = null;
+// Criar conexão apenas se a URL for fornecida
+let client: any = null;
 let db: any = null;
 
 if (databaseUrl) {
   try {
-    sql = neon(databaseUrl);
-    db = drizzle(sql, { schema });
+    client = postgres(databaseUrl);
+    db = drizzle(client, { schema });
   } catch (error) {
-    console.error('Failed to initialize database connection:', error);
+    console.error('Falha ao inicializar a conexão com o banco de dados:', error);
   }
 }
 
-export { db, sql };
+// Função auxiliar para obter o usuário atual
+const getCurrentUser = async () => {
+  const { data } = await supabase.auth.getUser();
+  return data.user;
+};
+
+export { db, client, getCurrentUser };
 export type Database = typeof db;

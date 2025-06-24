@@ -55,7 +55,7 @@ export interface BudgetSummary {
 }
 
 // Serviço de orçamentos
-export const budgetService = {
+export const budgetManagementService = {
   // Listar orçamentos (resumo)
   async getBudgetSummaries(): Promise<BudgetSummary[]> {
     try {
@@ -514,4 +514,4 @@ export const budgetService = {
       return false;
     }
   }
-};
+}; 
