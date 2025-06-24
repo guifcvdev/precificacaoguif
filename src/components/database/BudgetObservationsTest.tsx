@@ -4,9 +4,9 @@ import { Button } from '../ui/button';
 import { supabase } from '../../lib/supabaseClient';
 import { 
   testSupabaseConnection, 
-  checkBudgetObservationsTable, 
-  initializeBudgetObservations
+  checkBudgetObservationsTable
 } from '../../lib/supabaseTest';
+import { configService } from '../../services/configService';
 
 const BudgetObservationsTest: React.FC = () => {
   const [status, setStatus] = useState<string>('');
@@ -50,9 +50,9 @@ const BudgetObservationsTest: React.FC = () => {
     setStatus('Inicializando tabela...');
     
     try {
-      const result = await initializeBudgetObservations();
+      const result = await configService.createBudgetObservationsTable();
       setResult(result);
-      setStatus(result.message);
+      setStatus(result.success ? 'Tabela inicializada com sucesso!' : 'Erro ao inicializar tabela');
     } catch (error) {
       setStatus('Erro ao inicializar tabela');
       setResult(error);
@@ -67,55 +67,39 @@ const BudgetObservationsTest: React.FC = () => {
     
     try {
       // Criação direta da tabela via SQL
-      const { error } = await supabase.from('budget_observations').select('*').limit(1);
+      const sql = `
+      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
       
-      if (error && error.code === '42P01') {
-        // Tabela não existe, vamos criar
-        const createResult = await supabase.rpc('execute_sql', {
-          sql_query: `
-          CREATE TABLE IF NOT EXISTS budget_observations (
-            id SERIAL PRIMARY KEY,
-            payment_method TEXT,
-            delivery_time TEXT,
-            warranty TEXT
-          );
-          
-          ALTER TABLE budget_observations ENABLE ROW LEVEL SECURITY;
-          
-          CREATE POLICY "Allow anonymous select" ON budget_observations FOR SELECT USING (true);
-          CREATE POLICY "Allow anonymous insert" ON budget_observations FOR INSERT WITH CHECK (true);
-          CREATE POLICY "Allow anonymous update" ON budget_observations FOR UPDATE USING (true);
-          `
-        });
-        
-        if (createResult.error) {
-          setResult(createResult);
-          setStatus(`Erro ao criar tabela: ${createResult.error.message}`);
-          setIsLoading(false);
-          return;
-        }
-        
-        // Inserir dados padrão
-        const insertResult = await supabase
-          .from('budget_observations')
-          .insert({
-            id: 1,
-            payment_method: "- Entrada de 50% do valor e restante na retirada.\n- Parcelado no cartão a combinar.",
-            delivery_time: "- Entrega do pedido em 7 úteis após a aprovação de arte e pagamento.",
-            warranty: "*GARANTIA DE 3 MESES PARA O SERVIÇO ENTREGUE CONFORME A LEI Nº 8.078, DE 11 DE SETEMBRO DE 1990. Art. 26."
-          });
-        
-        setResult(insertResult);
-        setStatus(insertResult.error 
-          ? `Erro ao inserir dados: ${insertResult.error.message}` 
-          : 'Tabela criada e dados inseridos com sucesso!');
-      } else if (error) {
-        setResult({ error });
-        setStatus(`Erro ao verificar tabela: ${error.message}`);
-      } else {
-        setResult({ success: true });
-        setStatus('Tabela já existe');
+      CREATE TABLE IF NOT EXISTS budget_observations (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        payment_method TEXT,
+        delivery_time TEXT,
+        warranty TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      
+      -- Habilitar RLS
+      ALTER TABLE budget_observations ENABLE ROW LEVEL SECURITY;
+      
+      -- Permitir acesso anônimo
+      CREATE POLICY "Allow anonymous select" ON budget_observations FOR SELECT USING (true);
+      CREATE POLICY "Allow anonymous insert" ON budget_observations FOR INSERT WITH CHECK (true);
+      CREATE POLICY "Allow anonymous update" ON budget_observations FOR UPDATE USING (true);
+      CREATE POLICY "Allow anonymous delete" ON budget_observations FOR DELETE USING (true);
+      `;
+      
+      const { error: sqlError } = await supabase.rpc('execute_sql', { sql_query: sql });
+      
+      if (sqlError) {
+        setResult({ error: sqlError });
+        setStatus(`Erro ao criar tabela: ${sqlError.message}`);
+        setIsLoading(false);
+        return;
       }
+      
+      setResult({ success: true });
+      setStatus('Tabela criada com sucesso!');
     } catch (error) {
       setStatus('Erro ao criar tabela diretamente');
       setResult(error);
@@ -131,8 +115,7 @@ const BudgetObservationsTest: React.FC = () => {
     try {
       const { error } = await supabase
         .from('budget_observations')
-        .upsert({
-          id: 1,
+        .insert({
           payment_method: "- Entrada de 50% do valor e restante na retirada.\n- Parcelado no cartão a combinar.",
           delivery_time: "- Entrega do pedido em 7 úteis após a aprovação de arte e pagamento.",
           warranty: "*GARANTIA DE 3 MESES PARA O SERVIÇO ENTREGUE CONFORME A LEI Nº 8.078, DE 11 DE SETEMBRO DE 1990. Art. 26."
@@ -144,6 +127,52 @@ const BudgetObservationsTest: React.FC = () => {
         : 'Dados inseridos com sucesso!');
     } catch (error) {
       setStatus('Erro ao inserir dados');
+      setResult(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const createPricingConfig = async () => {
+    setIsLoading(true);
+    setStatus('Criando tabela pricing_configs...');
+    
+    try {
+      // Criação direta da tabela via SQL
+      const sql = `
+      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+      
+      CREATE TABLE IF NOT EXISTS pricing_configs (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        config_data JSONB NOT NULL,
+        is_default BOOLEAN DEFAULT false,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      
+      -- Habilitar RLS
+      ALTER TABLE pricing_configs ENABLE ROW LEVEL SECURITY;
+      
+      -- Permitir acesso anônimo
+      CREATE POLICY "Allow anonymous select" ON pricing_configs FOR SELECT USING (true);
+      CREATE POLICY "Allow anonymous insert" ON pricing_configs FOR INSERT WITH CHECK (true);
+      CREATE POLICY "Allow anonymous update" ON pricing_configs FOR UPDATE USING (true);
+      CREATE POLICY "Allow anonymous delete" ON pricing_configs FOR DELETE USING (true);
+      `;
+      
+      const { error: sqlError } = await supabase.rpc('execute_sql', { sql_query: sql });
+      
+      if (sqlError) {
+        setResult({ error: sqlError });
+        setStatus(`Erro ao criar tabela pricing_configs: ${sqlError.message}`);
+        setIsLoading(false);
+        return;
+      }
+      
+      setResult({ success: true });
+      setStatus('Tabela pricing_configs criada com sucesso!');
+    } catch (error) {
+      setStatus('Erro ao criar tabela pricing_configs');
       setResult(error);
     } finally {
       setIsLoading(false);
@@ -172,6 +201,9 @@ const BudgetObservationsTest: React.FC = () => {
             </Button>
             <Button onClick={insertData} disabled={isLoading}>
               Inserir Dados
+            </Button>
+            <Button onClick={createPricingConfig} disabled={isLoading}>
+              Criar Pricing Configs
             </Button>
           </div>
           

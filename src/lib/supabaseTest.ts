@@ -1,10 +1,10 @@
 import { supabase } from './supabaseClient';
-import { defaultConfig } from '../types/pricing';
 import { PricingConfig } from '../types/pricing';
 
 export const testSupabaseConnection = async () => {
   try {
-    const { data, error } = await supabase.from('pricing_configs').select('*').limit(1);
+    // Teste mais simples - apenas verificar se o Supabase responde
+    const { data, error } = await supabase.from('pricing_configs').select('id').limit(1);
     
     if (error) {
       console.error("Erro ao testar conexão:", error);
@@ -35,7 +35,7 @@ export const checkBudgetObservationsTable = async () => {
     // Tenta realizar uma consulta simples para verificar se a tabela existe
     const { data, error } = await supabase
       .from('budget_observations')
-      .select('*')
+      .select('id')
       .limit(1);
     
     if (error) {
@@ -57,7 +57,8 @@ export const checkBudgetObservationsTable = async () => {
     return {
       success: true,
       message: "Tabela budget_observations existe",
-      hasData: data && data.length > 0
+      hasData: data && data.length > 0,
+      data
     };
   } catch (error) {
     return {
@@ -151,12 +152,15 @@ export const executeSimpleQuery = async () => {
 
 export const createInitialConfig = async (config: PricingConfig) => {
   try {
-    const { error } = await supabase
+    // Inserir nova configuração
+    const { data, error } = await supabase
       .from('pricing_configs')
-      .upsert({
-        id: 1,
-        config: config
-      });
+      .insert({
+        config_data: config,
+        is_default: true
+      })
+      .select('id')
+      .single();
     
     if (error) {
       console.error("Erro ao criar configuração inicial:", error);
@@ -167,9 +171,15 @@ export const createInitialConfig = async (config: PricingConfig) => {
       };
     }
     
+    // Salvar o ID no localStorage
+    if (data && data.id) {
+      localStorage.setItem('pricing_config_id', data.id);
+    }
+    
     return {
       success: true,
-      message: "Configuração inicial criada com sucesso!"
+      message: "Configuração inicial criada com sucesso!",
+      data
     };
   } catch (error) {
     console.error("Exceção ao criar configuração inicial:", error);
@@ -181,89 +191,50 @@ export const createInitialConfig = async (config: PricingConfig) => {
   }
 };
 
-export const createBudgetObservationsTable = async () => {
+export const createPricingConfigsTable = async () => {
   try {
-    // Verificar se a tabela já existe
-    const checkResult = await checkBudgetObservationsTable();
-    
-    if (checkResult.success) {
-      return {
-        success: true,
-        message: "Tabela budget_observations já existe",
-        hasData: checkResult.hasData
-      };
-    }
-    
-    // Criar tabela com SQL simples
+    // Script SQL para criar a tabela
     const sql = `
-    CREATE TABLE IF NOT EXISTS budget_observations (
-      id SERIAL PRIMARY KEY,
-      payment_method TEXT,
-      delivery_time TEXT,
-      warranty TEXT
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    
+    CREATE TABLE IF NOT EXISTS pricing_configs (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      config_data JSONB NOT NULL,
+      is_default BOOLEAN DEFAULT false,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
     );
     
     -- Habilitar RLS
-    ALTER TABLE budget_observations ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE pricing_configs ENABLE ROW LEVEL SECURITY;
     
     -- Permitir acesso anônimo
-    CREATE POLICY "Allow anonymous select" ON budget_observations FOR SELECT USING (true);
-    CREATE POLICY "Allow anonymous insert" ON budget_observations FOR INSERT WITH CHECK (true);
-    CREATE POLICY "Allow anonymous update" ON budget_observations FOR UPDATE USING (true);
-    CREATE POLICY "Allow anonymous delete" ON budget_observations FOR DELETE USING (true);
+    CREATE POLICY "Allow anonymous select" ON pricing_configs FOR SELECT USING (true);
+    CREATE POLICY "Allow anonymous insert" ON pricing_configs FOR INSERT WITH CHECK (true);
+    CREATE POLICY "Allow anonymous update" ON pricing_configs FOR UPDATE USING (true);
+    CREATE POLICY "Allow anonymous delete" ON pricing_configs FOR DELETE USING (true);
     `;
     
-    // Executar SQL para criar tabela
-    const createResult = await supabase.rpc('execute_sql', { sql_query: sql });
+    const { error } = await supabase.rpc('execute_sql', { sql_query: sql });
     
-    if (createResult.error) {
-      // Se falhar, tentar uma abordagem mais simples
-      const simpleCreateResult = await supabase.rpc('execute_sql', {
-        sql_query: `CREATE TABLE IF NOT EXISTS budget_observations (
-          id SERIAL PRIMARY KEY,
-          payment_method TEXT,
-          delivery_time TEXT,
-          warranty TEXT
-        );`
-      });
-      
-      if (simpleCreateResult.error) {
-        return {
-          success: false,
-          message: `Erro ao criar tabela: ${simpleCreateResult.error.message}`,
-          error: simpleCreateResult.error
-        };
-      }
-    }
-    
-    // Inserir dados padrão
-    const defaultObservations = {
-      id: 1,
-      payment_method: "- Entrada de 50% do valor e restante na retirada.\n- Parcelado no cartão a combinar.",
-      delivery_time: "- Entrega do pedido em 7 úteis após a aprovação de arte e pagamento.",
-      warranty: "*GARANTIA DE 3 MESES PARA O SERVIÇO ENTREGUE CONFORME A LEI Nº 8.078, DE 11 DE SETEMBRO DE 1990. Art. 26."
-    };
-    
-    const { error: insertError } = await supabase
-      .from('budget_observations')
-      .insert([defaultObservations]);
-    
-    if (insertError) {
+    if (error) {
+      console.error("Erro ao criar tabela pricing_configs:", error);
       return {
         success: false,
-        message: `Erro ao inserir dados padrão: ${insertError.message}`,
-        error: insertError
+        message: `Erro ao criar tabela pricing_configs: ${error.message}`,
+        error
       };
     }
     
     return {
       success: true,
-      message: "Tabela budget_observations criada e inicializada com sucesso!"
+      message: "Tabela pricing_configs criada com sucesso!"
     };
   } catch (error) {
+    console.error("Exceção ao criar tabela pricing_configs:", error);
     return {
       success: false,
-      message: `Exceção ao criar tabela budget_observations: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
+      message: `Exceção ao criar tabela pricing_configs: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
       error
     };
   }

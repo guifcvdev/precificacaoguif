@@ -2,24 +2,55 @@ import { supabase } from '../lib/supabaseClient';
 import { PricingConfig } from '../types/pricing';
 import { BudgetObservations } from '../hooks/useBudgetSettings';
 
+// Armazenar IDs persistentes para as configurações
+const CONFIG_ID_KEY = 'pricing_config_id';
+const OBSERVATIONS_ID_KEY = 'budget_observations_id';
+
 export const configService = {
   async saveConfig(config: PricingConfig) {
     try {
-      // Abordagem mais simples: apenas inserir sem tentar deletar
-      const { error } = await supabase
-        .from('pricing_configs')
-        .upsert({
-          id: 1,
-          config_data: config,
-          is_default: true
-        });
-
-      if (error) {
-        console.error('Erro ao salvar configurações:', error);
-        return { success: false, error };
+      // Verificar se já existe um ID salvo no localStorage
+      const savedId = localStorage.getItem(CONFIG_ID_KEY);
+      
+      if (savedId) {
+        // Atualizar configuração existente
+        const { error } = await supabase
+          .from('pricing_configs')
+          .update({
+            config_data: config,
+            is_default: true
+          })
+          .eq('id', savedId);
+          
+        if (error) {
+          console.error('Erro ao atualizar configurações:', error);
+          return { success: false, error };
+        }
+        
+        return { success: true };
+      } else {
+        // Criar nova configuração
+        const { data, error } = await supabase
+          .from('pricing_configs')
+          .insert({
+            config_data: config,
+            is_default: true
+          })
+          .select('id')
+          .single();
+          
+        if (error) {
+          console.error('Erro ao salvar configurações:', error);
+          return { success: false, error };
+        }
+        
+        // Salvar o ID no localStorage para futuras operações
+        if (data && data.id) {
+          localStorage.setItem(CONFIG_ID_KEY, data.id);
+        }
+        
+        return { success: true };
       }
-
-      return { success: true };
     } catch (error) {
       console.error('Erro ao salvar configurações:', error);
       return { success: false, error };
@@ -28,21 +59,34 @@ export const configService = {
 
   async loadConfig(): Promise<PricingConfig | null> {
     try {
-      // Consulta mais simples possível
-      const { data, error } = await supabase
+      // Verificar se existe um ID salvo no localStorage
+      const savedId = localStorage.getItem(CONFIG_ID_KEY);
+      
+      let query = supabase
         .from('pricing_configs')
-        .select('config_data')
-        .eq('id', 1)
-        .limit(1);
+        .select('config_data, id');
+      
+      if (savedId) {
+        // Se tiver ID salvo, buscar por esse ID específico
+        query = query.eq('id', savedId);
+      } else {
+        // Caso contrário, buscar qualquer configuração (limitando a 1)
+        query = query.limit(1);
+      }
+      
+      const { data, error } = await query.single();
 
       if (error) {
         console.error('Erro ao carregar configurações:', error);
         return null;
       }
+      
+      // Se encontrou dados e não tinha ID salvo, salvar o ID
+      if (data && data.id && !savedId) {
+        localStorage.setItem(CONFIG_ID_KEY, data.id);
+      }
 
-      if (!data || data.length === 0) return null;
-
-      return data[0].config_data as PricingConfig;
+      return data?.config_data as PricingConfig;
     } catch (error) {
       console.error('Erro ao carregar configurações:', error);
       return null;
@@ -51,6 +95,9 @@ export const configService = {
   
   async saveBudgetObservations(observations: BudgetObservations) {
     try {
+      // Verificar se já existe um ID salvo no localStorage
+      const savedId = localStorage.getItem(OBSERVATIONS_ID_KEY);
+      
       // Verificar se a tabela existe
       const { error: checkError } = await supabase
         .from('budget_observations')
@@ -62,22 +109,47 @@ export const configService = {
         await this.createBudgetObservationsTable();
       }
       
-      // Agora inserir/atualizar os dados
-      const { error } = await supabase
-        .from('budget_observations')
-        .upsert({
-          id: 1,
-          payment_method: observations.paymentMethod,
-          delivery_time: observations.deliveryTime,
-          warranty: observations.warranty
-        });
-      
-      if (error) {
-        console.error('Erro ao salvar observações:', error);
-        return { success: false, error };
+      if (savedId) {
+        // Atualizar registro existente
+        const { error } = await supabase
+          .from('budget_observations')
+          .update({
+            payment_method: observations.paymentMethod,
+            delivery_time: observations.deliveryTime,
+            warranty: observations.warranty
+          })
+          .eq('id', savedId);
+        
+        if (error) {
+          console.error('Erro ao atualizar observações:', error);
+          return { success: false, error };
+        }
+        
+        return { success: true };
+      } else {
+        // Criar novo registro
+        const { data, error } = await supabase
+          .from('budget_observations')
+          .insert({
+            payment_method: observations.paymentMethod,
+            delivery_time: observations.deliveryTime,
+            warranty: observations.warranty
+          })
+          .select('id')
+          .single();
+        
+        if (error) {
+          console.error('Erro ao salvar observações:', error);
+          return { success: false, error };
+        }
+        
+        // Salvar o ID no localStorage para futuras operações
+        if (data && data.id) {
+          localStorage.setItem(OBSERVATIONS_ID_KEY, data.id);
+        }
+        
+        return { success: true };
       }
-      
-      return { success: true };
     } catch (error) {
       console.error('Erro ao salvar observações:', error);
       return { success: false, error };
@@ -86,23 +158,37 @@ export const configService = {
   
   async loadBudgetObservations(): Promise<BudgetObservations | null> {
     try {
-      const { data, error } = await supabase
+      // Verificar se existe um ID salvo no localStorage
+      const savedId = localStorage.getItem(OBSERVATIONS_ID_KEY);
+      
+      let query = supabase
         .from('budget_observations')
-        .select('*')
-        .eq('id', 1)
-        .limit(1);
+        .select('*, id');
+      
+      if (savedId) {
+        // Se tiver ID salvo, buscar por esse ID específico
+        query = query.eq('id', savedId);
+      } else {
+        // Caso contrário, buscar qualquer registro (limitando a 1)
+        query = query.limit(1);
+      }
+      
+      const { data, error } = await query.single();
       
       if (error) {
         console.error('Erro ao carregar observações:', error);
         return null;
       }
       
-      if (!data || data.length === 0) return null;
+      // Se encontrou dados e não tinha ID salvo, salvar o ID
+      if (data && data.id && !savedId) {
+        localStorage.setItem(OBSERVATIONS_ID_KEY, data.id);
+      }
       
       return {
-        paymentMethod: data[0].payment_method,
-        deliveryTime: data[0].delivery_time,
-        warranty: data[0].warranty
+        paymentMethod: data.payment_method,
+        deliveryTime: data.delivery_time,
+        warranty: data.warranty
       };
     } catch (error) {
       console.error('Erro ao carregar observações:', error);
@@ -112,14 +198,27 @@ export const configService = {
   
   async createBudgetObservationsTable() {
     try {
-      // Script SQL direto para criar a tabela
+      // Script SQL direto para criar a tabela com UUID
       const sql = `
+      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+      
       CREATE TABLE IF NOT EXISTS budget_observations (
-        id SERIAL PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         payment_method TEXT,
         delivery_time TEXT,
-        warranty TEXT
+        warranty TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       );
+      
+      -- Habilitar RLS (se for executar no Supabase)
+      ALTER TABLE budget_observations ENABLE ROW LEVEL SECURITY;
+      
+      -- Permitir acesso anônimo
+      CREATE POLICY "Allow anonymous select" ON budget_observations FOR SELECT USING (true);
+      CREATE POLICY "Allow anonymous insert" ON budget_observations FOR INSERT WITH CHECK (true);
+      CREATE POLICY "Allow anonymous update" ON budget_observations FOR UPDATE USING (true);
+      CREATE POLICY "Allow anonymous delete" ON budget_observations FOR DELETE USING (true);
       `;
       
       // Tenta executar o SQL

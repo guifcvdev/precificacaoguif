@@ -9,7 +9,7 @@ import { convertConfigToCurrency, convertCurrencyToNumbers } from './settings/co
 import { configService } from '../services/configService';
 import { useToast } from '../hooks/use-toast';
 import { Button } from './ui/button';
-import { testSupabaseConnection, createInitialConfig } from '../lib/supabaseTest';
+import { testSupabaseConnection, createInitialConfig, createPricingConfigsTable } from '../lib/supabaseTest';
 
 interface Props {
   config: PricingConfig;
@@ -92,6 +92,15 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
   const initializeConfig = async () => {
     try {
       setIsLoading(true);
+      
+      // Primeiro, criar a tabela se não existir
+      const tableResult = await createPricingConfigsTable();
+      if (!tableResult.success) {
+        console.error('Erro ao criar tabela pricing_configs:', tableResult.error);
+        // Continuar mesmo com erro, pois pode ser que a tabela já exista
+      }
+      
+      // Agora inserir a configuração inicial
       const result = await createInitialConfig(defaultConfig);
       
       if (!result.success) {
@@ -109,6 +118,43 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
       toast({
         title: "Erro",
         description: "Não foi possível inicializar as configurações.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const initializeTables = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Criar tabela pricing_configs
+      const pricingTableResult = await createPricingConfigsTable();
+      if (!pricingTableResult.success) {
+        console.error('Erro ao criar tabela pricing_configs:', pricingTableResult.error);
+      }
+      
+      // Criar tabela budget_observations
+      const observationsTableResult = await configService.createBudgetObservationsTable();
+      if (!observationsTableResult.success) {
+        console.error('Erro ao criar tabela budget_observations:', observationsTableResult.error);
+      }
+      
+      // Se ambas as operações falharem, lançar erro
+      if (!pricingTableResult.success && !observationsTableResult.success) {
+        throw new Error('Falha ao criar as tabelas no banco de dados');
+      }
+      
+      toast({
+        title: "Sucesso",
+        description: "Tabelas do banco de dados inicializadas com sucesso."
+      });
+    } catch (error) {
+      console.error('Erro ao inicializar tabelas:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível inicializar todas as tabelas do banco de dados.",
         variant: "destructive"
       });
     } finally {
@@ -142,7 +188,7 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
             </div>
           )}
           
-          <div className="mt-4 flex space-x-4">
+          <div className="mt-4 flex flex-wrap gap-3">
             <Button 
               onClick={initializeConfig} 
               disabled={isLoading}
@@ -157,6 +203,14 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
               variant="outline"
             >
               Testar Conexão
+            </Button>
+            
+            <Button 
+              onClick={initializeTables} 
+              disabled={isLoading}
+              variant="outline"
+            >
+              Inicializar Tabelas
             </Button>
           </div>
         </div>

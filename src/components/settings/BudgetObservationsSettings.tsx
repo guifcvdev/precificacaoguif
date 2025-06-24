@@ -102,6 +102,17 @@ const BudgetObservationsSettings: React.FC = () => {
             {initializationStatus}
           </div>
         )}
+        
+        <div className="mt-3">
+          <Button 
+            onClick={initializeTable} 
+            disabled={isLoading || localIsLoading}
+            variant="outline"
+            size="sm"
+          >
+            {localIsLoading ? 'Inicializando...' : 'Inicializar Tabela de Observações'}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
@@ -143,9 +154,6 @@ const BudgetObservationsSettings: React.FC = () => {
           </Button>
           <Button variant="outline" onClick={handleReset} disabled={isLoading || localIsLoading}>
             Restaurar Padrão
-          </Button>
-          <Button variant="outline" onClick={initializeTable} disabled={isLoading || localIsLoading}>
-            {localIsLoading ? 'Inicializando...' : 'Inicializar Tabela'}
           </Button>
         </div>
       </CardContent>
