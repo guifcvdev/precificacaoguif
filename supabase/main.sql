@@ -1,8 +1,6 @@
 -- Script principal para configuração do banco de dados
 -- Este script deve ser executado na interface do Supabase SQL Editor
-
--- 0. Fazer backup dos dados existentes
-\i backup_data.sql
+-- IMPORTANTE: Execute primeiro o script cleanup_database.sql se necessário
 
 -- 1. Configuração inicial (schemas e extensões)
 \i schema_setup.sql

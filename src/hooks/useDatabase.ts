@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { runMigrations } from '../lib/db/migrations';
+import { supabase } from '../lib/supabaseClient';
 import { useToast } from './use-toast';
 
 export const useDatabase = () => {
@@ -12,31 +11,31 @@ export const useDatabase = () => {
   const initializeDatabase = async () => {
     if (isInitializing || isInitialized) return;
 
-    // Check for database URL from localStorage first, then environment
-    const localConfig = localStorage.getItem('databaseConnectionString');
-    const databaseUrl = localConfig || import.meta.env.VITE_DATABASE_URL;
-    
-    if (!databaseUrl) {
-      setError('Banco de dados não configurado. Configure a string de conexão nas configurações.');
-      return;
-    }
-
     setIsInitializing(true);
     setError(null);
 
     try {
-      await runMigrations();
+      // Testar conexão com Supabase
+      const { data, error: connectionError } = await supabase
+        .from('profiles')
+        .select('id')
+        .limit(1);
+
+      if (connectionError && connectionError.code !== 'PGRST116') {
+        throw connectionError;
+      }
+
       setIsInitialized(true);
       toast({
         title: "Banco de dados conectado",
-        description: "Conexão com Neon Database estabelecida com sucesso.",
+        description: "Conexão com Supabase estabelecida com sucesso.",
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
       toast({
         title: "Erro na conexão",
-        description: "Falha ao conectar com o banco de dados. Verifique a string de conexão.",
+        description: "Falha ao conectar com o banco de dados Supabase.",
         variant: "destructive",
       });
     } finally {
@@ -44,27 +43,20 @@ export const useDatabase = () => {
     }
   };
 
-  // Migrate data from localStorage to database
-  const migrateLocalStorageData = async () => {
-    if (!isInitialized) return;
-
+  // Função para verificar se o usuário está autenticado
+  const checkAuth = async () => {
     try {
-      // This would be implemented when user authentication is added
-      console.log('Migration from localStorage will be implemented with user authentication');
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) throw error;
+      return user;
     } catch (err) {
-      console.error('Migration failed:', err);
+      console.error('Erro na autenticação:', err);
+      return null;
     }
   };
 
   useEffect(() => {
-    const localConfig = localStorage.getItem('databaseConnectionString');
-    const databaseUrl = localConfig || import.meta.env.VITE_DATABASE_URL;
-    
-    if (databaseUrl) {
-      initializeDatabase();
-    } else {
-      setError('Banco de dados não configurado. Configure a string de conexão nas configurações.');
-    }
+    initializeDatabase();
   }, []);
 
   return {
@@ -72,6 +64,6 @@ export const useDatabase = () => {
     isInitializing,
     error,
     initializeDatabase,
-    migrateLocalStorageData,
+    checkAuth,
   };
 };

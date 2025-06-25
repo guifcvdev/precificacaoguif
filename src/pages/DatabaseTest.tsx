@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Database } from 'lucide-react';
@@ -25,7 +24,7 @@ const DatabaseTest: React.FC = () => {
                 Teste do Banco de Dados
               </h1>
               <p className="text-gray-600">
-                Verificação e teste da conexão com Neon Database
+                Verificação e teste da conexão com Supabase
               </p>
             </div>
           </div>
@@ -44,16 +43,21 @@ const DatabaseTest: React.FC = () => {
 
           <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
             <h3 className="text-lg font-medium text-blue-900 mb-2">
-              Configuração Necessária
+              Configuração do Supabase
             </h3>
             <p className="text-blue-800 text-sm mb-3">
-              Para que a conexão funcione, você precisa configurar a variável de ambiente:
+              O banco de dados está configurado para usar Supabase com as seguintes credenciais:
             </p>
-            <code className="block bg-blue-100 text-blue-900 p-3 rounded text-sm font-mono">
-              VITE_DATABASE_URL=sua_string_de_conexao_neon
-            </code>
+            <div className="space-y-2">
+              <code className="block bg-blue-100 text-blue-900 p-3 rounded text-sm font-mono">
+                SUPABASE_URL: https://xhtnzcvdstrtwicxdacl.supabase.co
+              </code>
+              <code className="block bg-blue-100 text-blue-900 p-3 rounded text-sm font-mono">
+                SUPABASE_ANON_KEY: [Configurado]
+              </code>
+            </div>
             <p className="text-blue-700 text-xs mt-2">
-              Esta variável deve ser configurada nas configurações do projeto Lovable.
+              Para uma nova configuração, execute os scripts SQL no painel do Supabase.
             </p>
           </div>
         </div>
