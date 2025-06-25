@@ -36,30 +36,76 @@ const Index = () => {
         setConfig(supabaseConfig);
         // Sincronizar com localStorage para manter compatibilidade
         localStorage.setItem('pricingConfig', JSON.stringify(supabaseConfig));
-      } else {
-        console.log('🏠 [Index] Não encontrou config no Supabase, tentando localStorage...');
-        // Fallback: carregar do localStorage se não existir no Supabase
-        const savedConfig = localStorage.getItem('pricingConfig');
-        if (savedConfig) {
-          console.log('🏠 [Index] Config encontrado no localStorage, migrando para Supabase...');
-          const localConfig = JSON.parse(savedConfig);
-          setConfig(localConfig);
-          // Migrar dados do localStorage para o Supabase
-          await configService.saveConfig(localConfig);
-        } else {
-          console.log('🏠 [Index] Nenhum config encontrado, usando padrão...');
-          // Se não existir em nenhum lugar, usar configuração padrão
-          setConfig(defaultConfig);
-        }
+        console.log('🏠 [Index] Configuração do Supabase aplicada e sincronizada com localStorage');
+        return;
       }
-    } catch (error) {
-      console.error('❌ [Index] Erro ao carregar configurações:', error);
-      // Em caso de erro, usar localStorage como fallback
+      
+      console.log('🏠 [Index] Não encontrou config no Supabase, tentando localStorage...');
+      // Fallback: carregar do localStorage se não existir no Supabase
       const savedConfig = localStorage.getItem('pricingConfig');
       if (savedConfig) {
-        console.log('🏠 [Index] Usando fallback do localStorage...');
-        setConfig(JSON.parse(savedConfig));
+        try {
+          console.log('🏠 [Index] Config encontrado no localStorage, validando e migrando para Supabase...');
+          const localConfig = JSON.parse(savedConfig);
+          
+          // Validar se a configuração tem a estrutura esperada
+          if (localConfig && typeof localConfig === 'object' && localConfig.adesivo) {
+            setConfig(localConfig);
+            console.log('🏠 [Index] Configuração local aplicada, tentando migrar para Supabase...');
+            
+            // Migrar dados do localStorage para o Supabase
+            const migrationResult = await configService.saveConfig(localConfig);
+            if (migrationResult.success) {
+              console.log('🏠 [Index] Migração para Supabase bem-sucedida!');
+            } else {
+              console.error('🏠 [Index] Falha na migração para Supabase:', migrationResult.error);
+            }
+            return;
+          } else {
+            console.warn('🏠 [Index] Configuração local inválida, removendo do localStorage');
+            localStorage.removeItem('pricingConfig');
+          }
+        } catch (parseError) {
+          console.error('🏠 [Index] Erro ao parsear configuração do localStorage:', parseError);
+          localStorage.removeItem('pricingConfig');
+        }
       }
+      
+      console.log('🏠 [Index] Nenhuma configuração válida encontrada, usando padrão...');
+      // Se não existir em nenhum lugar, usar configuração padrão
+      setConfig(defaultConfig);
+      
+      // Salvar configuração padrão no Supabase para futuras consultas
+      console.log('🏠 [Index] Salvando configuração padrão no Supabase...');
+      const defaultSaveResult = await configService.saveConfig(defaultConfig);
+      if (defaultSaveResult.success) {
+        console.log('🏠 [Index] Configuração padrão salva no Supabase!');
+        // Sincronizar com localStorage
+        localStorage.setItem('pricingConfig', JSON.stringify(defaultConfig));
+      } else {
+        console.error('🏠 [Index] Falha ao salvar configuração padrão no Supabase:', defaultSaveResult.error);
+      }
+      
+    } catch (error) {
+      console.error('❌ [Index] Erro ao carregar configurações:', error);
+      // Em caso de erro, usar localStorage como fallback final
+      const savedConfig = localStorage.getItem('pricingConfig');
+      if (savedConfig) {
+        try {
+          console.log('🏠 [Index] Usando fallback do localStorage...');
+          const localConfig = JSON.parse(savedConfig);
+          if (localConfig && typeof localConfig === 'object' && localConfig.adesivo) {
+            setConfig(localConfig);
+            return;
+          }
+        } catch (parseError) {
+          console.error('🏠 [Index] Erro ao parsear fallback do localStorage:', parseError);
+        }
+      }
+      
+      // Último recurso: usar configuração padrão
+      console.log('🏠 [Index] Usando configuração padrão como último recurso');
+      setConfig(defaultConfig);
     }
   };
 

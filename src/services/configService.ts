@@ -11,25 +11,39 @@ export const configService = {
     try {
       console.log('🔧 [ConfigService] Iniciando saveConfig...', { config });
       
-      // Verificar se já existe um ID salvo no localStorage
-      const savedId = localStorage.getItem(CONFIG_ID_KEY);
-      console.log('🔧 [ConfigService] ID salvo no localStorage:', savedId);
+      // Primeiro, tentar encontrar uma configuração existente marcada como default
+      const { data: existingConfig, error: findError } = await supabase
+        .from('pricing_configs')
+        .select('id')
+        .eq('is_default', true)
+        .maybeSingle();
       
-      if (savedId) {
+      if (findError) {
+        console.error('❌ [ConfigService] Erro ao buscar configuração existente:', findError);
+        // Continuar mesmo com erro - pode ser que a tabela não exista ainda
+      }
+      
+      console.log('🔧 [ConfigService] Configuração existente encontrada:', existingConfig);
+      
+      if (existingConfig) {
         console.log('🔧 [ConfigService] Atualizando configuração existente...');
         // Atualizar configuração existente
         const { error } = await supabase
           .from('pricing_configs')
           .update({
             config_data: config,
-            is_default: true
+            updated_at: new Date().toISOString()
           })
-          .eq('id', savedId);
+          .eq('id', existingConfig.id);
           
         if (error) {
           console.error('❌ [ConfigService] Erro ao atualizar configurações:', error);
           return { success: false, error };
         }
+        
+        // Salvar o ID no localStorage para referência futura
+        localStorage.setItem(CONFIG_ID_KEY, existingConfig.id);
+        console.log('🔧 [ConfigService] ID salvo no localStorage:', existingConfig.id);
         
         console.log('✅ [ConfigService] Configuração atualizada com sucesso!');
         return { success: true };
@@ -69,43 +83,83 @@ export const configService = {
     try {
       console.log('📥 [ConfigService] Iniciando loadConfig...');
       
-      // Verificar se existe um ID salvo no localStorage
-      const savedId = localStorage.getItem(CONFIG_ID_KEY);
-      console.log('📥 [ConfigService] ID salvo no localStorage:', savedId);
-      
-      let query = supabase
+      // Estratégia 1: Buscar por configuração marcada como default
+      console.log('📥 [ConfigService] Buscando configuração padrão (is_default=true)...');
+      const { data: defaultConfig, error: defaultError } = await supabase
         .from('pricing_configs')
-        .select('config_data, id');
+        .select('config_data, id')
+        .eq('is_default', true)
+        .maybeSingle();
       
-      if (savedId) {
-        // Se tiver ID salvo, buscar por esse ID específico
-        console.log('📥 [ConfigService] Buscando por ID específico...');
-        query = query.eq('id', savedId);
-      } else {
-        // Caso contrário, buscar qualquer configuração (limitando a 1)
-        console.log('📥 [ConfigService] Buscando qualquer configuração...');
-        query = query.limit(1);
+      if (defaultError) {
+        console.error('❌ [ConfigService] Erro ao buscar configuração padrão:', defaultError);
+        // Continuar para próxima estratégia
+      } else if (defaultConfig) {
+        console.log('📥 [ConfigService] Configuração padrão encontrada:', defaultConfig);
+        
+        // Salvar ID no localStorage para referência futura
+        if (defaultConfig.id) {
+          localStorage.setItem(CONFIG_ID_KEY, defaultConfig.id);
+          console.log('📥 [ConfigService] ID salvo no localStorage:', defaultConfig.id);
+        }
+        
+        const configData = defaultConfig.config_data as PricingConfig;
+        console.log('📥 [ConfigService] Config data extraído (default):', configData);
+        return configData;
       }
       
-      const { data, error } = await query.maybeSingle();
-
-      if (error) {
-        console.error('❌ [ConfigService] Erro ao carregar configurações:', error);
+      // Estratégia 2: Buscar por ID salvo no localStorage (se existir)
+      const savedId = localStorage.getItem(CONFIG_ID_KEY);
+      if (savedId) {
+        console.log('📥 [ConfigService] Buscando por ID salvo no localStorage:', savedId);
+        const { data: savedConfig, error: savedError } = await supabase
+          .from('pricing_configs')
+          .select('config_data, id')
+          .eq('id', savedId)
+          .maybeSingle();
+        
+        if (savedError) {
+          console.error('❌ [ConfigService] Erro ao buscar por ID salvo:', savedError);
+          // ID pode estar inválido, remover do localStorage
+          localStorage.removeItem(CONFIG_ID_KEY);
+        } else if (savedConfig) {
+          console.log('📥 [ConfigService] Configuração encontrada por ID salvo:', savedConfig);
+          const configData = savedConfig.config_data as PricingConfig;
+          console.log('📥 [ConfigService] Config data extraído (by ID):', configData);
+          return configData;
+        }
+      }
+      
+      // Estratégia 3: Buscar qualquer configuração disponível
+      console.log('📥 [ConfigService] Buscando qualquer configuração disponível...');
+      const { data: anyConfig, error: anyError } = await supabase
+        .from('pricing_configs')
+        .select('config_data, id')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (anyError) {
+        console.error('❌ [ConfigService] Erro ao buscar qualquer configuração:', anyError);
         return null;
       }
       
-      console.log('📥 [ConfigService] Dados recebidos do Supabase:', data);
-      
-      // Se encontrou dados e não tinha ID salvo, salvar o ID
-      if (data && data.id && !savedId) {
-        localStorage.setItem(CONFIG_ID_KEY, data.id);
-        console.log('📥 [ConfigService] ID salvo no localStorage:', data.id);
+      if (anyConfig) {
+        console.log('📥 [ConfigService] Configuração encontrada (qualquer uma):', anyConfig);
+        
+        // Salvar ID no localStorage para referência futura
+        if (anyConfig.id) {
+          localStorage.setItem(CONFIG_ID_KEY, anyConfig.id);
+          console.log('📥 [ConfigService] ID salvo no localStorage:', anyConfig.id);
+        }
+        
+        const configData = anyConfig.config_data as PricingConfig;
+        console.log('📥 [ConfigService] Config data extraído (any):', configData);
+        return configData;
       }
-
-      const configData = data?.config_data as PricingConfig;
-      console.log('📥 [ConfigService] Config data extraído:', configData);
       
-      return configData;
+      console.log('📥 [ConfigService] Nenhuma configuração encontrada no banco');
+      return null;
     } catch (error) {
       console.error('❌ [ConfigService] Exceção ao carregar configurações:', error);
       return null;
