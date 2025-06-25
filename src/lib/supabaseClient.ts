@@ -1,6 +1,24 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://xhtnzcvdstrtwicxdacl.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhodG56Y3Zkc3RydHdpY3hkYWNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3OTMxMDAsImV4cCI6MjA2NjM2OTEwMH0.u99-K8ytUG03CjkRVpNawj8Sii58Ql-6hU5-d_tUNDA';
+// Obtém as variáveis de ambiente do Vite
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey); 
+// Validação das variáveis de ambiente
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('❌ Erro: Variáveis de ambiente do Supabase não configuradas!');
+  console.error('Por favor, configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no arquivo .env.local');
+  console.error('Exemplo:');
+  console.error('VITE_SUPABASE_URL=https://seu-projeto-id.supabase.co');
+  console.error('VITE_SUPABASE_ANON_KEY=sua-chave-anonima-aqui');
+}
+
+// Verifica se as URLs são válidas
+if (supabaseUrl && !supabaseUrl.includes('supabase.co')) {
+  console.warn('⚠️ Aviso: URL do Supabase parece estar incorreta. Verifique se está no formato: https://seu-projeto-id.supabase.co');
+}
+
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseAnonKey || 'placeholder-key'
+); 
