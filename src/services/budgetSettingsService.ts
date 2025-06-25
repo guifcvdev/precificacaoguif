@@ -45,7 +45,7 @@ export const budgetSettingsService = {
         .from('budget_settings')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -65,7 +65,7 @@ export const budgetSettingsService = {
         .from('budget_settings')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (checkError && checkError.code !== 'PGRST116') {
         throw checkError;
@@ -129,7 +129,7 @@ export const budgetSettingsService = {
         .select('id')
         .eq('user_id', user.id)
         .eq('installments', fee.installments)
-        .single();
+        .maybeSingle();
 
       if (checkError && checkError.code !== 'PGRST116') {
         throw checkError;
@@ -213,7 +213,7 @@ export const budgetSettingsService = {
         .select('id')
         .eq('user_id', user.id)
         .eq('location', fee.location)
-        .single();
+        .maybeSingle();
 
       if (checkError && checkError.code !== 'PGRST116') {
         throw checkError;

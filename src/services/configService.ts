@@ -74,7 +74,7 @@ export const configService = {
         query = query.limit(1);
       }
       
-      const { data, error } = await query.single();
+      const { data, error } = await query.maybeSingle();
 
       if (error) {
         console.error('Erro ao carregar configurações:', error);
@@ -173,22 +173,27 @@ export const configService = {
         query = query.limit(1);
       }
       
-      const { data, error } = await query.single();
+      const { data, error } = await query.maybeSingle();
       
       if (error) {
         console.error('Erro ao carregar observações:', error);
         return null;
       }
       
+      // Se não encontrou dados, retornar null
+      if (!data) {
+        return null;
+      }
+      
       // Se encontrou dados e não tinha ID salvo, salvar o ID
-      if (data && data.id && !savedId) {
+      if (data.id && !savedId) {
         localStorage.setItem(OBSERVATIONS_ID_KEY, data.id);
       }
       
       return {
-        paymentMethod: data.payment_method,
-        deliveryTime: data.delivery_time,
-        warranty: data.warranty
+        paymentMethod: data.payment_method || '',
+        deliveryTime: data.delivery_time || '',
+        warranty: data.warranty || ''
       };
     } catch (error) {
       console.error('Erro ao carregar observações:', error);
