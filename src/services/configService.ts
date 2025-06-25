@@ -9,10 +9,14 @@ const OBSERVATIONS_ID_KEY = 'budget_observations_id';
 export const configService = {
   async saveConfig(config: PricingConfig) {
     try {
+      console.log('🔧 [ConfigService] Iniciando saveConfig...', { config });
+      
       // Verificar se já existe um ID salvo no localStorage
       const savedId = localStorage.getItem(CONFIG_ID_KEY);
+      console.log('🔧 [ConfigService] ID salvo no localStorage:', savedId);
       
       if (savedId) {
+        console.log('🔧 [ConfigService] Atualizando configuração existente...');
         // Atualizar configuração existente
         const { error } = await supabase
           .from('pricing_configs')
@@ -23,12 +27,14 @@ export const configService = {
           .eq('id', savedId);
           
         if (error) {
-          console.error('Erro ao atualizar configurações:', error);
+          console.error('❌ [ConfigService] Erro ao atualizar configurações:', error);
           return { success: false, error };
         }
         
+        console.log('✅ [ConfigService] Configuração atualizada com sucesso!');
         return { success: true };
       } else {
+        console.log('🔧 [ConfigService] Criando nova configuração...');
         // Criar nova configuração
         const { data, error } = await supabase
           .from('pricing_configs')
@@ -40,27 +46,32 @@ export const configService = {
           .single();
           
         if (error) {
-          console.error('Erro ao salvar configurações:', error);
+          console.error('❌ [ConfigService] Erro ao salvar configurações:', error);
           return { success: false, error };
         }
         
         // Salvar o ID no localStorage para futuras operações
         if (data && data.id) {
           localStorage.setItem(CONFIG_ID_KEY, data.id);
+          console.log('🔧 [ConfigService] ID salvo no localStorage:', data.id);
         }
         
+        console.log('✅ [ConfigService] Nova configuração criada com sucesso!');
         return { success: true };
       }
     } catch (error) {
-      console.error('Erro ao salvar configurações:', error);
+      console.error('❌ [ConfigService] Exceção ao salvar configurações:', error);
       return { success: false, error };
     }
   },
 
   async loadConfig(): Promise<PricingConfig | null> {
     try {
+      console.log('📥 [ConfigService] Iniciando loadConfig...');
+      
       // Verificar se existe um ID salvo no localStorage
       const savedId = localStorage.getItem(CONFIG_ID_KEY);
+      console.log('📥 [ConfigService] ID salvo no localStorage:', savedId);
       
       let query = supabase
         .from('pricing_configs')
@@ -68,27 +79,35 @@ export const configService = {
       
       if (savedId) {
         // Se tiver ID salvo, buscar por esse ID específico
+        console.log('📥 [ConfigService] Buscando por ID específico...');
         query = query.eq('id', savedId);
       } else {
         // Caso contrário, buscar qualquer configuração (limitando a 1)
+        console.log('📥 [ConfigService] Buscando qualquer configuração...');
         query = query.limit(1);
       }
       
       const { data, error } = await query.maybeSingle();
 
       if (error) {
-        console.error('Erro ao carregar configurações:', error);
+        console.error('❌ [ConfigService] Erro ao carregar configurações:', error);
         return null;
       }
+      
+      console.log('📥 [ConfigService] Dados recebidos do Supabase:', data);
       
       // Se encontrou dados e não tinha ID salvo, salvar o ID
       if (data && data.id && !savedId) {
         localStorage.setItem(CONFIG_ID_KEY, data.id);
+        console.log('📥 [ConfigService] ID salvo no localStorage:', data.id);
       }
 
-      return data?.config_data as PricingConfig;
+      const configData = data?.config_data as PricingConfig;
+      console.log('📥 [ConfigService] Config data extraído:', configData);
+      
+      return configData;
     } catch (error) {
-      console.error('Erro ao carregar configurações:', error);
+      console.error('❌ [ConfigService] Exceção ao carregar configurações:', error);
       return null;
     }
   },

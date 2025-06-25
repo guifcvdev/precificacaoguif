@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import AdesivoCalculator from '../components/calculators/AdesivoCalculator';
 import LonaCalculator from '../components/calculators/LonaCalculator';
@@ -13,6 +12,7 @@ import ModernHeader from '../components/ModernHeader';
 import ModernTabs from '../components/ModernTabs';
 import ModernCalculatorWrapper from '../components/ModernCalculatorWrapper';
 import { PricingConfig, defaultConfig } from '../types/pricing';
+import { configService } from '../services/configService';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('adesivo');
@@ -20,15 +20,74 @@ const Index = () => {
   const [config, setConfig] = useState<PricingConfig>(defaultConfig);
 
   useEffect(() => {
-    const savedConfig = localStorage.getItem('pricingConfig');
-    if (savedConfig) {
-      setConfig(JSON.parse(savedConfig));
-    }
+    loadConfigFromSupabase();
   }, []);
 
-  const saveConfig = (newConfig: PricingConfig) => {
-    setConfig(newConfig);
-    localStorage.setItem('pricingConfig', JSON.stringify(newConfig));
+  const loadConfigFromSupabase = async () => {
+    try {
+      console.log('🏠 [Index] Iniciando loadConfigFromSupabase...');
+      
+      // Tentar carregar do Supabase primeiro
+      const supabaseConfig = await configService.loadConfig();
+      console.log('🏠 [Index] Config carregado do Supabase:', supabaseConfig);
+      
+      if (supabaseConfig) {
+        console.log('🏠 [Index] Aplicando config do Supabase...');
+        setConfig(supabaseConfig);
+        // Sincronizar com localStorage para manter compatibilidade
+        localStorage.setItem('pricingConfig', JSON.stringify(supabaseConfig));
+      } else {
+        console.log('🏠 [Index] Não encontrou config no Supabase, tentando localStorage...');
+        // Fallback: carregar do localStorage se não existir no Supabase
+        const savedConfig = localStorage.getItem('pricingConfig');
+        if (savedConfig) {
+          console.log('🏠 [Index] Config encontrado no localStorage, migrando para Supabase...');
+          const localConfig = JSON.parse(savedConfig);
+          setConfig(localConfig);
+          // Migrar dados do localStorage para o Supabase
+          await configService.saveConfig(localConfig);
+        } else {
+          console.log('🏠 [Index] Nenhum config encontrado, usando padrão...');
+          // Se não existir em nenhum lugar, usar configuração padrão
+          setConfig(defaultConfig);
+        }
+      }
+    } catch (error) {
+      console.error('❌ [Index] Erro ao carregar configurações:', error);
+      // Em caso de erro, usar localStorage como fallback
+      const savedConfig = localStorage.getItem('pricingConfig');
+      if (savedConfig) {
+        console.log('🏠 [Index] Usando fallback do localStorage...');
+        setConfig(JSON.parse(savedConfig));
+      }
+    }
+  };
+
+  const saveConfig = async (newConfig: PricingConfig) => {
+    try {
+      console.log('💾 [Index] Iniciando saveConfig...', { newConfig });
+      
+      // Salvar no Supabase como fonte primária
+      const result = await configService.saveConfig(newConfig);
+      console.log('💾 [Index] Resultado do save no Supabase:', result);
+      
+      if (result.success) {
+        console.log('💾 [Index] Save no Supabase bem-sucedido, atualizando estado...');
+        setConfig(newConfig);
+        // Manter sincronização com localStorage
+        localStorage.setItem('pricingConfig', JSON.stringify(newConfig));
+      } else {
+        console.error('❌ [Index] Erro ao salvar no Supabase:', result.error);
+        // Em caso de erro, salvar apenas no localStorage
+        setConfig(newConfig);
+        localStorage.setItem('pricingConfig', JSON.stringify(newConfig));
+      }
+    } catch (error) {
+      console.error('❌ [Index] Exceção ao salvar configurações:', error);
+      // Em caso de erro, salvar apenas no localStorage
+      setConfig(newConfig);
+      localStorage.setItem('pricingConfig', JSON.stringify(newConfig));
+    }
   };
 
   const getTabTitle = () => {

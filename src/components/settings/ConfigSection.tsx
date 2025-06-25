@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { CurrencyInput } from '../ui/currency-input';
 import { PercentageInput } from '../ui/percentage-input';
-import { configService } from '../../services/configService';
-import { useToast } from '../../hooks/use-toast';
 
 interface ConfigSectionProps {
   title: string;
@@ -14,8 +12,6 @@ interface ConfigSectionProps {
 }
 
 const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, editConfig, updateConfig }) => {
-  const { toast } = useToast();
-
   const getFieldValue = (field: string) => {
     if (field.includes('.')) {
       const [parentField, childField] = field.split('.');
@@ -24,49 +20,18 @@ const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, 
     return editConfig[section]?.[field] || '';
   };
 
-  const handleFieldChange = async (field: string, value: string) => {
-    try {
-      let updatedConfig = { ...editConfig };
-
-      if (field.includes('.')) {
-        const [parentField, childField] = field.split('.');
-        // Atualiza o objeto aninhado mantendo a estrutura existente
-        updatedConfig = {
-          ...updatedConfig,
-          [section]: {
-            ...updatedConfig[section],
-            [parentField]: {
-              ...updatedConfig[section]?.[parentField],
-              [childField]: value
-            }
-          }
-        };
-        updateConfig(section, parentField, updatedConfig[section][parentField]);
-      } else {
-        // Atualiza o campo direto mantendo a estrutura existente
-        updatedConfig = {
-          ...updatedConfig,
-          [section]: {
-            ...updatedConfig[section],
-            [field]: value
-          }
-        };
-        updateConfig(section, field, value);
-      }
-
-      // Salvar no Supabase
-      const { success, error } = await configService.saveConfig(updatedConfig);
-
-      if (!success && error) {
-        throw error;
-      }
-    } catch (error) {
-      console.error('Erro ao salvar configuração:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível salvar a configuração.",
-        variant: "destructive"
-      });
+  const handleFieldChange = (field: string, value: string) => {
+    if (field.includes('.')) {
+      const [parentField, childField] = field.split('.');
+      // Atualiza o objeto aninhado mantendo a estrutura existente
+      const updatedParentField = {
+        ...editConfig[section]?.[parentField],
+        [childField]: value
+      };
+      updateConfig(section, parentField, updatedParentField);
+    } else {
+      // Atualiza o campo direto
+      updateConfig(section, field, value);
     }
   };
 
