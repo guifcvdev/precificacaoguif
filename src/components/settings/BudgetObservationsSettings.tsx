@@ -39,10 +39,16 @@ const BudgetObservationsSettings: React.FC = () => {
       const createResult = await configService.createBudgetObservationsTable();
       
       if (!createResult.success) {
-        setInitializationStatus(`Erro ao criar tabela: ${createResult.error.message}`);
+        const errorMessage = createResult.error?.code === 'TABLE_NOT_EXISTS' 
+          ? 'Tabela não existe. Execute o script create_missing_tables.sql no SQL Editor do Supabase Dashboard.'
+          : `Erro ao criar tabela: ${createResult.error?.message || 'Erro desconhecido'}`;
+        
+        setInitializationStatus(errorMessage);
         toast({
           title: "Erro",
-          description: "Não foi possível criar a tabela de observações.",
+          description: createResult.error?.code === 'TABLE_NOT_EXISTS' 
+            ? "A tabela budget_observations precisa ser criada manualmente no banco de dados."
+            : "Não foi possível criar a tabela de observações.",
           variant: "destructive"
         });
         setLocalIsLoading(false);

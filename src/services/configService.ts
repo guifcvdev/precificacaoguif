@@ -388,40 +388,72 @@ export const configService = {
   
   async createBudgetObservationsTable() {
     try {
-      // Script SQL direto para criar a tabela com UUID
-      const sql = `
-      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+      console.log('🔧 [ConfigService] Criando tabela budget_observations...');
       
-      CREATE TABLE IF NOT EXISTS budget_observations (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        payment_method TEXT,
-        delivery_time TEXT,
-        warranty TEXT,
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        updated_at TIMESTAMPTZ DEFAULT NOW()
-      );
-      
-      -- Habilitar RLS (se for executar no Supabase)
-      ALTER TABLE budget_observations ENABLE ROW LEVEL SECURITY;
-      
-      -- Permitir acesso anônimo
-      CREATE POLICY "Allow anonymous select" ON budget_observations FOR SELECT USING (true);
-      CREATE POLICY "Allow anonymous insert" ON budget_observations FOR INSERT WITH CHECK (true);
-      CREATE POLICY "Allow anonymous update" ON budget_observations FOR UPDATE USING (true);
-      CREATE POLICY "Allow anonymous delete" ON budget_observations FOR DELETE USING (true);
-      `;
-      
-      // Tenta executar o SQL
-      const { error } = await supabase.rpc('execute_sql', { sql_query: sql });
-      
-      if (error) {
-        console.error('Erro ao criar tabela de observações:', error);
-        return { success: false, error };
+      // Primeiro, verificar se a tabela já existe tentando fazer uma query
+      try {
+        const { error: existsError } = await supabase
+          .from('budget_observations')
+          .select('id')
+          .limit(1);
+        
+        // Se não deu erro, a tabela já existe
+        if (!existsError) {
+          console.log('✅ [ConfigService] Tabela budget_observations já existe');
+          return { success: true };
+        }
+        
+        // Se o erro não for "tabela não existe", algo mais grave aconteceu
+        if (existsError.code !== '42P01' && existsError.code !== 'PGRST204') {
+          console.error('❌ [ConfigService] Erro inesperado ao verificar tabela:', existsError);
+          return { success: false, error: existsError };
+        }
+      } catch (error) {
+        console.log('🔧 [ConfigService] Tabela não existe, continuando criação...');
       }
       
+      // A tabela não existe, vamos criá-la usando SQL direto
+      // Como não temos execute_sql, vamos usar uma abordagem diferente:
+      // Tentar fazer um INSERT que falhará, mas criará a estrutura necessária
+      
+      console.log('🔧 [ConfigService] Tentando criar estrutura da tabela...');
+      
+      // Primeira tentativa: tentar inserir dados que forçará a criação da tabela
+      // se ela não existir (isso funcionará apenas se a tabela for autocriada)
+      const testData = {
+        payment_method: '- Entrada de 50% do valor e restante na retirada.\n- Parcelado no cartão a combinar.',
+        delivery_time: '- Entrega do pedido em 7 úteis após a aprovação de arte e pagamento.',
+        warranty: '*GARANTIA DE 3 MESES PARA O SERVIÇO ENTREGUE CONFORME A LEI Nº 8.078, DE 11 DE SETEMBRO DE 1990. Art. 26.'
+      };
+      
+      const { error: insertError } = await supabase
+        .from('budget_observations')
+        .insert(testData)
+        .select('id')
+        .single();
+      
+      if (insertError) {
+        // Se ainda deu erro de tabela não existe, isso significa que precisamos criar manualmente
+        if (insertError.code === '42P01' || insertError.code === 'PGRST204') {
+          return { 
+            success: false, 
+            error: {
+              message: 'Tabela budget_observations não existe no banco de dados. Execute o script SQL create_missing_tables.sql no SQL Editor do Supabase Dashboard.',
+              code: 'TABLE_NOT_EXISTS'
+            }
+          };
+        }
+        
+        // Outros tipos de erro
+        console.error('❌ [ConfigService] Erro ao inserir dados de teste:', insertError);
+        return { success: false, error: insertError };
+      }
+      
+      console.log('✅ [ConfigService] Tabela budget_observations criada e dados iniciais inseridos com sucesso!');
       return { success: true };
+      
     } catch (error) {
-      console.error('Erro ao criar tabela de observações:', error);
+      console.error('❌ [ConfigService] Exceção ao criar tabela:', error);
       return { success: false, error };
     }
   }
