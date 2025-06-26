@@ -1,9 +1,13 @@
-
 import { PricingConfig } from '../../types/pricing';
 
 const isPercentageField = (section: string, field: string) => {
   return (section === 'notaFiscal' && field === 'percentual') ||
          (section === 'cartaoCredito' && (field === 'taxa3x' || field === 'taxa6x' || field === 'taxa12x'));
+};
+
+const isMetricField = (section: string, field: string) => {
+  return (section === 'fachada' && field === 'estruturaMetalica.comprimentoBarra') ||
+         (section === 'luminoso' && field === 'estruturaMetalica.comprimentoBarra');
 };
 
 export const convertConfigToCurrency = (config: PricingConfig) => {
@@ -19,6 +23,8 @@ export const convertConfigToCurrency = (config: PricingConfig) => {
         Object.keys(value).forEach(nestedField => {
           const nestedValue = value[nestedField];
           if (isPercentageField(section, `${field}.${nestedField}`)) {
+            result[section][field][nestedField] = nestedValue.toString();
+          } else if (isMetricField(section, `${field}.${nestedField}`)) {
             result[section][field][nestedField] = nestedValue.toString();
           } else {
             result[section][field][nestedField] = new Intl.NumberFormat('pt-BR', {
@@ -58,6 +64,9 @@ export const convertCurrencyToNumbers = (currencyConfig: any): PricingConfig => 
         Object.keys(fieldValue).forEach(nestedField => {
           const value = fieldValue[nestedField];
           if (isPercentageField(section, `${field}.${nestedField}`)) {
+            const numericValue = parseFloat(value) || 0;
+            result[section][field][nestedField] = numericValue;
+          } else if (isMetricField(section, `${field}.${nestedField}`)) {
             const numericValue = parseFloat(value) || 0;
             result[section][field][nestedField] = numericValue;
           } else {

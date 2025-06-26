@@ -84,7 +84,7 @@ export const settingsConfig: ConfigSectionData[] = [
     section: "luminoso",
     fields: [
       { key: 'lona', label: 'Lona', unit: 'm²' },
-      { key: 'metalon20x20', label: 'Metalon 20x20', unit: 'unid' },
+      { key: 'metalon20x20', label: 'PS Leitoso 2x1m', unit: 'unid' },
       { key: 'acm122', label: 'ACM 1.22m', unit: 'unid' },
       { key: 'acm150', label: 'ACM 1.50m', unit: 'unid' },
       { key: 'lampadaTubular122', label: 'Lâmpada Tubular 1,22m', unit: 'unid' },
