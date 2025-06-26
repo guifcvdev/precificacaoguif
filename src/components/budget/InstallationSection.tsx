@@ -2,6 +2,7 @@
 import React from 'react';
 import { Label } from '../ui/label';
 import { formatCurrency, PricingConfig } from '../../types/pricing';
+import { getInstalacaoOptions } from '../../utils/instalacaoUtils';
 
 interface InstallationSectionProps {
   instalacao: string;
@@ -27,15 +28,7 @@ const InstallationSection: React.FC<InstallationSectionProps> = ({
     );
   }
 
-  const instalacaoOptions = [
-    { value: 'jacarei', label: 'Jacareí', price: config.instalacao.jacarei || 0 },
-    { value: 'sjCampos', label: 'S.J.Campos', price: config.instalacao.sjCampos || 0 },
-    { value: 'cacapavaTaubate', label: 'Caçapava/Taubaté', price: config.instalacao.cacapavaTaubate || 0 },
-    { value: 'litoral', label: 'Litoral', price: config.instalacao.litoral || 0 },
-    { value: 'guararemaSantaIsabel', label: 'Guararema/Sta Isabel', price: config.instalacao.guararemaSantaIsabel || 0 },
-    { value: 'santaBranca', label: 'Sta Branca', price: config.instalacao.santaBranca || 0 },
-    { value: 'saoPaulo', label: 'São Paulo', price: config.instalacao.saoPaulo || 0 },
-  ];
+  const instalacaoOptions = getInstalacaoOptions(config);
 
   return (
     <div className="space-y-3">

@@ -9,6 +9,7 @@ import NotaFiscalSection from './budget/NotaFiscalSection';
 import PaymentAndDeliverySection from './budget/PaymentAndDeliverySection';
 import InstallationSection from './budget/InstallationSection';
 import BudgetTotal from './budget/BudgetTotal';
+import { getInstalacaoOptions } from '../utils/instalacaoUtils';
 
 interface BudgetSummaryExtendedProps {
   baseTotal: number;
@@ -36,21 +37,24 @@ const BudgetSummaryExtended: React.FC<BudgetSummaryExtendedProps> = ({
   const { toast } = useToast();
 
   // Safety checks for config properties
-  const instalacaoOptions = [
-    { value: 'jacarei', label: 'Jacareí', price: config?.instalacao?.jacarei || 0 },
-    { value: 'sjCampos', label: 'S.J.Campos', price: config?.instalacao?.sjCampos || 0 },
-    { value: 'cacapavaTaubate', label: 'Caçapava/Taubaté', price: config?.instalacao?.cacapavaTaubate || 0 },
-    { value: 'litoral', label: 'Litoral', price: config?.instalacao?.litoral || 0 },
-    { value: 'guararemaSantaIsabel', label: 'Guararema/Sta Isabel', price: config?.instalacao?.guararemaSantaIsabel || 0 },
-    { value: 'santaBranca', label: 'Sta Branca', price: config?.instalacao?.santaBranca || 0 },
-    { value: 'saoPaulo', label: 'São Paulo', price: config?.instalacao?.saoPaulo || 0 },
-  ];
+  const instalacaoOptions = getInstalacaoOptions(config || {} as PricingConfig);
 
   const cartaoOptions = [
     { value: '3x', label: '3x', taxa: config?.cartaoCredito?.taxa3x || 0 },
     { value: '6x', label: '6x', taxa: config?.cartaoCredito?.taxa6x || 0 },
     { value: '12x', label: '12x', taxa: config?.cartaoCredito?.taxa12x || 0 },
   ];
+
+  // Validar estado de instalação quando a configuração muda
+  useEffect(() => {
+    if (instalacao && instalacaoOptions.length > 0) {
+      const instalacaoExists = instalacaoOptions.some(option => option.value === instalacao);
+      if (!instalacaoExists) {
+        console.warn('Instalação selecionada não existe na nova configuração:', instalacao);
+        setInstalacao(''); // Resetar se a opção não existe mais
+      }
+    }
+  }, [config, instalacao, instalacaoOptions]);
 
   useEffect(() => {
     let total = baseTotal;
