@@ -44,6 +44,31 @@ const AdesivoCalculator: React.FC<Props> = ({ config, fullConfig }) => {
       id: 'imantado',
       label: 'Imantado',
       price: config.imantado
+    },
+    {
+      id: 'jateado',
+      label: 'Jateado',
+      price: config.jateado
+    },
+    {
+      id: 'recorte1Cor',
+      label: 'Recorte 1 Cor',
+      price: config.recorte1Cor
+    },
+    {
+      id: 'recorte2Cores',
+      label: 'Recorte 2 Cores',
+      price: config.recorte2Cores
+    },
+    {
+      id: 'transparente',
+      label: 'Transparente',
+      price: config.transparente
+    },
+    {
+      id: 'translucido',
+      label: 'Translúcido',
+      price: config.translucido
     }
   ];
 

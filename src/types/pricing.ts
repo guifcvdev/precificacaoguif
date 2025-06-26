@@ -4,6 +4,11 @@ export interface AdesivoConfig {
   laminado: number;
   adesivoPerfurado: number;
   imantado: number;
+  jateado: number;
+  recorte1Cor: number;
+  recorte2Cores: number;
+  transparente: number;
+  translucido: number;
 }
 
 export interface LonaConfig {
@@ -112,6 +117,11 @@ export const defaultConfig: PricingConfig = {
     laminado: 35.0,
     adesivoPerfurado: 30.0,
     imantado: 40.0,
+    jateado: 45.0,
+    recorte1Cor: 28.0,
+    recorte2Cores: 35.0,
+    transparente: 32.0,
+    translucido: 38.0,
   },
   lona: {
     bannerFaixa: 20.0,

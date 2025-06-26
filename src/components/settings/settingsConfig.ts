@@ -20,6 +20,11 @@ export const settingsConfig: ConfigSectionData[] = [
       { key: 'laminado', label: 'Laminado', unit: 'm²' },
       { key: 'adesivoPerfurado', label: 'Adesivo Perfurado', unit: 'm²' },
       { key: 'imantado', label: 'Imantado', unit: 'm²' },
+      { key: 'jateado', label: 'Jateado', unit: 'm²' },
+      { key: 'recorte1Cor', label: 'Recorte 1 Cor', unit: 'm²' },
+      { key: 'recorte2Cores', label: 'Recorte 2 Cores', unit: 'm²' },
+      { key: 'transparente', label: 'Transparente', unit: 'm²' },
+      { key: 'translucido', label: 'Translúcido', unit: 'm²' },
     ]
   },
   {
