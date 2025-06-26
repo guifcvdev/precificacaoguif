@@ -168,69 +168,179 @@ export const configService = {
   
   async saveBudgetObservations(observations: BudgetObservations) {
     try {
-      // Verificar se já existe um ID salvo no localStorage
-      const savedId = localStorage.getItem(OBSERVATIONS_ID_KEY);
+      console.log('🔧 [ConfigService] Salvando observações...', observations);
       
-      // Verificar se a tabela existe
-      const { error: checkError } = await supabase
-        .from('budget_observations')
-        .select('id')
-        .limit(1);
-      
-      // Se a tabela não existir, criar primeiro
-      if (checkError && checkError.code === '42P01') {
-        await this.createBudgetObservationsTable();
+      // Verificar se existem dados de usuário atual ou usar acesso anônimo
+      let user_id = null;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        user_id = user?.id;
+      } catch (authError) {
+        console.log('🔧 [ConfigService] Usuário não autenticado, usando acesso anônimo');
       }
-      
-      if (savedId) {
-        // Atualizar registro existente
-        const { error } = await supabase
-          .from('budget_observations')
-          .update({
-            payment_method: observations.paymentMethod,
-            delivery_time: observations.deliveryTime,
-            warranty: observations.warranty
-          })
-          .eq('id', savedId);
+
+      if (user_id) {
+        // Usar tabela user_data.budget_settings para usuários autenticados
+        console.log('🔧 [ConfigService] Usando user_data.budget_settings para usuário:', user_id);
         
-        if (error) {
-          console.error('Erro ao atualizar observações:', error);
-          return { success: false, error };
-        }
-        
-        return { success: true };
-      } else {
-        // Criar novo registro
-        const { data, error } = await supabase
-          .from('budget_observations')
-          .insert({
-            payment_method: observations.paymentMethod,
-            delivery_time: observations.deliveryTime,
-            warranty: observations.warranty
-          })
+        // Verificar se já existe configuração para o usuário
+        const { data: existingSettings, error: checkError } = await supabase
+          .from('budget_settings')
           .select('id')
-          .single();
+          .eq('user_id', user_id)
+          .maybeSingle();
+
+        if (checkError && checkError.code !== 'PGRST116') {
+          console.error('❌ [ConfigService] Erro ao verificar configurações existentes:', checkError);
+          return { success: false, error: checkError };
+        }
+
+        if (existingSettings) {
+          // Atualizar configuração existente
+          console.log('🔧 [ConfigService] Atualizando configuração existente...');
+          const { error } = await supabase
+            .from('budget_settings')
+            .update({
+              payment_method: observations.paymentMethod,
+              delivery_time: observations.deliveryTime,
+              warranty: observations.warranty,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existingSettings.id);
+
+          if (error) {
+            console.error('❌ [ConfigService] Erro ao atualizar configurações:', error);
+            return { success: false, error };
+          }
+          
+          console.log('✅ [ConfigService] Configurações atualizadas com sucesso!');
+          return { success: true };
+        } else {
+          // Criar nova configuração
+          console.log('🔧 [ConfigService] Criando nova configuração...');
+          const { error } = await supabase
+            .from('budget_settings')
+            .insert({
+              user_id: user_id,
+              payment_method: observations.paymentMethod,
+              delivery_time: observations.deliveryTime,
+              warranty: observations.warranty
+            });
+
+          if (error) {
+            console.error('❌ [ConfigService] Erro ao criar configurações:', error);
+            return { success: false, error };
+          }
+          
+          console.log('✅ [ConfigService] Nova configuração criada com sucesso!');
+          return { success: true };
+        }
+      } else {
+        // Fallback: usar tabela budget_observations no schema public para acesso anônimo
+        console.log('🔧 [ConfigService] Usando fallback para public.budget_observations');
         
-        if (error) {
-          console.error('Erro ao salvar observações:', error);
-          return { success: false, error };
+        // Verificar se já existe um ID salvo no localStorage
+        const savedId = localStorage.getItem(OBSERVATIONS_ID_KEY);
+        
+        // Verificar se a tabela existe
+        const { error: checkError } = await supabase
+          .from('budget_observations')
+          .select('id')
+          .limit(1);
+        
+        // Se a tabela não existir, criar primeiro
+        if (checkError && checkError.code === '42P01') {
+          console.log('🔧 [ConfigService] Tabela não existe, criando...');
+          await this.createBudgetObservationsTable();
         }
         
-        // Salvar o ID no localStorage para futuras operações
-        if (data && data.id) {
-          localStorage.setItem(OBSERVATIONS_ID_KEY, data.id);
+        if (savedId) {
+          // Atualizar registro existente
+          const { error } = await supabase
+            .from('budget_observations')
+            .update({
+              payment_method: observations.paymentMethod,
+              delivery_time: observations.deliveryTime,
+              warranty: observations.warranty
+            })
+            .eq('id', savedId);
+          
+          if (error) {
+            console.error('❌ [ConfigService] Erro ao atualizar observações:', error);
+            return { success: false, error };
+          }
+          
+          return { success: true };
+        } else {
+          // Criar novo registro
+          const { data, error } = await supabase
+            .from('budget_observations')
+            .insert({
+              payment_method: observations.paymentMethod,
+              delivery_time: observations.deliveryTime,
+              warranty: observations.warranty
+            })
+            .select('id')
+            .single();
+          
+          if (error) {
+            console.error('❌ [ConfigService] Erro ao salvar observações:', error);
+            return { success: false, error };
+          }
+          
+          // Salvar o ID no localStorage para futuras operações
+          if (data && data.id) {
+            localStorage.setItem(OBSERVATIONS_ID_KEY, data.id);
+          }
+          
+          return { success: true };
         }
-        
-        return { success: true };
       }
     } catch (error) {
-      console.error('Erro ao salvar observações:', error);
+      console.error('❌ [ConfigService] Exceção ao salvar observações:', error);
       return { success: false, error };
     }
   },
   
   async loadBudgetObservations(): Promise<BudgetObservations | null> {
     try {
+      console.log('📥 [ConfigService] Carregando observações...');
+      
+      // Verificar se existem dados de usuário atual ou usar acesso anônimo
+      let user_id = null;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        user_id = user?.id;
+      } catch (authError) {
+        console.log('📥 [ConfigService] Usuário não autenticado, usando acesso anônimo');
+      }
+
+      if (user_id) {
+        // Usar tabela user_data.budget_settings para usuários autenticados
+        console.log('📥 [ConfigService] Buscando em user_data.budget_settings para usuário:', user_id);
+        
+        const { data, error } = await supabase
+          .from('budget_settings')
+          .select('payment_method, delivery_time, warranty')
+          .eq('user_id', user_id)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('❌ [ConfigService] Erro ao carregar configurações do usuário:', error);
+          // Continuar para fallback
+        } else if (data) {
+          console.log('📥 [ConfigService] Configurações encontradas para usuário:', data);
+          return {
+            paymentMethod: data.payment_method || '',
+            deliveryTime: data.delivery_time || '',
+            warranty: data.warranty || ''
+          };
+        }
+      }
+
+      // Fallback: buscar na tabela budget_observations no schema public
+      console.log('📥 [ConfigService] Usando fallback para public.budget_observations');
+      
       // Verificar se existe um ID salvo no localStorage
       const savedId = localStorage.getItem(OBSERVATIONS_ID_KEY);
       
@@ -249,12 +359,13 @@ export const configService = {
       const { data, error } = await query.maybeSingle();
       
       if (error) {
-        console.error('Erro ao carregar observações:', error);
+        console.error('❌ [ConfigService] Erro ao carregar observações do fallback:', error);
         return null;
       }
       
       // Se não encontrou dados, retornar null
       if (!data) {
+        console.log('📥 [ConfigService] Nenhuma configuração encontrada');
         return null;
       }
       
@@ -263,13 +374,14 @@ export const configService = {
         localStorage.setItem(OBSERVATIONS_ID_KEY, data.id);
       }
       
+      console.log('📥 [ConfigService] Observações carregadas do fallback:', data);
       return {
         paymentMethod: data.payment_method || '',
         deliveryTime: data.delivery_time || '',
         warranty: data.warranty || ''
       };
     } catch (error) {
-      console.error('Erro ao carregar observações:', error);
+      console.error('❌ [ConfigService] Exceção ao carregar observações:', error);
       return null;
     }
   },

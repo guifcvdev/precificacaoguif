@@ -40,6 +40,11 @@ const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, 
            (sectionName === 'cartaoCredito' && (fieldKey === 'taxa3x' || fieldKey === 'taxa6x' || fieldKey === 'taxa12x'));
   };
 
+  const isMetricField = (sectionName: string, fieldKey: string) => {
+    return (sectionName === 'fachada' && fieldKey === 'estruturaMetalica.comprimentoBarra') ||
+           (sectionName === 'luminoso' && fieldKey === 'estruturaMetalica.comprimentoBarra');
+  };
+
   return (
     <Card className="bg-card/80 backdrop-blur-xl border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
       <CardHeader className="pb-4">
@@ -59,6 +64,16 @@ const ConfigSection = React.memo<ConfigSectionProps>(({ title, section, fields, 
                   value={getFieldValue(field.key)}
                   onChange={(value) => handleFieldChange(field.key, value)}
                   className="hover:bg-background/70"
+                />
+              ) : isMetricField(section, field.key) ? (
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={getFieldValue(field.key)}
+                  onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-background/70"
                 />
               ) : (
                 <CurrencyInput
