@@ -1,73 +1,113 @@
-# Welcome to your Lovable project
+# Sistema de Precificação - GUIF Comunicação Visual
 
-## Project info
+Sistema de precificação para serviços de comunicação visual. Calcule preços de adesivos, lonas, placas, fachadas, luminosos e muito mais de forma rápida e precisa.
 
-**URL**: https://lovable.dev/projects/5470e839-6327-4740-8d87-7d302a9ba533
+## Sobre o Projeto
 
-## How can I edit this code?
+Este sistema foi desenvolvido para facilitar a precificação de serviços na área de comunicação visual, oferecendo:
 
-There are several ways of editing your application.
+- ✨ Calculadoras específicas para diferentes tipos de produtos
+- 📊 Configuração personalizada de preços e margens
+- 💾 Persistência de dados via Supabase
+- 📱 Interface responsiva e moderna
+- 🔧 Configurações avançadas de impostos e taxas
 
-**Use Lovable**
+## Funcionalidades Principais
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5470e839-6327-4740-8d87-7d302a9ba533) and start prompting.
+### Calculadoras Disponíveis
+- **Adesivo**: Corte especial, laminado, perfurado, imantado
+- **Lona**: Banner/faixa, backlight, reforços e ilhós
+- **Placas**: PS (1mm/2mm), ACM
+- **Fachada Simples**: Com estrutura metálica e materiais
+- **Letra Caixa**: Dimensionamento personalizado
+- **Luminoso**: LED, tubular, fontes chaveadas
+- **Vidro**: Diferentes tipos e espessuras
 
-Changes made via Lovable will be committed automatically to this repo.
+### Gerenciamento
+- Configuração de preços base
+- Gestão de observações de orçamento
+- Configuração de impostos e taxas
+- Histórico de orçamentos
 
-**Use your preferred IDE**
+## Tecnologias Utilizadas
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Frontend**: React + TypeScript + Vite
+- **UI**: shadcn-ui + Tailwind CSS
+- **Backend**: Supabase (PostgreSQL)
+- **Deploy**: Plataforma de hosting personalizada
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Como Executar o Projeto
 
-Follow these steps:
+### Pré-requisitos
+- Node.js 18+ e npm instalados
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Instalação
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. Clone o repositório:
+```bash
+git clone <URL_DO_REPOSITORIO>
+cd precificacaoguif
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+2. Instale as dependências:
+```bash
+npm install
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Configure as variáveis de ambiente:
+```bash
+# Crie um arquivo .env.local com suas credenciais do Supabase
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_publica_do_supabase
+```
+
+4. Execute o projeto em modo de desenvolvimento:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+5. Acesse em: `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Scripts Disponíveis
 
-**Use GitHub Codespaces**
+```bash
+npm run dev          # Servidor de desenvolvimento
+npm run build        # Build para produção
+npm run build:dev    # Build em modo desenvolvimento
+npm run preview      # Preview do build de produção
+npm run lint         # Verificação de código
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Configuração do Banco de Dados
 
-## What technologies are used for this project?
+O projeto utiliza Supabase como backend. Para configurar:
 
-This project is built with:
+1. Crie um projeto no [Supabase](https://supabase.com)
+2. Execute os scripts SQL da pasta `supabase/`
+3. Configure as variáveis de ambiente
+4. Execute as migrações necessárias
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Consulte os arquivos `README-DATABASE.md` e `README-SUPABASE-CONFIG.md` para mais detalhes.
 
-## How can I deploy this project?
+## Estrutura do Projeto
 
-Simply open [Lovable](https://lovable.dev/projects/5470e839-6327-4740-8d87-7d302a9ba533) and click on Share -> Publish.
+```
+src/
+├── components/          # Componentes React
+│   ├── calculators/    # Calculadoras específicas
+│   ├── settings/       # Configurações
+│   └── ui/            # Componentes de interface
+├── hooks/             # Custom hooks
+├── lib/               # Bibliotecas e utilitários
+├── pages/             # Páginas da aplicação
+├── services/          # Serviços de API
+└── types/             # Definições TypeScript
+```
 
-## Can I connect a custom domain to my Lovable project?
+## Licença
 
-Yes, you can!
+Este projeto é propriedade da GUIF Comunicação Visual.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Contato
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Para suporte ou dúvidas, entre em contato através do site oficial da GUIF Comunicação Visual.
