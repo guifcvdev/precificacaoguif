@@ -178,11 +178,6 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
       <SettingsHeader onSave={handleSave} onClose={onClose} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Diagnóstico de Configuração do Supabase */}
-        <div className="mb-6">
-          <SupabaseConfigDiagnostic />
-        </div>
-
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg backdrop-blur-sm">
           <p className="text-blue-800">
             <strong>Importante:</strong> Todos os produtos que utilizam cálculo por m² têm um valor mínimo de R$ 20,00 automaticamente aplicado.
@@ -236,6 +231,11 @@ const SettingsPanel: React.FC<Props> = ({ config, onSave, onClose }) => {
               updateConfig={updateConfig}
             />
           ))}
+        </div>
+
+        {/* Diagnóstico de Configuração do Supabase - Movido para o final */}
+        <div className="mt-6">
+          <SupabaseConfigDiagnostic />
         </div>
       </div>
     </SettingsLayout>
