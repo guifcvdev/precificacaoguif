@@ -111,8 +111,10 @@ VALUES
   ((SELECT id FROM config.products WHERE slug = 'fachada-simples'), 'ACM 1.22m', 'unid', 2),
   ((SELECT id FROM config.products WHERE slug = 'fachada-simples'), 'ACM 1.50m', 'unid', 3),
   ((SELECT id FROM config.products WHERE slug = 'fachada-simples'), 'Cantoneira 3/4', 'unid', 4),
-  ((SELECT id FROM config.products WHERE slug = 'fachada-simples'), 'Estrutura Metálica - Preço por Barra', 'unid', 5),
-  ((SELECT id FROM config.products WHERE slug = 'fachada-simples'), 'Estrutura Metálica - Comprimento da Barra', 'm', 6);
+  ((SELECT id FROM config.products WHERE slug = 'fachada-simples'), 'Ilhós', 'unid', 5),
+  ((SELECT id FROM config.products WHERE slug = 'fachada-simples'), 'Fita Nylon', 'unid', 6),
+  ((SELECT id FROM config.products WHERE slug = 'fachada-simples'), 'Estrutura Metálica - Preço por Barra', 'unid', 7),
+  ((SELECT id FROM config.products WHERE slug = 'fachada-simples'), 'Estrutura Metálica - Comprimento da Barra', 'm', 8);
 
 -- Preços base para Fachada Simples
 INSERT INTO config.base_prices (product_option_id, base_price)
@@ -121,6 +123,8 @@ VALUES
   ((SELECT id FROM config.product_options WHERE name = 'ACM 1.22m' AND product_id = (SELECT id FROM config.products WHERE slug = 'fachada-simples')), 120.00),
   ((SELECT id FROM config.product_options WHERE name = 'ACM 1.50m' AND product_id = (SELECT id FROM config.products WHERE slug = 'fachada-simples')), 150.00),
   ((SELECT id FROM config.product_options WHERE name = 'Cantoneira 3/4' AND product_id = (SELECT id FROM config.products WHERE slug = 'fachada-simples')), 8.00),
+  ((SELECT id FROM config.product_options WHERE name = 'Ilhós' AND product_id = (SELECT id FROM config.products WHERE slug = 'fachada-simples')), 3.00),
+  ((SELECT id FROM config.product_options WHERE name = 'Fita Nylon' AND product_id = (SELECT id FROM config.products WHERE slug = 'fachada-simples')), 2.50),
   ((SELECT id FROM config.product_options WHERE name = 'Estrutura Metálica - Preço por Barra' AND product_id = (SELECT id FROM config.products WHERE slug = 'fachada-simples')), 34.00),
   ((SELECT id FROM config.product_options WHERE name = 'Estrutura Metálica - Comprimento da Barra' AND product_id = (SELECT id FROM config.products WHERE slug = 'fachada-simples')), 6.00);
 

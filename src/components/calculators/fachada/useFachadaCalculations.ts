@@ -16,6 +16,8 @@ export const useFachadaCalculations = (config: FachadaConfig) => {
     acm122: 0,
     acm150: 0,
     cantoneira: 0,
+    ilhos: 0,
+    fitaNylon: 0,
   });
   
   const [total, setTotal] = useState<number>(0);
@@ -66,6 +68,8 @@ export const useFachadaCalculations = (config: FachadaConfig) => {
     { id: 'cantoneira', label: 'Cantoneira 3/4', price: config.cantoneira, unit: 'unid' },
     { id: 'acm122', label: 'ACM 1.22m', price: config.acm122, unit: 'unid' },
     { id: 'acm150', label: 'ACM 1.50m', price: config.acm150, unit: 'unid' },
+    { id: 'ilhos', label: 'Ilhós', price: config.ilhos, unit: 'unid' },
+    { id: 'fitaNylon', label: 'Fita Nylon', price: config.fitaNylon, unit: 'unid' },
   ];
 
   useEffect(() => {
@@ -88,7 +92,7 @@ export const useFachadaCalculations = (config: FachadaConfig) => {
     totalValue += estruturaCalc.custoTotal;
     
     setTotal(totalValue);
-  }, [larguraLona, alturaLona, quantidadeLona, quantities, config, estruturaCalc.custoTotal]);
+  }, [areaLona, quantidadeLona, quantities, config, estruturaCalc.custoTotal, items]);
 
   const handleQuantityChange = (itemId: string, value: number) => {
     setQuantities(prev => ({
